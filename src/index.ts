@@ -1,6 +1,7 @@
 import Discord from 'discord.js';
 import dotenv from 'dotenv';
-import { handlePing, parseCommand } from './commands';
+import { ping, parseCommand } from './commands';
+import { startGuessing } from './commands/startGuessing';
 
 dotenv.config();
 
@@ -17,7 +18,9 @@ client.on('message', (message) => {
   }
 
   if (command.name === 'ping') {
-    handlePing(command, message);
+    ping(command, message);
+  } else if (command.name === 'start') {
+    startGuessing(command, message);
   }
 });
 

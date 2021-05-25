@@ -1,7 +1,6 @@
-import Discord from 'discord.js';
-import { BotCommand } from './parser';
+import { CommandHandler } from './types';
 
-export const handlePing = (command: BotCommand, message: Discord.Message): void => {
+export const ping: CommandHandler = (command, message): void => {
   const latency = Date.now() - message.createdTimestamp;
   message.channel.send(`Pong! (latência: ${latency}ms)`);
 };
