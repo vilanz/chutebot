@@ -10,17 +10,32 @@ const playerGuessFilter = (name: string) => (message: Discord.Message) => {
   return command.args === name;
 };
 
+const channelsWithSessionsRunning = new Set<string>();
+
 export const startGuessing: CommandHandler = async (command, message) => {
+  const channelId = message.channel.id;
+
+  if (channelsWithSessionsRunning.has(channelId)) {
+    message.reply('Já tem uma sessão rodando.');
+    return;
+  }
+  channelsWithSessionsRunning.add(channelId);
+
   message.channel.send('Iniciando quiz...');
 
   // TODO use a random player from a real database
   const playerName = command.args;
+  const filterByPlayerName = playerGuessFilter(playerName);
 
-  message.channel.awaitMessages(playerGuessFilter(playerName), { max: 1, time: 10000, errors: ['time'] })
-    .then((collected) => {
-      message.channel.send(`${collected.first()!.author} acertou! Era o ${playerName}.`);
-    })
-    .catch(() => {
-      message.channel.send('Ninguém acertou depois de 10 segundos :(');
-    });
+  try {
+    const correctMessage = await message
+      .channel
+      .awaitMessages(filterByPlayerName, { max: 1, time: 10000, errors: ['time'] });
+    message.channel.send(`${correctMessage.first()!.author} acertou! Era o ${playerName}.`);
+  } catch (ex) {
+    console.log(ex);
+    message.channel.send('Ninguém acertou depois de 10 segundos :(');
+  } finally {
+    channelsWithSessionsRunning.delete(channelId);
+  }
 };
