@@ -1,19 +1,23 @@
 import Discord from 'discord.js';
 import dotenv from 'dotenv';
+import { handlePing, parseCommand } from './commands';
 
 dotenv.config();
 
 const client = new Discord.Client();
 
 client.on('ready', () => {
-  if (client.user) {
-    console.log(`Logged in as ${client.user.tag}!`);
-  }
+  console.log('Started bot.');
 });
 
-client.on('message', (msg) => {
-  if (msg.content === 'ping') {
-    msg.reply('pong');
+client.on('message', (message) => {
+  const command = parseCommand(message.content);
+  if (!command) {
+    return;
+  }
+
+  if (command.name === 'ping') {
+    handlePing(command, message);
   }
 });
 
