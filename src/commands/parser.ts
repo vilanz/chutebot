@@ -9,24 +9,19 @@ export interface BotCommand {
 
 export type CommandHandler = (botCommand: BotCommand, message: Discord.Message) => void;
 
-const MATCH_FIRST_WORD_UNTIL_SPACE_AND_REST = new RegExp(`^${BOT_PREFIX}([^ ]+) ?(.*)`, 'g'); // yeah :(
 export const parseCommand = (content: string): BotCommand | null => {
   if (!content.startsWith(BOT_PREFIX)) {
     return null;
   }
 
-  const matched = [...content.matchAll(MATCH_FIRST_WORD_UNTIL_SPACE_AND_REST)];
-  if (matched === null || !matched.length) {
-    return null;
-  }
+  const allArgs = content.slice(BOT_PREFIX.length).trim().split(/ +/);
 
-  const [name, args] = matched[0].slice(1);
+  const name = allArgs[0].toLowerCase();
   if (!name) {
     return null;
   }
 
-  return {
-    name,
-    args,
-  };
+  const args = allArgs.slice(1).join(' ');
+
+  return { name, args };
 };

@@ -1,6 +1,6 @@
 import { parseCommand } from './parser';
 
-const invalidCommands = ['', 'g!', 'g! aye'];
+const invalidCommands = ['', 'agnoline', 'g!'];
 test.each(invalidCommands)('parsing invalid commands returns null', (command) => {
   expect(parseCommand(command)).toBeNull();
 });
