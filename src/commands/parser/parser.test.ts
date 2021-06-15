@@ -1,12 +1,4 @@
-import { parseCommand } from "./parser";
-
-const invalidCommands = ["", "agnoline", "g!"];
-test.each(invalidCommands)(
-  "parsing invalid commands returns null",
-  (command) => {
-    expect(parseCommand(command)).toBeNull();
-  }
-);
+import { parseCommand } from ".";
 
 test("parsing a simple command", () => {
   expect(parseCommand("g!ping")).toEqual({
@@ -21,3 +13,10 @@ test("parsing a command with args", () => {
     args: "fire extinguisher",
   });
 });
+
+test.each(["big invalid command", "  ", "g!", ""])(
+  "parsing invalid commands returns null",
+  (command) => {
+    expect(parseCommand(command)).toBeNull();
+  }
+);

@@ -1,11 +1,11 @@
 import Discord from "discord.js";
 import { parseCommand } from "./parser";
-import { CommandHandler } from "./types";
+import { CommandHandler, Commands } from "./types";
 
 const playerGuessFilter =
   (playerName: string) => (message: Discord.Message) => {
     const command = parseCommand(message.content);
-    if (!command || command.name !== "g") {
+    if (!command || command.name !== Commands.Guess) {
       return false;
     }
     return command.args === playerName;
@@ -20,6 +20,7 @@ export const startGuessing: CommandHandler = async (command, message) => {
     message.reply("Já tem uma sessão rodando.");
     return;
   }
+
   channelsWithSessionsRunning.add(channelId);
 
   message.channel.send("Iniciando quiz...");
@@ -38,7 +39,7 @@ export const startGuessing: CommandHandler = async (command, message) => {
     );
   } catch (ex) {
     message.channel.send("Ninguém acertou depois de 10 segundos :(");
-  } finally {
-    channelsWithSessionsRunning.delete(channelId);
   }
+
+  channelsWithSessionsRunning.delete(channelId);
 };

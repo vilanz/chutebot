@@ -1,7 +1,7 @@
 import Discord from "discord.js";
 import dotenv from "dotenv";
-import { ping, parseCommand } from "./commands";
-import { startGuessing } from "./commands/startGuessing";
+import { parseCommand, ping, startGuessing } from "./commands";
+import { Commands } from "./commands/types";
 
 dotenv.config();
 
@@ -17,9 +17,11 @@ client.on("message", (message) => {
     return;
   }
 
-  if (command.name === "ping") {
+  const { name } = command;
+
+  if (name === Commands.Ping) {
     ping(command, message);
-  } else if (command.name === "start") {
+  } else if (name === Commands.Start) {
     startGuessing(command, message);
   }
 });
