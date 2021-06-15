@@ -2,7 +2,7 @@ import Discord from "discord.js";
 import { parseCommand } from "./parser";
 import { CommandHandler, Commands } from "./types";
 
-const playerGuessFilter =
+const filterCorrectGuess =
   (playerName: string) => (message: Discord.Message) => {
     const command = parseCommand(message.content);
     if (!command || command.name !== Commands.Guess) {
@@ -27,11 +27,10 @@ export const startGuessing: CommandHandler = async (command, message) => {
 
   // TODO use a random player from a real database
   const playerName = command.args;
-  const filterByPlayerName = playerGuessFilter(playerName);
 
   try {
     const correctMessage = await message.channel.awaitMessages(
-      filterByPlayerName,
+      filterCorrectGuess(playerName),
       { max: 1, time: 10000, errors: ["time"] }
     );
     message.channel.send(
