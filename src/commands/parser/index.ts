@@ -1,16 +1,6 @@
-import Discord from "discord.js";
+import { BotCommand } from "../types";
 
 const BOT_PREFIX = "g!";
-
-export interface BotCommand {
-  name: string;
-  args: string;
-}
-
-export type CommandHandler = (
-  botCommand: BotCommand,
-  message: Discord.Message
-) => void;
 
 export const parseCommand = (content: string): BotCommand | null => {
   if (!content.startsWith(BOT_PREFIX)) {
