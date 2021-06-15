@@ -1,10 +1,11 @@
-import Discord from 'discord.js';
+import Discord from "discord.js";
 
 export interface BotCommand {
-  name: string
-  args: string
+  name: string;
+  args: string;
 }
 
 export type CommandHandler = (
-  botCommand: BotCommand, message: Discord.Message
+  botCommand: BotCommand,
+  message: Discord.Message
 ) => void | Promise<void>;

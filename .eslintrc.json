@@ -1,10 +1,9 @@
 {
-  "extends": ["airbnb-typescript/base"],
-  "ignorePatterns": ["jest.config.ts"],
+  "extends": "./node_modules/@vilanz/tooling/eslint",
   "parserOptions": {
     "project": "./tsconfig.json"
   },
   "rules": {
-    "import/prefer-default-export": 0
+    "no-console": "off" // this is a Node app
   }
 }

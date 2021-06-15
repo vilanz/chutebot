@@ -1,13 +1,16 @@
-import Discord from 'discord.js';
+import Discord from "discord.js";
 
-const BOT_PREFIX = 'g!';
+const BOT_PREFIX = "g!";
 
 export interface BotCommand {
-  name: string
-  args: string
+  name: string;
+  args: string;
 }
 
-export type CommandHandler = (botCommand: BotCommand, message: Discord.Message) => void;
+export type CommandHandler = (
+  botCommand: BotCommand,
+  message: Discord.Message
+) => void;
 
 export const parseCommand = (content: string): BotCommand | null => {
   if (!content.startsWith(BOT_PREFIX)) {
@@ -21,7 +24,7 @@ export const parseCommand = (content: string): BotCommand | null => {
     return null;
   }
 
-  const args = allArgs.slice(1).join(' ');
+  const args = allArgs.slice(1).join(" ");
 
   return { name, args };
 };

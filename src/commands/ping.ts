@@ -1,4 +1,4 @@
-import { CommandHandler } from './types';
+import { CommandHandler } from "./types";
 
 export const ping: CommandHandler = (command, message): void => {
   const latency = Date.now() - message.createdTimestamp;
