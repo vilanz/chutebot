@@ -8,7 +8,11 @@ const filterCorrectGuess =
     if (!command || command.name !== Commands.Guess) {
       return false;
     }
-    return command.args === playerName;
+    const isCorrectPlayer = command.args === playerName;
+    if (!isCorrectPlayer) {
+      message.react("❌");
+    }
+    return isCorrectPlayer;
   };
 
 const channelsWithSessionsRunning = new Set<string>();
