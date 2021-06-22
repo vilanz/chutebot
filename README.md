@@ -2,37 +2,41 @@
 
 This will be a Discord bot that runs a little quiz game where the clues are a football player's career records.
 
-I still need to scrap the WhoScored database, so for now, it just works as any normal quiz bot.
+## Current commands
 
-## Commands
+#### `c!add <player name>`
 
-#### `g!start [word]`
+Gets the player's seasons from Transfermarkt and adds it into the pool of available players.
 
-Starts a quiz game with `[word]`.
-This `[word]` parameter is just for testing. When we use real data, it will be dropped.
+#### `c!start`
 
-#### `g!g [name]`
+Starts a quiz session.
 
-When a game has started, guesses the player's name being `[name]`.
+##### `c!g [name]`
 
-#### `g!ping`
+During a quiz session, guesses the player's name being `[name]`.
+
+#### `c!ping`
 
 Returns `Pong!` and the response's latency.
 
 ## Getting started
 
-Create a `.env` file based on the `.env.example` file and run `npm install`.
+Create a `.env` file based on the `.env.example` file and run `yarn`.
 
-#### `npm start`
+#### `yarn dev`
 
-Runs the project.
+Runs the project locally.
 
-#### `npm test`
+#### `yarn test`
 
 Runs tests.
 
 ## Todo
 
-[ ] Scrap a real football API
-[ ] Store this API's data somewhere
+[X] Scrap a real football database
+[X] Make scrapped players' seasons available for trivia
+[ ] Handle invalid data from the database (like missing seasons or incomplete names)
+[ ] Store the players in an actual database
 [ ] Store wins somewhere
+[ ] Run this in a production machine
