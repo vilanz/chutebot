@@ -1,24 +1,7 @@
 import fetch from "node-fetch";
 import cheerio, { CheerioAPI, Element as CheerioElement } from "cheerio";
 import { log } from "../log";
-
-export interface Player {
-  name: string;
-  seasons: PlayerSeason[];
-}
-
-export interface PlayerSeason {
-  season: string;
-  date: Date;
-  from: PlayerSeasonClub;
-  to: PlayerSeasonClub;
-  transferFee: string;
-}
-
-export interface PlayerSeasonClub {
-  country: string;
-  name: string;
-}
+import { Player, PlayerSpell } from "./player";
 
 const getTransfermarktCheerio = async (url: string): Promise<CheerioAPI> =>
   fetch(`https://www.transfermarkt.com${url}`, {
@@ -27,7 +10,7 @@ const getTransfermarktCheerio = async (url: string): Promise<CheerioAPI> =>
     .then((r) => r.text())
     .then((html) => cheerio.load(html));
 
-const getSeasonFromRow = (rowElement: CheerioElement): PlayerSeason => {
+const getSeasonFromRow = (rowElement: CheerioElement): PlayerSpell => {
   const [season, date, fromCountry, from, toCountry, to, price] = cheerio(
     rowElement
   )
@@ -76,7 +59,7 @@ export const getPlayerFromTransfermarkt = async (
 
   return {
     name: ch(".dataName h1 b").text(),
-    seasons: ch(".transferhistorie tr.zeile-transfer")
+    spells: ch(".transferhistorie tr.zeile-transfer")
       .map((_, row) => getSeasonFromRow(row))
       .toArray(),
   };

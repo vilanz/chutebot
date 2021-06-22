@@ -2,7 +2,7 @@ import Discord, { Message, User } from "discord.js";
 import { log } from "../../log";
 import { MOCK_PLAYER_DB } from "../add-player";
 import { parseCommand, CommandHandler, Commands } from "../../command-parser";
-import { getPlayerSeasonsEmbed } from "./format-seasons";
+import { getPlayerSpellsEmbed } from "./format-career";
 
 const isCorrectPlayer = (playerName: string) => (message: Discord.Message) => {
   const command = parseCommand(message.content);
@@ -56,7 +56,7 @@ export const startGuessing: CommandHandler = async (message) => {
       return;
     }
 
-    const embed = getPlayerSeasonsEmbed(randomPlayer.seasons);
+    const embed = getPlayerSpellsEmbed(randomPlayer.spells);
     message.channel.send(embed);
 
     try {
@@ -71,8 +71,6 @@ export const startGuessing: CommandHandler = async (message) => {
       log("guessing", "Error (probably ran out of time)", err);
       await message.channel.send("Ninguém acertou depois de 10 segundos :(");
     }
-  } catch (err) {
-    log("start-guessing", "Error", err);
   } finally {
     channelsWithSessionsRunning.delete(channelId);
   }

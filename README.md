@@ -2,11 +2,20 @@
 
 This will be a Discord bot that runs a little quiz game where the clues are a football player's career records.
 
+## Todo
+
+[X] Scrap a real football database
+[X] Make scrapped players' career records available for trivia
+[ ] Handle invalid data from the football database (like missing spells or incomplete names)
+[ ] Store this stuff in an actual database
+[ ] Store wins
+[ ] Run this in a production environment
+
 ## Current commands
 
 #### `c!add <player name>`
 
-Gets the player's seasons from Transfermarkt and adds it into the pool of available players.
+Gets the player's career record from Transfermarkt and adds it into the pool of available players.
 
 #### `c!start`
 
@@ -31,12 +40,3 @@ Runs the project locally.
 #### `yarn test`
 
 Runs tests.
-
-## Todo
-
-[X] Scrap a real football database
-[X] Make scrapped players' seasons available for trivia
-[ ] Handle invalid data from the database (like missing seasons or incomplete names)
-[ ] Store the players in an actual database
-[ ] Store wins somewhere
-[ ] Run this in a production machine

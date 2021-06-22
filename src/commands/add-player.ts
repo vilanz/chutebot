@@ -2,7 +2,7 @@ import { getPlayerFromTransfermarkt, Player } from "../data";
 import { log } from "../log";
 import { CommandHandler, Commands } from "../command-parser";
 
-// TODO use a real DB
+// TODO use a real DB :p
 export const MOCK_PLAYER_DB: Player[] = [];
 
 export const addPlayer: CommandHandler = async (message, playerName) => {
