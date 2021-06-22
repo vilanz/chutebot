@@ -1,26 +1,9 @@
-import { flag } from "country-emoji";
-import { MessageEmbed } from "discord.js";
-import { getPlayerFromTransfermarkt, Player, PlayerSeasonClub } from "../data";
+import { getPlayerFromTransfermarkt, Player } from "../data";
 import { log } from "../log";
 import { CommandHandler, Commands } from "./parser";
 
-const formatClub = (club: PlayerSeasonClub): string =>
-  `${flag(club.country)} ${club.name}`;
-
-const getPlayerEmbed = (player: Player): MessageEmbed =>
-  new MessageEmbed()
-    .setTitle(player.name)
-    .addFields(
-      player.seasons.map((season) => ({
-        name: season.season,
-        value: [
-          `:point_right: ${formatClub(season.to)}`,
-          `:point_left: ${formatClub(season.from)}`,
-          `Por ${season.transferFee} em ${season.date.toLocaleDateString()}`,
-        ].join("\n"),
-      }))
-    )
-    .setTimestamp();
+// TODO use a real DB
+export const MOCK_PLAYER_DB: Player[] = [];
 
 export const addPlayer: CommandHandler = async (command, message) => {
   try {
@@ -29,10 +12,12 @@ export const addPlayer: CommandHandler = async (command, message) => {
 
     const player = await getPlayerFromTransfermarkt(playerName);
 
-    const embed = getPlayerEmbed(player);
-    message.channel.send(embed);
-  } catch (ex) {
-    message.reply("Não rolou.");
-    log(Commands.AddPlayer, "An error ocurred.", ex);
+    MOCK_PLAYER_DB.push(player);
+
+    message.reply(`foi adicionado ${player.name}.`);
+    log(Commands.AddPlayer, `Added ${player.name}.`);
+  } catch (err) {
+    message.reply("não rolou.");
+    log(Commands.AddPlayer, "An error ocurred.", err);
   }
 };

@@ -1,5 +1,26 @@
-import Discord, { Message, User } from "discord.js";
+import { flag } from "country-emoji";
+import Discord, { Message, MessageEmbed, User } from "discord.js";
+import { Player, PlayerSeasonClub } from "../data";
+import { log } from "../log";
+import { MOCK_PLAYER_DB } from "./add-player";
 import { parseCommand, CommandHandler, Commands } from "./parser";
+
+const formatClub = (club: PlayerSeasonClub): string =>
+  `${flag(club.country)} ${club.name}`;
+
+const getPlayerEmbed = (player: Player): MessageEmbed =>
+  new MessageEmbed()
+    .addFields(
+      player.seasons.map((season) => ({
+        name: season.season,
+        value: [
+          `:point_right: ${formatClub(season.to)}`,
+          `:point_left: ${formatClub(season.from)}`,
+          `Por ${season.transferFee} em ${season.date.toLocaleDateString()}`,
+        ].join("\n"),
+      }))
+    )
+    .setTimestamp();
 
 const isCorrectPlayer = (playerName: string) => (message: Discord.Message) => {
   const command = parseCommand(message.content);
@@ -35,28 +56,42 @@ export const startGuessing: CommandHandler = async (command, message) => {
   const channelId = message.channel.id;
 
   if (channelsWithSessionsRunning.has(channelId)) {
-    await message.reply("Já tem uma sessão rodando.");
+    await message.reply("já tem uma sessão rodando.");
     return;
   }
 
   channelsWithSessionsRunning.add(channelId);
 
-  await message.channel.send("Iniciando quiz...");
-
-  // TODO use a random player from a real database
-  const playerName = command.args;
-
   try {
-    const correctMessageAuthor = await waitForCorrectPlayer(
-      playerName,
-      message
-    );
-    await message.channel.send(
-      `${correctMessageAuthor} acertou! Era o ${playerName}.`
-    );
-  } catch (ex) {
-    await message.channel.send("Ninguém acertou depois de 10 segundos :(");
-  }
+    await message.channel.send("Iniciando quiz...");
 
-  channelsWithSessionsRunning.delete(channelId);
+    // TODO use a random player from an actual database
+    const randomPlayer =
+      MOCK_PLAYER_DB[Math.floor(Math.random() * MOCK_PLAYER_DB.length)];
+
+    if (!randomPlayer) {
+      message.channel.send("Não temos jogadores :(");
+      return;
+    }
+
+    const embed = getPlayerEmbed(randomPlayer);
+    message.channel.send(embed);
+
+    try {
+      const correctMessageAuthor = await waitForCorrectPlayer(
+        randomPlayer.name,
+        message
+      );
+      await message.channel.send(
+        `${correctMessageAuthor} acertou! Era o ${randomPlayer.name}.`
+      );
+    } catch (err) {
+      log("guessing", "Error (probably ran out of time)", err);
+      await message.channel.send("Ninguém acertou depois de 10 segundos :(");
+    }
+  } catch (err) {
+    log("start-guessing", "Error", err);
+  } finally {
+    channelsWithSessionsRunning.delete(channelId);
+  }
 };
