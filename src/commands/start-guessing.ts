@@ -1,6 +1,5 @@
 import Discord from "discord.js";
-import { parseCommand } from "./parser";
-import { CommandHandler, Commands } from "./types";
+import { parseCommand, CommandHandler, Commands } from "./parser";
 
 const filterCorrectGuess =
   (playerName: string) => (message: Discord.Message) => {

@@ -1,7 +1,6 @@
 import Discord from "discord.js";
 import dotenv from "dotenv";
-import { parseCommand, ping, startGuessing } from "./commands";
-import { Commands } from "./commands/types";
+import { parseCommand, ping, startGuessing, Commands } from "./commands";
 
 dotenv.config();
 
