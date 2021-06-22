@@ -1,33 +1,15 @@
-import { flag } from "country-emoji";
-import Discord, { Message, MessageEmbed, User } from "discord.js";
-import { Player, PlayerSeasonClub } from "../data";
-import { log } from "../log";
-import { MOCK_PLAYER_DB } from "./add-player";
-import { parseCommand, CommandHandler, Commands } from "./parser";
-
-const formatClub = (club: PlayerSeasonClub): string =>
-  `${flag(club.country)} ${club.name}`;
-
-const getPlayerEmbed = (player: Player): MessageEmbed =>
-  new MessageEmbed()
-    .addFields(
-      player.seasons.map((season) => ({
-        name: season.season,
-        value: [
-          `:point_right: ${formatClub(season.to)}`,
-          `:point_left: ${formatClub(season.from)}`,
-          `Por ${season.transferFee} em ${season.date.toLocaleDateString()}`,
-        ].join("\n"),
-      }))
-    )
-    .setTimestamp();
+import Discord, { Message, User } from "discord.js";
+import { log } from "../../log";
+import { MOCK_PLAYER_DB } from "../add-player";
+import { parseCommand, CommandHandler, Commands } from "../../command-parser";
+import { getPlayerSeasonsEmbed } from "./format-seasons";
 
 const isCorrectPlayer = (playerName: string) => (message: Discord.Message) => {
   const command = parseCommand(message.content);
   if (!command || command.name !== Commands.Guess) {
     return false;
   }
-  const correct = command.args === playerName;
+  const correct = command.args.toLowerCase() === playerName.toLowerCase();
   if (!correct) {
     message.react("❌");
   }
@@ -52,7 +34,7 @@ const waitForCorrectPlayer = async (
 
 const channelsWithSessionsRunning = new Set<string>();
 
-export const startGuessing: CommandHandler = async (command, message) => {
+export const startGuessing: CommandHandler = async (message) => {
   const channelId = message.channel.id;
 
   if (channelsWithSessionsRunning.has(channelId)) {
@@ -74,7 +56,7 @@ export const startGuessing: CommandHandler = async (command, message) => {
       return;
     }
 
-    const embed = getPlayerEmbed(randomPlayer);
+    const embed = getPlayerSeasonsEmbed(randomPlayer.seasons);
     message.channel.send(embed);
 
     try {

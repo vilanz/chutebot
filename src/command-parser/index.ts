@@ -6,8 +6,8 @@ export interface BotCommand {
 }
 
 export type CommandHandler = (
-  botCommand: BotCommand,
-  message: Discord.Message
+  message: Discord.Message,
+  args: string
 ) => void | Promise<void>;
 
 export enum Commands {

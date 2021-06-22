@@ -1,12 +1,7 @@
 import Discord from "discord.js";
 import dotenv from "dotenv";
-import {
-  parseCommand,
-  ping,
-  startGuessing,
-  Commands,
-  addPlayer,
-} from "./commands";
+import { Commands, parseCommand } from "./command-parser";
+import { ping, startGuessing, addPlayer } from "./commands";
 
 dotenv.config();
 
@@ -22,14 +17,14 @@ client.on("message", async (message) => {
     return;
   }
 
-  const { name } = command;
+  const { name, args } = command;
 
   if (name === Commands.Ping) {
-    ping(command, message);
+    ping(message, args);
   } else if (name === Commands.Start) {
-    startGuessing(command, message);
+    startGuessing(message, args);
   } else if (name === Commands.AddPlayer) {
-    addPlayer(command, message);
+    addPlayer(message, args);
   }
 });
 

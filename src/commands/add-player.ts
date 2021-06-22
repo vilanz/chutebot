@@ -1,13 +1,12 @@
 import { getPlayerFromTransfermarkt, Player } from "../data";
 import { log } from "../log";
-import { CommandHandler, Commands } from "./parser";
+import { CommandHandler, Commands } from "../command-parser";
 
 // TODO use a real DB
 export const MOCK_PLAYER_DB: Player[] = [];
 
-export const addPlayer: CommandHandler = async (command, message) => {
+export const addPlayer: CommandHandler = async (message, playerName) => {
   try {
-    const playerName = command.args;
     log(Commands.AddPlayer, `Will try to add ${playerName}.`);
 
     const player = await getPlayerFromTransfermarkt(playerName);
