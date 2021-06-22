@@ -14,9 +14,10 @@ export enum Commands {
   Ping = "ping",
   Start = "start",
   Guess = "g",
+  AddPlayer = "add",
 }
 
-const BOT_PREFIX = "c!";
+export const BOT_PREFIX = "c!";
 
 export const parseCommand = (content: string): BotCommand | null => {
   if (!content.startsWith(BOT_PREFIX)) {

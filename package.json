@@ -11,9 +11,13 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@types/node-fetch": "^2.5.10",
     "@vilanz/tooling": "vilanz/tooling#main",
+    "cheerio": "^1.0.0-rc.10",
+    "country-emoji": "^1.5.6",
     "discord.js": "^12.5.3",
-    "dotenv": "^10.0.0"
+    "dotenv": "^10.0.0",
+    "node-fetch": "^2.6.1"
   },
   "devDependencies": {
     "@types/jest": "^26.0.23",

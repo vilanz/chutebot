@@ -1,6 +1,12 @@
 import Discord from "discord.js";
 import dotenv from "dotenv";
-import { parseCommand, ping, startGuessing, Commands } from "./commands";
+import {
+  parseCommand,
+  ping,
+  startGuessing,
+  Commands,
+  addPlayer,
+} from "./commands";
 
 dotenv.config();
 
@@ -10,9 +16,9 @@ client.on("ready", () => {
   console.log("Started bot.");
 });
 
-client.on("message", (message) => {
+client.on("message", async (message) => {
   const command = parseCommand(message.content);
-  if (!command) {
+  if (!command || !command.name) {
     return;
   }
 
@@ -22,6 +28,8 @@ client.on("message", (message) => {
     ping(command, message);
   } else if (name === Commands.Start) {
     startGuessing(command, message);
+  } else if (name === Commands.AddPlayer) {
+    addPlayer(command, message);
   }
 });
 
