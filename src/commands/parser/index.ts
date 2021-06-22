@@ -23,14 +23,17 @@ export const parseCommand = (content: string): BotCommand | null => {
     return null;
   }
 
-  const allArgs = content.slice(BOT_PREFIX.length).trim().split(/ +/);
+  const [commandName, ...commandArgs] = content
+    .slice(BOT_PREFIX.length)
+    .trim()
+    .split(/ +/);
 
-  const name = allArgs[0].toLowerCase();
-  if (!name) {
+  if (!commandName) {
     return null;
   }
 
-  const args = allArgs.slice(1).join(" ");
-
-  return { name, args };
+  return {
+    name: commandName.toLowerCase(),
+    args: commandArgs.join(" "),
+  };
 };
