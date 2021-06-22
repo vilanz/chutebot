@@ -16,7 +16,7 @@ export enum Commands {
   Guess = "g",
 }
 
-const BOT_PREFIX = "g!";
+const BOT_PREFIX = "c!";
 
 export const parseCommand = (content: string): BotCommand | null => {
   if (!content.startsWith(BOT_PREFIX)) {
