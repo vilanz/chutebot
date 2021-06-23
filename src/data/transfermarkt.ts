@@ -22,7 +22,7 @@ const parseClubColumns = (
 };
 
 const getTransfermarktCheerio = async (url: string): Promise<CheerioAPI> =>
-  fetch(`https://www.transfermarkt.com${url}`, {
+  fetch(`https://www.transfermarkt.com.br${url}`, {
     method: "GET",
   })
     .then((r) => r.text())
@@ -51,7 +51,7 @@ const getSeasonFromRow = (rowElement: CheerioElement): PlayerSpell => {
   };
 };
 
-const getPlayerProfileLink = async (
+export const getPlayerProfileLink = async (
   playerName: string
 ): Promise<string | undefined> => {
   const nameQuery = encodeURIComponent(playerName);
@@ -63,16 +63,11 @@ const getPlayerProfileLink = async (
 };
 
 export const getPlayerFromTransfermarkt = async (
-  playerName: string
+  playerUrl: string
 ): Promise<Player> => {
-  const playerProfileLink = await getPlayerProfileLink(playerName);
-  if (!playerProfileLink) {
-    throw new Error("No players found");
-  }
+  log("transfermarkt", `Going to ${playerUrl}.`);
 
-  log("transfermarkt", `Going to ${playerProfileLink}.`);
-
-  const ch = await getTransfermarktCheerio(playerProfileLink);
+  const ch = await getTransfermarktCheerio(playerUrl);
 
   return {
     name: ch(".dataName h1 b").text(),

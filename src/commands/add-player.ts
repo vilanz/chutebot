@@ -1,4 +1,8 @@
-import { getPlayerFromTransfermarkt, Player } from "../data";
+import {
+  getPlayerFromTransfermarkt,
+  getPlayerProfileLink,
+  Player,
+} from "../data";
 import { log } from "../log";
 import { CommandHandler, Commands } from "../command-parser";
 
@@ -8,15 +12,21 @@ export const MOCK_PLAYER_DB: Player[] = [];
 export const addPlayer: CommandHandler = async (message, playerName) => {
   try {
     log(Commands.AddPlayer, `Will try to add ${playerName}.`);
+    message.react("👍");
 
-    const player = await getPlayerFromTransfermarkt(playerName);
+    const playerUrl = await getPlayerProfileLink(playerName);
+    if (!playerUrl) {
+      message.react("🤔");
+      return;
+    }
+
+    const player = await getPlayerFromTransfermarkt(playerUrl);
 
     MOCK_PLAYER_DB.push(player);
-
-    message.reply(`foi adicionado ${player.name}.`);
+    message.react("🤙");
     log(Commands.AddPlayer, `Added ${player.name}.`);
   } catch (err) {
-    message.reply("não rolou.");
+    message.react("❌");
     log(Commands.AddPlayer, "An error ocurred.", err);
   }
 };
