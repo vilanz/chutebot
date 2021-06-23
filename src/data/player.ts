@@ -6,8 +6,8 @@ export interface Player {
 export interface PlayerSpell {
   season: string;
   date: Date;
-  from: PlayerSpellClub;
-  to: PlayerSpellClub;
+  from?: PlayerSpellClub;
+  to?: PlayerSpellClub;
   transferFee: string;
 }
 

@@ -1,7 +1,25 @@
 import fetch from "node-fetch";
-import cheerio, { CheerioAPI, Element as CheerioElement } from "cheerio";
+import cheerio, {
+  Cheerio,
+  CheerioAPI,
+  Element as CheerioElement,
+} from "cheerio";
 import { log } from "../log";
-import { Player, PlayerSpell } from "./player";
+import { Player, PlayerSpell, PlayerSpellClub } from "./player";
+
+const parseClubColumns = (
+  countryEl: Cheerio<CheerioElement>,
+  clubEl: Cheerio<CheerioElement>
+): PlayerSpellClub | undefined => {
+  const clubName = clubEl.text();
+  if (clubName === "Without Club") {
+    return undefined;
+  }
+  return {
+    name: clubName,
+    country: countryEl.find("img").attr("title")!,
+  };
+};
 
 const getTransfermarktCheerio = async (url: string): Promise<CheerioAPI> =>
   fetch(`https://www.transfermarkt.com${url}`, {
@@ -11,26 +29,25 @@ const getTransfermarktCheerio = async (url: string): Promise<CheerioAPI> =>
     .then((html) => cheerio.load(html));
 
 const getSeasonFromRow = (rowElement: CheerioElement): PlayerSpell => {
-  const [season, date, fromCountry, from, toCountry, to, price] = cheerio(
-    rowElement
-  )
-    .find(
-      "td.zentriert, td.flagge img.flaggenrahmen, td.vereinsname a, td.zelle-abloese"
-    )
+  const [
+    seasonEl,
+    dateEl,
+    fromCountryEl,
+    fromClubEl,
+    toCountryEl,
+    toClubEl,
+    priceEl,
+  ] = cheerio(rowElement)
+    .find("td.zentriert, td.flagge, td.vereinsname a, td.zelle-abloese")
     .get()
     .map((el) => cheerio(el));
+
   return {
-    season: season.text(),
-    date: new Date(date.text()),
-    from: {
-      country: fromCountry.attr("title")!,
-      name: from.text(),
-    },
-    to: {
-      country: toCountry.attr("title")!,
-      name: to.text(),
-    },
-    transferFee: price.text(),
+    season: seasonEl.text(),
+    date: new Date(dateEl.text()),
+    from: parseClubColumns(fromCountryEl, fromClubEl),
+    to: parseClubColumns(toCountryEl, toClubEl),
+    transferFee: priceEl.text(),
   };
 };
 

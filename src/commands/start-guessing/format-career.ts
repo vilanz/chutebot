@@ -2,8 +2,8 @@ import { flag } from "country-emoji";
 import { MessageEmbed } from "discord.js";
 import { PlayerSpell, PlayerSpellClub } from "../../data";
 
-const formatClub = (club: PlayerSpellClub): string =>
-  `${flag(club.country)} ${club.name}`;
+const formatClub = (club?: PlayerSpellClub): string =>
+  club ? `${flag(club.country)} ${club.name}` : "Sem clube";
 
 export const getPlayerSpellsEmbed = (spells: PlayerSpell[]): MessageEmbed =>
   new MessageEmbed()
