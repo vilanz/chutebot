@@ -1,4 +1,4 @@
-import { getPlayerPlaymakerstatsId, Player } from "../data";
+import { logStuffTransfermarkt, Player } from "../data";
 import { log } from "../log";
 import { CommandHandler, Commands } from "../command-parser";
 import { RecaptchaError } from "../data/extract/utils";
@@ -11,8 +11,10 @@ export const addPlayer: CommandHandler = async (message, playerName) => {
   message.react("👍");
 
   try {
-    const playerId = await getPlayerPlaymakerstatsId(playerName);
-    message.reply(playerId ?? "N/A");
+    const career = await logStuffTransfermarkt();
+    message.reply(JSON.stringify([...career], null, 2));
+    // const playerId = await getPlayerPlaymakerstatsId(playerName);
+    // message.reply(playerId ?? "N/A");
   } catch (ex) {
     if (ex instanceof RecaptchaError) {
       message.reply("Caímos no captcha :/");
