@@ -22,7 +22,7 @@ const parseClubColumns = (
 };
 
 const getTransfermarktCheerio = async (url: string): Promise<CheerioAPI> =>
-  fetch(`https://www.transfermarkt.com.br${url}`, {
+  fetch(`https://www.transfermarkt.com${url}`, {
     method: "GET",
   })
     .then((r) => r.text())
