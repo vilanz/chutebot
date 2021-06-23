@@ -21,6 +21,6 @@ export const getQueryParamFromRelativeUrl = (
   param: string
 ) => new URL(`https://localhost/${relativeUrl}`).searchParams.get(param);
 
-export const toArrayOfCheerios = (
+export const mapCheerioNodesList = (
   cheerioElements: Cheerio<Element>
 ): Cheerio<Node>[] => cheerioElements.map((_, el) => cheerio(el)).toArray();
