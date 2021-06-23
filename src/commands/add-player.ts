@@ -16,14 +16,14 @@ export const addPlayer: CommandHandler = async (message, playerName) => {
 
     const playerUrl = await getPlayerProfileLink(playerName);
     if (!playerUrl) {
-      message.react("🤔");
+      message.reply("Jogador não encontrado.");
       return;
     }
 
     const player = await getPlayerFromTransfermarkt(playerUrl);
 
     MOCK_PLAYER_DB.push(player);
-    message.react("🤙");
+    message.reply(`${player.name} adicionado!`);
     log(Commands.AddPlayer, `Added ${player.name}.`);
   } catch (err) {
     message.react("❌");
