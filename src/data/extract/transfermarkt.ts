@@ -1,4 +1,10 @@
-import { cheerioFromPage, mapCheerioNodesList } from "./utils";
+import { log } from "../../log";
+import { Player, PlayerSpell } from "../player";
+import {
+  cheerioFromPage,
+  parseNumberFromNode,
+  mapCheerioNodesList,
+} from "./utils";
 
 /*
 const parseClubColumns = (
@@ -72,51 +78,64 @@ export const getPlayerFromTransfermarkt = async (
 };
 */
 
-type Career = Record<string, any>;
+type PlayerSpellsWoo = Record<string, PlayerSpell>;
 
-const numberOrZero = (str: string) => (str === "-" ? 0 : +str);
+export const scrapPlayerCareerFromTransfermarkt = async (
+  url: string
+): Promise<Player> => {
+  const ch = await cheerioFromPage(url);
 
-export const scrapPlayerCareerFromTransfermarkt = async (): Promise<Career> => {
-  const careerUrl = `https://www.transfermarkt.com.br/taison/leistungsdatendetails/spieler/76028/verein/0/liga/0/wettbewerb//pos/0/trainer_id/0`;
-  const ch = await cheerioFromPage(careerUrl);
-
-  const allSeasonsPerClub: Record<string, any> = {};
-
-  const columnsOfCompetitionsPlayedPerClub = mapCheerioNodesList(
+  const allCompetitionsColumns = mapCheerioNodesList(
     ch(".grid-view table.items tbody tr")
   );
 
-  columnsOfCompetitionsPlayedPerClub.forEach((col) => {
-    const competitionCol = mapCheerioNodesList(col.find("td"));
+  const allSeasonsPerClub = allCompetitionsColumns.reduce<PlayerSpellsWoo>(
+    (accum, column) => {
+      const competitionCol = mapCheerioNodesList(column.find("td"));
 
-    const [
-      tourneySeasonEl,
-      ,
-      ,
-      tourneyClubEl,
-      tourneyMatchesEl,
-      ,
-      tourneyGoalsEl,
-    ] = competitionCol;
+      const [
+        tourneySeasonEl,
+        ,
+        ,
+        tourneyClubEl,
+        tourneyMatchesEl,
+        ,
+        tourneyGoalsEl,
+      ] = competitionCol;
 
-    const clubName = tourneyClubEl.find("img").attr("alt")!;
-    const season = tourneySeasonEl.text();
+      const club = tourneyClubEl.find("img").attr("alt")!;
+      const season = tourneySeasonEl.text();
 
-    const matchesInTourney = numberOrZero(tourneyMatchesEl.text());
-    const goalsInTourney = numberOrZero(tourneyGoalsEl.text());
+      const matchesInTourney = parseNumberFromNode(tourneyMatchesEl);
+      const goalsInTourney = parseNumberFromNode(tourneyGoalsEl);
 
-    const careerKey = `${clubName}-${season}`;
+      const clubSeasonKey = `${club}-${season}`;
 
-    const playerCareer = allSeasonsPerClub[careerKey] ?? {
-      matches: 0,
-      goals: 0,
-    };
+      const currentClubSeason = accum[clubSeasonKey] ?? {
+        club,
+        season,
+        matches: 0,
+        goals: 0,
+      };
 
-    allSeasonsPerClub[careerKey] = {
-      matches: playerCareer.matches + matchesInTourney,
-      goals: playerCareer.goals + goalsInTourney,
-    };
-  });
+      log("transfermarkt", currentClubSeason);
 
-  return allSeasonsPerClub;
+      return {
+        ...accum,
+        [clubSeasonKey]: {
+          ...currentClubSeason,
+          matches: matchesInTourney + currentClubSeason.matches,
+          goals: goalsInTourney + currentClubSeason.goals,
+        },
+      };
+    },
+    {}
+  );
+
+  log("transfermarkt", allSeasonsPerClub);
+
+  return {
+    name: "Taiso",
+    spells: Object.values(allSeasonsPerClub),
+  };
 };
