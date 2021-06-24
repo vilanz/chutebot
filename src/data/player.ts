@@ -4,14 +4,8 @@ export interface Player {
 }
 
 export interface PlayerSpell {
+  club: string;
   season: string;
-  date: Date;
-  from?: PlayerSpellClub;
-  to?: PlayerSpellClub;
-  transferFee: string;
-}
-
-export interface PlayerSpellClub {
-  country: string;
-  name: string;
+  matches: number;
+  goals: number;
 }

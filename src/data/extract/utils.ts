@@ -24,3 +24,11 @@ export const getQueryParamFromRelativeUrl = (
 export const mapCheerioNodesList = (
   cheerioElements: Cheerio<Element>
 ): Cheerio<Node>[] => cheerioElements.map((_, el) => cheerio(el)).toArray();
+
+export const parseNumberFromNode = (node: Cheerio<Node>): number => {
+  const text = node.text();
+  if (text === "-") {
+    return 0;
+  }
+  return +text;
+};

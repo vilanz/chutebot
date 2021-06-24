@@ -1,7 +1,5 @@
-import { flag } from "country-emoji";
-import { MessageEmbed } from "discord.js";
-import { PlayerSpell, PlayerSpellClub } from "../../data";
-
+import { PlayerSpell } from "../../data";
+/*
 const formatTransferFee = (transferFee: string): string => {
   switch (transferFee) {
     case "free transfer":
@@ -27,19 +25,11 @@ const formatClub = (club?: PlayerSpellClub): string => {
   const country = club.country === "England" ? "UK" : club.country;
   return `${flag(country)} ${club.name}`;
 };
-
-export const getPlayerSpellsEmbed = (spells: PlayerSpell[]): MessageEmbed =>
-  new MessageEmbed()
-    .addFields(
-      spells.map((spell) => ({
-        name: spell.season,
-        value: [
-          `:point_right: ${formatClub(spell.to)}`,
-          `:point_left: ${formatClub(spell.from)}`,
-          `${spell.date.toLocaleDateString()}: ${formatTransferFee(
-            spell.transferFee
-          )}`,
-        ].join("\n"),
-      }))
+*/
+export const getPlayerSpellsEmbed = (spells: PlayerSpell[]): string =>
+  spells
+    .map(
+      (spell) =>
+        `${spell.season} - ${spell.club} - ${spell.goals} gols em ${spell.matches} jogos`
     )
-    .setTimestamp();
+    .join("\n");

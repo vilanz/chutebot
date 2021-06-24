@@ -1,18 +1,15 @@
 import { Player, scrapPlayerCareerFromTransfermarkt } from "../data";
-import { log } from "../log";
-import { CommandHandler, Commands } from "../command-parser";
+import { CommandHandler } from "../command-parser";
 import { RecaptchaError } from "../data/extract/utils";
+import { getPlayerSpellsEmbed } from "./start-guessing/format-career";
 
 // TODO use a real DB :p
 export const MOCK_PLAYER_DB: Player[] = [];
 
-export const addPlayer: CommandHandler = async (message, playerName) => {
-  log(Commands.AddPlayer, `Will try to add ${playerName}.`);
-  message.react("👍");
-
+export const addPlayer: CommandHandler = async (message, url) => {
   try {
-    const career = await scrapPlayerCareerFromTransfermarkt();
-    message.reply(JSON.stringify(career, null, 2));
+    const player = await scrapPlayerCareerFromTransfermarkt(url);
+    message.channel.send(getPlayerSpellsEmbed(player.spells));
     // const playerId = await getPlayerPlaymakerstatsId(playerName);
     // message.reply(playerId ?? "N/A");
   } catch (ex) {
