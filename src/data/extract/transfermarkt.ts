@@ -78,8 +78,6 @@ export const getPlayerFromTransfermarkt = async (
 };
 */
 
-type PlayerSpellsWoo = Record<string, PlayerSpell>;
-
 export const scrapPlayerCareerFromTransfermarkt = async (
   url: string
 ): Promise<Player> => {
@@ -89,7 +87,11 @@ export const scrapPlayerCareerFromTransfermarkt = async (
     ch(".grid-view table.items tbody tr")
   );
 
-  const allSeasonsPerClub = allCompetitionsColumns.reduce<PlayerSpellsWoo>(
+  type SpellsPerSeasonAndClub = {
+    [clubAndSeason: string]: PlayerSpell;
+  };
+
+  const allSpells = allCompetitionsColumns.reduce<SpellsPerSeasonAndClub>(
     (accum, column) => {
       const competitionCol = mapCheerioNodesList(column.find("td"));
 
@@ -118,8 +120,6 @@ export const scrapPlayerCareerFromTransfermarkt = async (
         goals: 0,
       };
 
-      log("transfermarkt", currentClubSeason);
-
       return {
         ...accum,
         [clubSeasonKey]: {
@@ -132,10 +132,10 @@ export const scrapPlayerCareerFromTransfermarkt = async (
     {}
   );
 
-  log("transfermarkt", allSeasonsPerClub);
+  log("transfermarkt", allSpells);
 
   return {
     name: "Taiso",
-    spells: Object.values(allSeasonsPerClub),
+    spells: Object.values(allSpells),
   };
 };
