@@ -7,8 +7,7 @@ import {
   searchPlayersInTransfermarkt,
 } from "../data";
 import { CommandHandler } from "../command-parser";
-import { getPlayerSpellsEmbed } from "./start-guessing/format-career";
-import { log } from "../utils";
+import { formatPlayerSpells, log } from "../utils";
 
 // TODO use a real DB :p
 export const MOCK_PLAYER_DB: Player[] = [];
@@ -23,15 +22,15 @@ const awaitForPlayerSearchReaction = async (
   const playerListNessage = await message.channel.send(`
     Jogadores encontrados:\n${playersFound
       .slice(0, MAX_PLAYERS)
-      .map((p, i) => `${PLAYER_REACTIONS[i]} ${p.name}`)
+      .map((p, i) => `${PLAYER_REACTIONS[i]} ${p.desc}`)
       .join("\n")}
   `);
-
-  await Promise.all(PLAYER_REACTIONS.map((R) => playerListNessage.react(R)));
 
   try {
     const isCorrectReactionFromUser = (r: MessageReaction, user: User) =>
       PLAYER_REACTIONS.includes(r.emoji.name) && user.id === message.author.id;
+
+    PLAYER_REACTIONS.map((R) => playerListNessage.react(R));
 
     const playerWantedReaction = await playerListNessage
       .awaitReactions(isCorrectReactionFromUser, {
@@ -56,6 +55,11 @@ export const addPlayer: CommandHandler = async (message, playerName) => {
 
   log("add", { playersFound });
 
+  if (!playersFound.length) {
+    message.channel.send("Nenhum jogador encontrado.");
+    return;
+  }
+
   const playerWanted = await awaitForPlayerSearchReaction(
     playersFound,
     message
@@ -78,7 +82,7 @@ export const addPlayer: CommandHandler = async (message, playerName) => {
   });
 
   allPlayers.forEach((p) => {
-    const msg = `${p.name}\n${getPlayerSpellsEmbed(p.spells ?? [])}`;
+    const msg = `${p.name}\n${formatPlayerSpells(p.spells ?? [])}`;
     message.channel.send(msg);
   });
 };

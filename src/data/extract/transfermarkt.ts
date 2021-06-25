@@ -7,7 +7,7 @@ import {
 } from "./utils";
 
 export interface PlayerSearchResult {
-  name: string;
+  desc: string;
   detailsCareerUrl: string;
 }
 
@@ -19,18 +19,23 @@ export const searchPlayersInTransfermarkt = async (
     `/schnellsuche/ergebnis/schnellsuche?query=${nameQuery}`
   );
 
-  const advancedSearchText = ch("div.table-footer a").text();
-  if (advancedSearchText !== "Pesquisa avançada - jogadores") {
+  const advancedSearchText = ch("div.table-footer a").text().trim();
+  const isPlayerSearchPage =
+    advancedSearchText === "Pesquisa avançada - jogadores";
+  if (!isPlayerSearchPage) {
     return [];
   }
 
   const allPlayerRows = mapCheerioNodesList(ch("table.items > tbody > tr"));
 
   return allPlayerRows.map((row) => {
-    const clickablePlayerName = row.find(".hauptlink a").first();
+    const [playerNameRow, clubNameRow] = mapCheerioNodesList(
+      row.find("tbody > tr")
+    );
     return {
-      name: clickablePlayerName.text()!,
-      detailsCareerUrl: clickablePlayerName
+      desc: `${playerNameRow.text()} (${clubNameRow.text()})`,
+      detailsCareerUrl: playerNameRow
+        .find(".hauptlink a")
         .attr("href")!
         .replace("/profil", "/leistungsdatendetails"),
     };
