@@ -6,21 +6,34 @@ import {
   mapCheerioNodesList,
 } from "./utils";
 
-export const getPlayerCareerDetailsLink = async (
+interface PlayerSearchResult {
+  name: string;
+  detailsCareerUrl: string;
+}
+
+export const searchPlayersInTransfermarkt = async (
   playerName: string
-): Promise<string | undefined> => {
+): Promise<PlayerSearchResult[]> => {
   const nameQuery = encodeURIComponent(playerName);
   const ch = await getCheerioFromPageHTML(
     `/schnellsuche/ergebnis/schnellsuche?query=${nameQuery}`
   );
 
-  const playerProfileLink = ch("td.hauptlink a").first().attr("href");
+  const allPlayerRows = mapCheerioNodesList(
+    ch("table.items > tbody > tr").slice(0, 8)
+  );
 
-  if (playerProfileLink) {
-    return playerProfileLink.replace("/profil", "/leistungsdatendetails");
-  }
-
-  return playerProfileLink;
+  return allPlayerRows.map((row) => {
+    console.log(row.html());
+    const clickablePlayerName = row.find(".hauptlink a").first();
+    console.log(clickablePlayerName.toString());
+    return {
+      name: clickablePlayerName.text()!,
+      detailsCareerUrl: clickablePlayerName
+        .attr("href")!
+        .replace("/profil", "/leistungsdatendetails"),
+    };
+  });
 };
 
 export const getPlayerCareerFromTransfermarkt = async (
