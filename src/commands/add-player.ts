@@ -2,8 +2,7 @@ import {
   getPlayerCareerDetailsLink,
   getPlayerCareerFromTransfermarkt,
   Player,
-  Players,
-  PlayerSpells,
+  PlayerEntity,
 } from "../data";
 import { CommandHandler } from "../command-parser";
 import { getPlayerSpellsEmbed } from "./start-guessing/format-career";
@@ -22,26 +21,20 @@ export const addPlayer: CommandHandler = async (message, playerName) => {
     playerCareerDetailsLink
   );
 
-  const playerEntity = await Players.create(player);
+  const playerEntity = await PlayerEntity.create(player);
 
   await Promise.all(
     player.spells.map(async (spell) => {
-      await PlayerSpells.create({
-        ...spell,
-        playerId: playerEntity.id,
-      });
+      await playerEntity.createSpell({ ...spell });
     })
   );
-  /*
 
-  const allPlayers = await Players.findAll({
-    include: [Players.associations.spells],
+  const allPlayers = await PlayerEntity.findAll({
+    include: [PlayerEntity.associations.spells],
   });
 
   allPlayers.forEach((p) => {
     const msg = `${p.name}\n${getPlayerSpellsEmbed(p.spells ?? [])}`;
     message.channel.send(msg);
   });
-  
-  */
 };

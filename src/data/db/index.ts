@@ -1,21 +1,30 @@
 // eslint-disable-next-line max-classes-per-file
-import { Sequelize, STRING, INTEGER, Model, Association } from "sequelize";
+import {
+  Sequelize,
+  STRING,
+  INTEGER,
+  Model,
+  Association,
+  HasManyCreateAssociationMixin,
+} from "sequelize";
 
 const sequelize = new Sequelize("sqlite::memory:");
 
-export class Players extends Model {
+export class PlayerEntity extends Model {
   public readonly id!: number;
 
   public readonly name!: string;
 
-  public readonly spells?: PlayerSpells[];
+  public createSpell!: HasManyCreateAssociationMixin<PlayerSpellEntity>;
+
+  public readonly spells?: PlayerSpellEntity[];
 
   public static associations: {
-    spells: Association<Players, PlayerSpells>;
+    spells: Association<PlayerEntity, PlayerSpellEntity>;
   };
 }
 
-Players.init(
+PlayerEntity.init(
   {
     name: STRING,
   },
@@ -24,7 +33,7 @@ Players.init(
   }
 );
 
-export class PlayerSpells extends Model {
+export class PlayerSpellEntity extends Model {
   public readonly id!: number;
 
   public readonly club!: string;
@@ -36,7 +45,7 @@ export class PlayerSpells extends Model {
   public readonly goals!: number;
 }
 
-PlayerSpells.init(
+PlayerSpellEntity.init(
   {
     club: STRING,
     season: STRING,
@@ -48,15 +57,13 @@ PlayerSpells.init(
   }
 );
 
-Players.hasMany(PlayerSpells, {
+PlayerEntity.hasMany(PlayerSpellEntity, {
+  sourceKey: "id",
   foreignKey: "playerId",
   as: "spells",
 });
-PlayerSpells.belongsTo(Players, {
-  foreignKey: "playerId",
-});
 
 export const syncDatabase = async () => {
-  await Players.sync({ force: true });
-  await PlayerSpells.sync({ force: true });
+  await PlayerEntity.sync({ force: true });
+  await PlayerSpellEntity.sync({ force: true });
 };
