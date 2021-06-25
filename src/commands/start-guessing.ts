@@ -52,8 +52,8 @@ export const startGuessing: CommandHandler = async (message) => {
       return;
     }
 
-    const embed = formatPlayerSpells(randomPlayer.spells);
-    message.reply(embed);
+    const playerSpellsString = formatPlayerSpells(randomPlayer.spells);
+    const playerSpellsMessage = await message.reply(playerSpellsString);
 
     try {
       const correctMessage = await waitForCorrectPlayer(
@@ -65,7 +65,7 @@ export const startGuessing: CommandHandler = async (message) => {
       );
     } catch (err) {
       log("guessing", "Error (probably ran out of time)", err);
-      await message.reply(
+      await playerSpellsMessage.reply(
         `Ninguém acertou depois de ${SECONDS_TO_GUESS} segundos.`
       );
     }
