@@ -1,4 +1,4 @@
-import { log } from "../../log";
+import { log } from "../../utils";
 import { Player, PlayerSpell } from "../player";
 import {
   getCheerioFromPageHTML,
@@ -6,7 +6,7 @@ import {
   mapCheerioNodesList,
 } from "./utils";
 
-interface PlayerSearchResult {
+export interface PlayerSearchResult {
   name: string;
   detailsCareerUrl: string;
 }
@@ -19,14 +19,10 @@ export const searchPlayersInTransfermarkt = async (
     `/schnellsuche/ergebnis/schnellsuche?query=${nameQuery}`
   );
 
-  const allPlayerRows = mapCheerioNodesList(
-    ch("table.items > tbody > tr").slice(0, 8)
-  );
+  const allPlayerRows = mapCheerioNodesList(ch("table.items > tbody > tr"));
 
   return allPlayerRows.map((row) => {
-    console.log(row.html());
     const clickablePlayerName = row.find(".hauptlink a").first();
-    console.log(clickablePlayerName.toString());
     return {
       name: clickablePlayerName.text()!,
       detailsCareerUrl: clickablePlayerName

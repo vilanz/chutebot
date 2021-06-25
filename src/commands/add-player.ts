@@ -1,62 +1,84 @@
+import { Message, MessageReaction, User } from "discord.js";
 import {
   getPlayerCareerFromTransfermarkt,
   Player,
   PlayerEntity,
+  PlayerSearchResult,
   searchPlayersInTransfermarkt,
 } from "../data";
 import { CommandHandler } from "../command-parser";
 import { getPlayerSpellsEmbed } from "./start-guessing/format-career";
-import { log } from "../log";
+import { log } from "../utils";
 
 // TODO use a real DB :p
 export const MOCK_PLAYER_DB: Player[] = [];
+
+const PLAYER_REACTIONS = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"];
+const MAX_PLAYERS = PLAYER_REACTIONS.length;
+
+const awaitForPlayerSearchReaction = async (
+  playersFound: PlayerSearchResult[],
+  message: Message
+): Promise<PlayerSearchResult | null> => {
+  const playerListNessage = await message.channel.send(`
+    Jogadores encontrados:\n${playersFound
+      .slice(0, MAX_PLAYERS)
+      .map((p, i) => `${PLAYER_REACTIONS[i]} ${p.name}`)
+      .join("\n")}
+  `);
+
+  await Promise.all(PLAYER_REACTIONS.map((R) => playerListNessage.react(R)));
+
+  try {
+    const isCorrectReactionFromUser = (r: MessageReaction, user: User) =>
+      PLAYER_REACTIONS.includes(r.emoji.name) && user.id === message.author.id;
+
+    const playerWantedReaction = await playerListNessage
+      .awaitReactions(isCorrectReactionFromUser, {
+        max: 1,
+        time: 15000,
+      })
+      .then((r) => r.first()!);
+
+    const playerWantedIndex = PLAYER_REACTIONS.findIndex(
+      (r) => r === playerWantedReaction.emoji.name
+    );
+
+    return playersFound[playerWantedIndex] ?? null;
+  } catch {
+    playerListNessage.react("⌚");
+    return null;
+  }
+};
 
 export const addPlayer: CommandHandler = async (message, playerName) => {
   const playersFound = await searchPlayersInTransfermarkt(playerName);
 
   log("add", { playersFound });
 
-  const waitingForPlayersMessage = await message.channel.send(`
-    Jogadores encontrados:
-    ${playersFound.map((p) => p.name).join("\n")}
-    Responda a essa mensagem com o nome do que você quer em até 15 segundos.
-  `);
+  const playerWanted = await awaitForPlayerSearchReaction(
+    playersFound,
+    message
+  );
 
-  try {
-    const playerWantedMessage = await message.channel.awaitMessages(
-      (m) => playersFound.map((x) => x.name).includes(m.content),
-      {
-        max: 1,
-        time: 15000,
-      }
-    );
-    const playerWanted = playersFound.find(
-      (p) => p.name === playerWantedMessage.first()!.content
-    );
+  log("add", { playerWanted });
 
-    log("add", { playerWanted });
+  const player = await getPlayerCareerFromTransfermarkt(
+    playerWanted!.detailsCareerUrl
+  );
 
-    const player = await getPlayerCareerFromTransfermarkt(
-      playerWanted!.detailsCareerUrl
-    );
+  const playerEntity = await PlayerEntity.create(player);
 
-    const playerEntity = await PlayerEntity.create(player);
+  await Promise.all(
+    player.spells.map((spell) => playerEntity.createSpell({ ...spell }))
+  );
 
-    await Promise.all(
-      player.spells.map(async (spell) => {
-        await playerEntity.createSpell({ ...spell });
-      })
-    );
+  const allPlayers = await PlayerEntity.findAll({
+    include: [PlayerEntity.associations.spells],
+  });
 
-    const allPlayers = await PlayerEntity.findAll({
-      include: [PlayerEntity.associations.spells],
-    });
-
-    allPlayers.forEach((p) => {
-      const msg = `${p.name}\n${getPlayerSpellsEmbed(p.spells ?? [])}`;
-      message.channel.send(msg);
-    });
-  } catch {
-    waitingForPlayersMessage.react("⌚");
-  }
+  allPlayers.forEach((p) => {
+    const msg = `${p.name}\n${getPlayerSpellsEmbed(p.spells ?? [])}`;
+    message.channel.send(msg);
+  });
 };
