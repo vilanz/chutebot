@@ -1,8 +1,7 @@
 import Discord, { Message, User } from "discord.js";
-import { log } from "../../log";
-import { MOCK_PLAYER_DB } from "../add-player";
-import { parseCommand, CommandHandler, Commands } from "../../command-parser";
-import { getPlayerSpellsEmbed } from "./format-career";
+import { formatPlayerSpells, log } from "../utils";
+import { parseCommand, CommandHandler, Commands } from "../command-parser";
+import { getRandomPlayer } from "../data";
 
 const isCorrectPlayer = (playerName: string) => (message: Discord.Message) => {
   const command = parseCommand(message.content);
@@ -48,15 +47,16 @@ export const startGuessing: CommandHandler = async (message) => {
     await message.channel.send("Iniciando quiz...");
 
     // TODO use a random player from an actual database
-    const randomPlayer =
-      MOCK_PLAYER_DB[Math.floor(Math.random() * MOCK_PLAYER_DB.length)];
+    const randomPlayer = await getRandomPlayer().then((playerEntity) =>
+      playerEntity?.toInterface()
+    );
 
     if (!randomPlayer) {
       message.channel.send("Não temos jogadores :(");
       return;
     }
 
-    const embed = getPlayerSpellsEmbed(randomPlayer.spells);
+    const embed = formatPlayerSpells(randomPlayer.spells);
     message.channel.send(embed);
 
     try {

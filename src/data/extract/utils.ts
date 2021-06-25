@@ -1,6 +1,6 @@
 import cheerio, { Cheerio, CheerioAPI, Node, Element } from "cheerio";
 import fetch from "node-fetch";
-import { log } from "../../log";
+import { log } from "../../utils";
 
 export class RecaptchaError extends Error {}
 

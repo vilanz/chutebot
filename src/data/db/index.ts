@@ -6,7 +6,9 @@ import {
   Model,
   Association,
   HasManyCreateAssociationMixin,
+  literal,
 } from "sequelize";
+import { Player } from "../types";
 
 const sequelize = new Sequelize("sqlite::memory:");
 
@@ -22,6 +24,11 @@ export class PlayerEntity extends Model {
   public static associations: {
     spells: Association<PlayerEntity, PlayerSpellEntity>;
   };
+
+  public toInterface = (): Player => ({
+    name: this.name,
+    spells: this.spells ?? [],
+  });
 }
 
 PlayerEntity.init(
@@ -67,3 +74,8 @@ export const syncDatabase = async () => {
   await PlayerEntity.sync({ force: true });
   await PlayerSpellEntity.sync({ force: true });
 };
+
+export const getRandomPlayer = () =>
+  PlayerEntity.findOne({
+    order: literal("random"),
+  });

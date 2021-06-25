@@ -1,5 +1,5 @@
 import { log } from "../../utils";
-import { Player, PlayerSpell } from "../player";
+import { Player, PlayerSpell } from "../types";
 import {
   getCheerioFromPageHTML,
   parseNumberFromNode,
@@ -18,6 +18,11 @@ export const searchPlayersInTransfermarkt = async (
   const ch = await getCheerioFromPageHTML(
     `/schnellsuche/ergebnis/schnellsuche?query=${nameQuery}`
   );
+
+  const advancedSearchText = ch("div.table-footer a").text();
+  if (advancedSearchText !== "Pesquisa avançada - jogadores") {
+    return [];
+  }
 
   const allPlayerRows = mapCheerioNodesList(ch("table.items > tbody > tr"));
 
