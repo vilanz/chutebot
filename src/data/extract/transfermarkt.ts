@@ -1,87 +1,34 @@
 import { log } from "../../log";
 import { Player, PlayerSpell } from "../player";
 import {
-  cheerioFromPage,
+  getCheerioFromPageHTML,
   parseNumberFromNode,
   mapCheerioNodesList,
 } from "./utils";
 
-/*
-const parseClubColumns = (
-  countryEl: Cheerio<CheerioElement>,
-  clubEl: Cheerio<CheerioElement>
-): PlayerSpellClub | undefined => {
-  const clubName = clubEl.text();
-  if (clubName === "Without Club") {
-    return undefined;
-  }
-  return {
-    name: clubName,
-    country: countryEl.find("img").attr("title")!,
-  };
-};
-
-const getTransfermarktCheerio = async (url: string): Promise<CheerioAPI> =>
-  fetch(`https://www.transfermarkt.com${url}`, {
-    method: "GET",
-  })
-    .then((r) => r.text())
-    .then((html) => cheerio.load(html));
-
-const getSeasonFromRow = (rowElement: CheerioElement): PlayerSpell => {
-  const [
-    seasonEl,
-    dateEl,
-    fromCountryEl,
-    fromClubEl,
-    toCountryEl,
-    toClubEl,
-    priceEl,
-  ] = cheerio(rowElement)
-    .find("td.zentriert, td.flagge, td.vereinsname a, td.zelle-abloese")
-    .get()
-    .map((el) => cheerio(el));
-
-  return {
-    season: seasonEl.text(),
-    date: new Date(dateEl.text()),
-    from: parseClubColumns(fromCountryEl, fromClubEl),
-    to: parseClubColumns(toCountryEl, toClubEl),
-    transferFee: priceEl.text(),
-  };
-};
-
-export const getPlayerProfileLink = async (
+export const getPlayerCareerDetailsLink = async (
   playerName: string
 ): Promise<string | undefined> => {
   const nameQuery = encodeURIComponent(playerName);
-  const ch = await getTransfermarktCheerio(
+  const ch = await getCheerioFromPageHTML(
     `/schnellsuche/ergebnis/schnellsuche?query=${nameQuery}`
   );
 
-  return ch("td.hauptlink a").first().attr("href");
+  const playerProfileLink = ch("td.hauptlink a").first().attr("href");
+
+  if (playerProfileLink) {
+    return playerProfileLink.replace("/profil", "/leistungsdatendetails");
+  }
+
+  return playerProfileLink;
 };
 
-export const getPlayerFromTransfermarkt = async (
-  playerUrl: string
+export const getPlayerCareerFromTransfermarkt = async (
+  careerDetailsUrl: string
 ): Promise<Player> => {
-  log("transfermarkt", `Going to ${playerUrl}.`);
+  const ch = await getCheerioFromPageHTML(careerDetailsUrl);
 
-  const ch = await getTransfermarktCheerio(playerUrl);
-
-  return {
-    name: ch(".dataName h1 b").text(),
-    spells: ch(".transferhistorie tr.zeile-transfer")
-      .map((_, row) => getSeasonFromRow(row))
-      .toArray(),
-  };
-};
-*/
-
-export const scrapPlayerCareerFromTransfermarkt = async (
-  url: string
-): Promise<Player> => {
-  const ch = await cheerioFromPage(url);
+  const playerName = ch(".dataName h1").text();
 
   const allCompetitionsColumns = mapCheerioNodesList(
     ch(".grid-view table.items tbody tr")
@@ -101,7 +48,6 @@ export const scrapPlayerCareerFromTransfermarkt = async (
         ,
         tourneyClubEl,
         tourneyMatchesEl,
-        ,
         tourneyGoalsEl,
       ] = competitionCol;
 
@@ -120,22 +66,27 @@ export const scrapPlayerCareerFromTransfermarkt = async (
         goals: 0,
       };
 
+      log(
+        `transfermarkt`,
+        playerName,
+        currentClubSeason,
+        competitionCol.map((x) => `${x.attr("class")} -> ${x.html()}`)
+      );
+
       return {
         ...accum,
         [clubSeasonKey]: {
           ...currentClubSeason,
-          matches: matchesInTourney + currentClubSeason.matches,
-          goals: goalsInTourney + currentClubSeason.goals,
+          matches: currentClubSeason.matches + matchesInTourney,
+          goals: currentClubSeason.goals + goalsInTourney,
         },
       };
     },
     {}
   );
 
-  log("transfermarkt", allSpells);
-
   return {
-    name: "Taiso",
+    name: playerName,
     spells: Object.values(allSpells),
   };
 };
