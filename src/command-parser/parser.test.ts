@@ -1,14 +1,14 @@
 import { parseCommand } from ".";
 
 test("parsing a simple command", () => {
-  expect(parseCommand("g!ping")).toEqual({
+  expect(parseCommand("c!ping")).toEqual({
     name: "ping",
     args: "",
   });
 });
 
 test("parsing a command with args", () => {
-  expect(parseCommand("g!kick fire extinguisher")).toEqual({
+  expect(parseCommand("c!kick fire extinguisher")).toEqual({
     name: "kick",
     args: "fire extinguisher",
   });
