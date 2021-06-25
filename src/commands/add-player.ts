@@ -29,7 +29,9 @@ const awaitForPlayerSearchReaction = async (
       PLAYER_REACTIONS.includes(r.emoji.name) &&
       user.id === message.author.id;
 
-    PLAYER_REACTIONS.map((R) => playerListNessage.react(R));
+    PLAYER_REACTIONS.slice(0, playersFound.length).map((R) =>
+      playerListNessage.react(R)
+    );
 
     const playerWantedReaction = await playerListNessage
       .awaitReactions(isCorrectReactionFromUser, {
