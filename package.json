@@ -15,7 +15,7 @@
     "@vilanz/tooling": "vilanz/tooling#main",
     "cheerio": "^1.0.0-rc.10",
     "country-emoji": "^1.5.6",
-    "discord.js": "^12.5.3",
+    "discord.js": "^13.0.0-dev.5af2ef5fbc7ad11281f38384c360ae79efe63b39",
     "dotenv": "^10.0.0",
     "node-fetch": "^2.6.1",
     "sequelize": "^6.6.2",

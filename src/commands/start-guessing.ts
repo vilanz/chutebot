@@ -1,4 +1,4 @@
-import Discord, { Message, User } from "discord.js";
+import Discord, { Message } from "discord.js";
 import { formatPlayerSpells, log } from "../utils";
 import { parseCommand, CommandHandler, Commands } from "../command-parser";
 import { getRandomPlayer } from "../data";
@@ -15,21 +15,21 @@ const isCorrectPlayer = (playerName: string) => (message: Discord.Message) => {
   return correct;
 };
 
+const SECONDS_TO_GUESS = 20;
+
 const waitForCorrectPlayer = async (
   playerName: string,
   message: Message
-): Promise<User> => {
-  const TWENTY_SECONDS = 20000;
-
+): Promise<Message> => {
   const correctMessage = await message.channel
     .awaitMessages(isCorrectPlayer(playerName), {
       max: 1,
-      time: TWENTY_SECONDS,
+      time: SECONDS_TO_GUESS * 1000,
       errors: ["time"],
     })
     .then((ms) => ms.first()!);
 
-  return correctMessage.author;
+  return correctMessage;
 };
 
 const channelsWithSessionsRunning = new Set<string>();
@@ -45,29 +45,29 @@ export const startGuessing: CommandHandler = async (message) => {
   channelsWithSessionsRunning.add(channelId);
 
   try {
-    await message.channel.send("Iniciando quiz...");
-
     const randomPlayer = await getRandomPlayer();
 
     if (!randomPlayer?.spells) {
-      message.channel.send("Não temos jogadores :(");
+      message.reply("Não temos jogadores :(");
       return;
     }
 
     const embed = formatPlayerSpells(randomPlayer.spells);
-    message.channel.send(embed);
+    message.reply(embed);
 
     try {
-      const correctMessageAuthor = await waitForCorrectPlayer(
+      const correctMessage = await waitForCorrectPlayer(
         randomPlayer.name,
         message
       );
-      await message.channel.send(
-        `${correctMessageAuthor} acertou! Era o ${randomPlayer.name}.`
+      await correctMessage.reply(
+        `${correctMessage.author} acertou! Era o **${randomPlayer.name}**.`
       );
     } catch (err) {
       log("guessing", "Error (probably ran out of time)", err);
-      await message.channel.send("Ninguém acertou depois de 10 segundos :(");
+      await message.reply(
+        `Ninguém acertou depois de ${SECONDS_TO_GUESS} segundos.`
+      );
     }
   } finally {
     channelsWithSessionsRunning.delete(channelId);

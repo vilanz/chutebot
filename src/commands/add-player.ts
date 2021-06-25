@@ -1,17 +1,13 @@
 import { Message, MessageReaction, User } from "discord.js";
 import {
   getPlayerFromTransfermarkt,
-  Player,
   PlayerEntity,
   playerExists,
   PlayerSearchResult,
   searchPlayersInTransfermarkt,
 } from "../data";
 import { CommandHandler } from "../command-parser";
-import { formatPlayerSpells, log } from "../utils";
-
-// TODO use a real DB :p
-export const MOCK_PLAYER_DB: Player[] = [];
+import { log } from "../utils";
 
 const PLAYER_REACTIONS = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"];
 const MAX_PLAYERS = PLAYER_REACTIONS.length;
@@ -20,7 +16,7 @@ const awaitForPlayerSearchReaction = async (
   playersFound: PlayerSearchResult[],
   message: Message
 ): Promise<PlayerSearchResult | null> => {
-  const playerListNessage = await message.channel.send(`
+  const playerListNessage = await message.reply(`
     Jogadores encontrados:\n${playersFound
       .slice(0, MAX_PLAYERS)
       .map((p, i) => `${PLAYER_REACTIONS[i]} ${p.desc}`)
@@ -29,7 +25,9 @@ const awaitForPlayerSearchReaction = async (
 
   try {
     const isCorrectReactionFromUser = (r: MessageReaction, user: User) =>
-      PLAYER_REACTIONS.includes(r.emoji.name) && user.id === message.author.id;
+      !!r.emoji.name &&
+      PLAYER_REACTIONS.includes(r.emoji.name) &&
+      user.id === message.author.id;
 
     PLAYER_REACTIONS.map((R) => playerListNessage.react(R));
 
@@ -52,12 +50,18 @@ const awaitForPlayerSearchReaction = async (
 };
 
 export const addPlayer: CommandHandler = async (message, playerName) => {
+  const playerNameWithoutSpaces = playerName?.trim();
+  if (!playerNameWithoutSpaces || playerNameWithoutSpaces.length > 80) {
+    message.reply("Precisamos de um nome válido.");
+    return;
+  }
+
   const playersFound = await searchPlayersInTransfermarkt(playerName);
 
   log("add", { playersFound });
 
   if (!playersFound.length) {
-    message.channel.send("Nenhum jogador encontrado.");
+    message.reply("Nenhum jogador encontrado.");
     return;
   }
 
@@ -73,7 +77,7 @@ export const addPlayer: CommandHandler = async (message, playerName) => {
   );
 
   if (await playerExists(player.transfermarktId)) {
-    message.channel.send("Esse jogador já foi adicionado.");
+    message.reply("Esse jogador já foi adicionado.");
     return;
   }
 
@@ -83,12 +87,5 @@ export const addPlayer: CommandHandler = async (message, playerName) => {
     player.spells.map((spell) => playerEntity.createSpell({ ...spell }))
   );
 
-  const allPlayers = await PlayerEntity.findAll({
-    include: [PlayerEntity.associations.spells],
-  });
-
-  allPlayers.forEach((p) => {
-    const msg = `${p.name}\n${formatPlayerSpells(p.spells ?? [])}`;
-    message.channel.send(msg);
-  });
+  await message.reply(`**${player.name}** adicionado com sucesso.`);
 };
