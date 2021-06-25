@@ -6,7 +6,6 @@ import {
   Model,
   Association,
   HasManyCreateAssociationMixin,
-  literal,
 } from "sequelize";
 import { Player } from "../types";
 
@@ -77,5 +76,6 @@ export const syncDatabase = async () => {
 
 export const getRandomPlayer = () =>
   PlayerEntity.findOne({
-    order: literal("random"),
+    order: sequelize.random(),
+    include: [PlayerEntity.associations.spells],
   });

@@ -19,11 +19,13 @@ const waitForCorrectPlayer = async (
   playerName: string,
   message: Message
 ): Promise<User> => {
+  const TWENTY_SECONDS = 20000;
+
   const correctMessages = await message.channel.awaitMessages(
     isCorrectPlayer(playerName),
     {
       max: 1,
-      time: 10000,
+      time: TWENTY_SECONDS,
       errors: ["time"],
     }
   );
@@ -51,7 +53,7 @@ export const startGuessing: CommandHandler = async (message) => {
       playerEntity?.toInterface()
     );
 
-    if (!randomPlayer) {
+    if (!randomPlayer?.spells) {
       message.channel.send("Não temos jogadores :(");
       return;
     }
