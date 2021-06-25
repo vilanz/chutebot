@@ -1,13 +1,11 @@
 import { Message, MessageReaction, User } from "discord.js";
-import {
-  getPlayerFromTransfermarkt,
-  PlayerEntity,
-  playerExists,
-  PlayerSearchResult,
-  searchPlayersInTransfermarkt,
-} from "../data";
 import { CommandHandler } from "../command-parser";
 import { log } from "../utils";
+import { addPlayerFromTransfermarkt } from "../data/actions";
+import {
+  PlayerSearchResult,
+  searchPlayersInTransfermarkt,
+} from "../data/transfermarkt";
 
 const PLAYER_REACTIONS = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"];
 const MAX_PLAYERS = PLAYER_REACTIONS.length;
@@ -67,27 +65,27 @@ export const addPlayer: CommandHandler = async (message, playerName) => {
     return;
   }
 
-  const playerWanted = await awaitForPlayerSearchReaction(
+  const wantedPlayer = await awaitForPlayerSearchReaction(
     playersFound,
     message
   );
 
-  log("add", { playerWanted });
+  log("add", { playerWanted: wantedPlayer });
 
-  const player = await getPlayerFromTransfermarkt(
-    playerWanted!.detailsCareerUrl
-  );
-
-  if (await playerExists(player.transfermarktId)) {
-    message.reply("Esse jogador já foi adicionado.");
+  if (!wantedPlayer) {
+    message.reply(
+      "Não conseguimos pegar o link dos detalhes da carreira do jogador. Isso não deveria estar acontecendo."
+    );
     return;
   }
 
-  const playerEntity = await PlayerEntity.create(player);
-
-  await Promise.all(
-    player.spells.map((spell) => playerEntity.createSpell({ ...spell }))
+  const newPlayer = await addPlayerFromTransfermarkt(
+    wantedPlayer.transfermarktId
   );
 
-  await message.reply(`**${player.name}** adicionado com sucesso.`);
+  if (!newPlayer) {
+    await message.reply("Esse jogador já foi adicionado.");
+  } else {
+    await message.reply(`**${newPlayer.name}** adicionado com sucesso.`);
+  }
 };

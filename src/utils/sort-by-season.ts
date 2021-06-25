@@ -19,8 +19,8 @@ export const compareSeason = (seasonA: string, seasonB: string): number => {
   const seasonADetails = getSeasonDetails(seasonA);
   const seasonBDetails = getSeasonDetails(seasonB);
 
-  const startDiff = seasonADetails.start - seasonBDetails.start;
-  const endDiff = seasonADetails.end - seasonBDetails.end;
+  const startDiff = seasonBDetails.start - seasonADetails.start;
+  const endDiff = seasonBDetails.end - seasonADetails.end;
 
   return startDiff + endDiff;
 };

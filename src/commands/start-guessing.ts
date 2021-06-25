@@ -2,6 +2,7 @@ import Discord, { Message } from "discord.js";
 import { formatPlayerSpells, log } from "../utils";
 import { parseCommand, CommandHandler, Commands } from "../command-parser";
 import { getRandomPlayer } from "../data";
+import { fetchPlayerCareer } from "../data/transfermarkt";
 
 const isCorrectPlayer = (playerName: string) => (message: Discord.Message) => {
   const command = parseCommand(message.content);
@@ -46,13 +47,20 @@ export const startGuessing: CommandHandler = async (message) => {
 
   try {
     const randomPlayer = await getRandomPlayer();
-
-    if (!randomPlayer?.spells) {
-      message.reply("Não temos jogadores :(");
-      return;
+    if (!randomPlayer) {
+      throw new Error("Could not find a random player");
     }
 
-    const playerSpellsString = formatPlayerSpells(randomPlayer.spells);
+    const randomPlayerCareer = await fetchPlayerCareer(
+      randomPlayer!.transfermarktId
+    );
+    if (!randomPlayerCareer) {
+      throw new Error(
+        `Could not find a career for ${JSON.stringify(randomPlayer)}`
+      );
+    }
+
+    const playerSpellsString = formatPlayerSpells(randomPlayerCareer.spells);
     const playerSpellsMessage = await message.reply(playerSpellsString);
 
     try {

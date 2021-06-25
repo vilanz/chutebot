@@ -32,3 +32,6 @@ export const getQueryParamFromRelativeUrl = (
   relativeUrl: string,
   param: string
 ) => new URL(`https://localhost/${relativeUrl}`).searchParams.get(param);
+
+export const getTransfermarktPlayerCareerUrl = (transfermarktId: number) =>
+  `/geosmina/leistungsdatendetails/spieler/${transfermarktId}`;

@@ -1,3 +1,3 @@
 export * from "./types";
-export * from "./extract";
+export * from "./transfermarkt";
 export * from "./db";
