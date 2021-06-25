@@ -6,6 +6,8 @@ import {
   Model,
   Association,
   HasManyCreateAssociationMixin,
+  NUMBER,
+  Op,
 } from "sequelize";
 import { Player } from "../types";
 
@@ -13,6 +15,8 @@ const sequelize = new Sequelize("sqlite::memory:");
 
 export class PlayerEntity extends Model {
   public readonly id!: number;
+
+  public readonly transfermarktId!: number;
 
   public readonly name!: string;
 
@@ -26,12 +30,14 @@ export class PlayerEntity extends Model {
 
   public toInterface = (): Player => ({
     name: this.name,
+    transfermarktId: this.transfermarktId,
     spells: this.spells ?? [],
   });
 }
 
 PlayerEntity.init(
   {
+    transfermarktId: NUMBER,
     name: STRING,
   },
   {
@@ -79,3 +85,16 @@ export const getRandomPlayer = () =>
     order: sequelize.random(),
     include: [PlayerEntity.associations.spells],
   });
+
+export const playerExists = async (
+  transfermarktId: number
+): Promise<boolean> => {
+  const count = await PlayerEntity.count({
+    where: {
+      transfermarktId: {
+        [Op.eq]: transfermarktId,
+      },
+    },
+  });
+  return count > 0;
+};

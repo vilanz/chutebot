@@ -1,8 +1,9 @@
 import { Message, MessageReaction, User } from "discord.js";
 import {
-  getPlayerCareerFromTransfermarkt,
+  getPlayerFromTransfermarkt,
   Player,
   PlayerEntity,
+  playerExists,
   PlayerSearchResult,
   searchPlayersInTransfermarkt,
 } from "../data";
@@ -67,9 +68,14 @@ export const addPlayer: CommandHandler = async (message, playerName) => {
 
   log("add", { playerWanted });
 
-  const player = await getPlayerCareerFromTransfermarkt(
+  const player = await getPlayerFromTransfermarkt(
     playerWanted!.detailsCareerUrl
   );
+
+  if (await playerExists(player.transfermarktId)) {
+    message.channel.send("Esse jogador já foi adicionado.");
+    return;
+  }
 
   const playerEntity = await PlayerEntity.create(player);
 

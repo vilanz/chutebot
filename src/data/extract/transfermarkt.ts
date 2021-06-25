@@ -26,7 +26,9 @@ export const searchPlayersInTransfermarkt = async (
     return [];
   }
 
-  const allPlayerRows = mapCheerioNodesList(ch("table.items > tbody > tr"));
+  const allPlayerRows = mapCheerioNodesList(
+    ch("table.items").first().find("> tbody > tr")
+  );
 
   return allPlayerRows.map((row) => {
     const [playerNameRow, clubNameRow] = mapCheerioNodesList(
@@ -42,12 +44,13 @@ export const searchPlayersInTransfermarkt = async (
   });
 };
 
-export const getPlayerCareerFromTransfermarkt = async (
+export const getPlayerFromTransfermarkt = async (
   careerDetailsUrl: string
 ): Promise<Player> => {
   const ch = await getCheerioFromPageHTML(careerDetailsUrl);
 
-  const playerName = ch(".dataName h1").text();
+  const name = ch(".dataName h1").text();
+  const transfermarktId = +ch(".spielprofil_tooltip").first().attr("id")!;
 
   const allCompetitionsColumns = mapCheerioNodesList(
     ch(".grid-view table.items tbody tr")
@@ -87,7 +90,7 @@ export const getPlayerCareerFromTransfermarkt = async (
 
       log(
         `transfermarkt`,
-        playerName,
+        name,
         currentClubSeason,
         competitionCol.map((x) => `${x.attr("class")} -> ${x.html()}`)
       );
@@ -105,7 +108,8 @@ export const getPlayerCareerFromTransfermarkt = async (
   );
 
   return {
-    name: playerName,
+    name,
+    transfermarktId,
     spells: Object.values(allSpells),
   };
 };

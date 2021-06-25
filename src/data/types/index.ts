@@ -1,5 +1,6 @@
 export interface Player {
   name: string;
+  transfermarktId: number;
   spells: PlayerSpell[];
 }
 
