@@ -21,16 +21,15 @@ const waitForCorrectPlayer = async (
 ): Promise<User> => {
   const TWENTY_SECONDS = 20000;
 
-  const correctMessages = await message.channel.awaitMessages(
-    isCorrectPlayer(playerName),
-    {
+  const correctMessage = await message.channel
+    .awaitMessages(isCorrectPlayer(playerName), {
       max: 1,
       time: TWENTY_SECONDS,
       errors: ["time"],
-    }
-  );
-  // we set max: 1 so it's always one message
-  return correctMessages.first()!.author;
+    })
+    .then((ms) => ms.first()!);
+
+  return correctMessage.author;
 };
 
 const channelsWithSessionsRunning = new Set<string>();
@@ -48,10 +47,7 @@ export const startGuessing: CommandHandler = async (message) => {
   try {
     await message.channel.send("Iniciando quiz...");
 
-    // TODO use a random player from an actual database
-    const randomPlayer = await getRandomPlayer().then((playerEntity) =>
-      playerEntity?.toInterface()
-    );
+    const randomPlayer = await getRandomPlayer();
 
     if (!randomPlayer?.spells) {
       message.channel.send("Não temos jogadores :(");
