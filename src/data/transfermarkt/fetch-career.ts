@@ -6,7 +6,7 @@ import {
   parseNumberFromNode,
   mapCheerioNodesList,
   getTransfermarktPlayerCareerUrl,
-} from "./utils";
+} from "./fetching";
 
 type SpellsPerSeasonAndClub = {
   [clubAndSeason: string]: PlayerSpell;

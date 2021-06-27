@@ -1,2 +1,2 @@
 export * from "./fetch-career";
-export * from "./search";
+export * from "./search-players";
