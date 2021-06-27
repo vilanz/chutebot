@@ -25,8 +25,10 @@ export const formatPlayerSpells = (spells: PlayerSpell[]): string =>
     ]),
   ]);
 
+const MAX_USERNAME_LENGTH = 25;
+
 export const formatUserWins = (users: UserWin[]) =>
   borderlessTableMarkdown([
     ["Usuário", "Vitórias"],
-    ...users.map((u) => [u.userName, u.wins]),
+    ...users.map((u) => [u.userName.slice(0, MAX_USERNAME_LENGTH), u.wins]),
   ]);

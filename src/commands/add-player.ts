@@ -1,20 +1,23 @@
-import { Message, MessageReaction, User } from "discord.js";
+import { Message } from "discord.js";
 import { CommandHandler } from "../command-parser";
 import { addPlayerFromTransfermarkt } from "../data/actions";
 import {
   PlayerSearchResult,
   searchPlayersInTransfermarkt,
 } from "../data/transfermarkt";
-import { secondsToMs } from "../utils";
-
-const PLAYER_REACTIONS = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"];
-const MAX_PLAYERS = PLAYER_REACTIONS.length;
-const SECONDS_TO_CONFIRM = 15;
+import { waitForUserReaction } from "../discord-helpers";
+import { logger } from "../log";
 
 const awaitForPlayerSearchReaction = async (
   playersFound: PlayerSearchResult[],
   message: Message
 ): Promise<PlayerSearchResult | null> => {
+  const MAX_PLAYERS = 5;
+  const PLAYER_REACTIONS = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"].slice(
+    0,
+    playersFound.length
+  );
+
   const playerFoundList = playersFound
     .slice(0, MAX_PLAYERS)
     .map((p, i) => `${PLAYER_REACTIONS[i]} ${p.desc}`)
@@ -24,33 +27,23 @@ const awaitForPlayerSearchReaction = async (
   `);
 
   try {
-    const isCorrectReactionFromUser = (r: MessageReaction, user: User) =>
-      !!r.emoji.name &&
-      PLAYER_REACTIONS.includes(r.emoji.name) &&
-      user.id === message.author.id;
-
-    PLAYER_REACTIONS.slice(0, playersFound.length).map((R) =>
-      playersFoundMessage.react(R)
+    const wantedPlayerIndex = await waitForUserReaction(
+      playersFoundMessage,
+      PLAYER_REACTIONS
     );
-
-    const wantedPlayerIndex = await playersFoundMessage
-      .awaitReactions(isCorrectReactionFromUser, {
-        max: 1,
-        time: secondsToMs(SECONDS_TO_CONFIRM),
-      })
-      .then((r) => r.first()!.emoji.name)
-      .then((emoji) => PLAYER_REACTIONS.findIndex((r) => r === emoji));
 
     const wantedPlayer = playersFound[wantedPlayerIndex] ?? null;
 
     if (!wantedPlayer) {
       throw new Error(
-        `got invalid prompt ${wantedPlayerIndex} when adding a player at`
+        `got invalid prompt ${wantedPlayerIndex} when adding a player`
       );
     }
 
     return wantedPlayer;
-  } catch {
+  } catch (err) {
+    // TODO check if it was actually a timeout
+    logger.info("time ran out for adding a player", { err });
     playersFoundMessage.react("⌚");
     return null;
   }
