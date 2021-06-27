@@ -7,8 +7,8 @@ This will be a Discord bot that runs a little quiz game where the clues are a fo
 - [x] Use a real football database
 - [x] Make career records available for trivia
 - [x] Store this stuff in an actual database
-- [ ] Store wins
-- [ ] Run in prod
+- [x] Store wins
+- [x] Run in prod
 - [ ] Handle nicknames
 
 ## Current commands
@@ -31,11 +31,9 @@ Returns `Pong!` and the response's latency.
 
 ## Getting started
 
-Create a `.env` file based on the `.env.example` file and run `yarn`.
+#### `yarn start`
 
-#### `yarn dev`
-
-Runs the project locally.
+Runs the bot.
 
 #### `yarn test`
 

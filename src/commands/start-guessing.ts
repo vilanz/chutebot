@@ -2,7 +2,6 @@ import Discord, { Message } from "discord.js";
 import { formatPlayerSpells, secondsToMs } from "../utils";
 import { parseCommand, CommandHandler, Commands } from "../command-parser";
 import { addUserWin, getRandomPlayer } from "../data";
-import { fetchPlayerCareer } from "../data/transfermarkt";
 import { logger } from "../log";
 
 const SECONDS_TO_GUESS = 20;
@@ -47,21 +46,12 @@ export const startGuessing: CommandHandler = async (message) => {
   channelsWithSessionsRunning.add(channelId);
 
   try {
-    const randomPlayer = await getRandomPlayer();
+    const randomPlayer = await getRandomPlayer().then((p) => p?.toInterface());
     if (!randomPlayer) {
       throw new Error("could not find a random player");
     }
 
-    const randomPlayerCareer = await fetchPlayerCareer(
-      randomPlayer!.transfermarktId
-    );
-    if (!randomPlayerCareer) {
-      throw new Error(
-        `could not find a career for ${JSON.stringify(randomPlayer)}`
-      );
-    }
-
-    const playerSpellsString = formatPlayerSpells(randomPlayerCareer.spells);
+    const playerSpellsString = formatPlayerSpells(randomPlayer.spells);
     const playerSpellsMessage = await message.reply(playerSpellsString);
 
     try {

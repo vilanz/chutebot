@@ -1,5 +1,6 @@
-export interface PlayerCareer {
-  playerName: string;
+export interface Player {
+  transfermarktId: number;
+  name: string;
   spells: PlayerSpell[];
 }
 

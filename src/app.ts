@@ -16,38 +16,37 @@ const client = new Discord.Client({
   ],
 });
 
-(async () => {
-  await syncDatabaseModels();
-  await addInitialPlayersIfNeeded();
+syncDatabaseModels()
+  .then(() => addInitialPlayersIfNeeded())
+  .then(() => {
+    logger.info("starting bot");
 
-  logger.info("starting bot");
+    client.on("ready", async () => {
+      logger.info("started bot");
+    });
 
-  client.on("ready", async () => {
-    logger.info("started bot");
-  });
-
-  client.on("message", async (message) => {
-    const command = parseCommand(message.content);
-    if (!command || !command.name) {
-      return;
-    }
-    const { name, args } = command;
-
-    try {
-      if (name === Commands.Ping) {
-        await ping(message, args);
-      } else if (name === Commands.Start) {
-        await startGuessing(message, args);
-      } else if (name === Commands.AddPlayer) {
-        await addPlayer(message, args);
-      } else if (name === Commands.Wins) {
-        await wins(message, args);
+    client.on("message", async (message) => {
+      const command = parseCommand(message.content);
+      if (!command || !command.name) {
+        return;
       }
-    } catch (err) {
-      logger.error(err);
-      message.reply("Ocorreu um erro ao tentar executar esse comando.");
-    }
-  });
+      const { name, args } = command;
 
-  client.login(process.env.DISCORD_BOT_TOKEN);
-})();
+      try {
+        if (name === Commands.Ping) {
+          await ping(message, args);
+        } else if (name === Commands.Start) {
+          await startGuessing(message, args);
+        } else if (name === Commands.AddPlayer) {
+          await addPlayer(message, args);
+        } else if (name === Commands.Wins) {
+          await wins(message, args);
+        }
+      } catch (err) {
+        logger.error("error when running a command", err);
+        message.reply("Ocorreu um erro ao tentar executar esse comando.");
+      }
+    });
+
+    client.login(process.env.DISCORD_BOT_TOKEN);
+  });

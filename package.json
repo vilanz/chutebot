@@ -4,30 +4,30 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
-    "dev": "nodemon src/app.ts",
+    "start": "tsc && node build/app.js",
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@types/node-fetch": "^2.5.10",
     "@vilanz/tooling": "vilanz/tooling#main",
     "cheerio": "^1.0.0-rc.10",
     "country-emoji": "^1.5.6",
     "discord.js": "^13.0.0-dev.5af2ef5fbc7ad11281f38384c360ae79efe63b39",
     "dotenv": "^10.0.0",
-    "node-cache": "^5.1.2",
     "node-fetch": "^2.6.1",
     "sequelize": "^6.6.2",
     "sqlite3": "^5.0.2",
     "table": "^6.7.1",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.3.4",
     "user-agents": "^1.0.695",
     "winston": "^3.3.3"
   },
   "devDependencies": {
     "@types/jest": "^26.0.23",
+    "@types/node-fetch": "^2.5.10",
     "@types/sqlite3": "^3.1.7",
     "@types/user-agents": "^1.0.1",
     "@typescript-eslint/eslint-plugin": "4.25.0",
@@ -43,8 +43,6 @@
     "nodemon": "^2.0.7",
     "prettier": "2.3.0",
     "prettier-eslint": "12.0.0",
-    "ts-jest": "^26.5.6",
-    "ts-node": "10.0.0",
-    "typescript": "4.3.2"
+    "ts-jest": "^26.5.6"
   }
 }

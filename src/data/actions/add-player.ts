@@ -1,13 +1,13 @@
 import { logger } from "../../log";
 import { getRandomNumberUpTo, waitSeconds } from "../../utils";
-import { createPlayer, PlayerEntity, playerExists } from "../db";
+import { createPlayer, getPlayerByTransfermarktId, PlayerEntity } from "../db";
 import { fetchPlayerCareer } from "../transfermarkt";
 
 export const addPlayerFromTransfermarkt = async (
   transfermarktId: number,
   useRandomDelay?: boolean
 ): Promise<PlayerEntity | null> => {
-  if (await playerExists(transfermarktId)) {
+  if (await getPlayerByTransfermarktId(transfermarktId)) {
     return null;
   }
 
@@ -22,11 +22,13 @@ export const addPlayerFromTransfermarkt = async (
     await waitSeconds(randomDelay);
   }
 
-  // TODO skip career fetching when adding a player (we only need a name)
   const career = await fetchPlayerCareer(transfermarktId);
 
-  return createPlayer({
-    name: career.playerName,
+  const entity = await createPlayer({
+    name: career.name,
     transfermarktId,
+    spells: career.spells,
   });
+
+  return entity;
 };

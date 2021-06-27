@@ -1,6 +1,7 @@
 {
   "extends": "@vilanz/tooling/typescript",
   "include": ["src/**/*"],
+  "exclude": ["src/**/*.test.ts"],
   "compilerOptions": {
     "outDir": "build",
     "esModuleInterop": true,
