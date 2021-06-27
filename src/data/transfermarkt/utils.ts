@@ -9,7 +9,7 @@ export const getCheerioFromPageHTML = async (
   const response = await fetch(transfermarktUrl, {
     method: "GET",
   });
-  logger.log("got Transfermarkt response", {
+  logger.info("got Transfermarkt response", {
     status: response.status,
     statusText: response.statusText,
     url: response.url,
