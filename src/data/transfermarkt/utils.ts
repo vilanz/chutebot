@@ -9,12 +9,11 @@ export const getCheerioFromPageHTML = async (
   const response = await fetch(transfermarktUrl, {
     method: "GET",
   });
-  logger.info(
-    "got Transfermarkt response",
-    response.status,
-    response.statusText,
-    response.url
-  );
+  logger.log("got Transfermarkt response", {
+    status: response.status,
+    statusText: response.statusText,
+    url: response.url,
+  });
   const html = await response.text();
   return cheerio.load(html);
 };

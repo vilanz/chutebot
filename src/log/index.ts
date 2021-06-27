@@ -1,18 +1,14 @@
-import winston from "winston";
+import { createLogger, format, transports } from "winston";
 
-export const logger = winston.createLogger({
-  transports: [
-    new winston.transports.File({ filename: "guess-the-player.log" }),
-  ],
+export const logger = createLogger({
+  format: format.combine(
+    format.splat(),
+    format.timestamp(),
+    format.prettyPrint()
+  ),
+  transports: [new transports.File({ filename: "guess-the-player.log" })],
 });
 
 if (process.env.NODE_ENV !== "production") {
-  logger.add(
-    new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.simple()
-      ),
-    })
-  );
+  logger.add(new transports.Console());
 }

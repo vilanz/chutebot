@@ -29,12 +29,17 @@ client.on("message", async (message) => {
   }
   const { name, args } = command;
 
-  if (name === Commands.Ping) {
-    ping(message, args);
-  } else if (name === Commands.Start) {
-    startGuessing(message, args);
-  } else if (name === Commands.AddPlayer) {
-    addPlayer(message, args);
+  try {
+    if (name === Commands.Ping) {
+      ping(message, args);
+    } else if (name === Commands.Start) {
+      startGuessing(message, args);
+    } else if (name === Commands.AddPlayer) {
+      addPlayer(message, args);
+    }
+  } catch (err) {
+    logger.error(err);
+    message.reply("Ocorreu um erro ao tentar executar esse comando.");
   }
 });
 

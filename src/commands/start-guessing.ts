@@ -74,7 +74,7 @@ export const startGuessing: CommandHandler = async (message) => {
       );
     } catch (err) {
       // TODO check if it's a timeout error
-      logger.info("no correct player was guessed", err);
+      logger.info("no correct player was guessed", { err });
       await playerSpellsMessage.reply(
         `Ninguém acertou depois de ${SECONDS_TO_GUESS} segundos.`
       );
