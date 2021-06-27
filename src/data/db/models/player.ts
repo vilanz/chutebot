@@ -1,18 +1,24 @@
 import { STRING, Model, NUMBER } from "sequelize";
 import { sequelizeInstance } from "../instance";
 
-export class PlayerEntity extends Model {
-  public readonly id!: number;
+export interface PlayerAttributes {
+  transfermarktId: number;
+  name: string;
+}
+
+export class PlayerEntity extends Model<PlayerAttributes> {
+  public readonly transfermarktId!: number;
 
   public readonly name!: string;
-
-  public readonly transfermarktId!: number;
 }
 
 PlayerEntity.init(
   {
+    transfermarktId: {
+      type: NUMBER,
+      primaryKey: true,
+    },
     name: STRING,
-    transfermarktId: NUMBER,
   },
   {
     sequelize: sequelizeInstance,

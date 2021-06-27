@@ -1,6 +1,6 @@
-import { Op } from "sequelize";
 import { sequelizeInstance } from "./instance";
 import { PlayerEntity } from "./models";
+import { PlayerAttributes } from "./models/player";
 
 export const getRandomPlayer = () =>
   PlayerEntity.findOne({
@@ -12,9 +12,7 @@ export const playerExists = async (
 ): Promise<boolean> => {
   const count = await PlayerEntity.count({
     where: {
-      transfermarktId: {
-        [Op.eq]: transfermarktId,
-      },
+      transfermarktId,
     },
   });
   return count > 0;
@@ -24,3 +22,6 @@ export const hasPlayers = async (): Promise<boolean> => {
   const count = await PlayerEntity.count();
   return count > 0;
 };
+
+export const createPlayer = (attribs: PlayerAttributes) =>
+  PlayerEntity.create(attribs);

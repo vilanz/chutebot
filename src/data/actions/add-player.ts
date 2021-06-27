@@ -1,6 +1,6 @@
 import { logger } from "../../log";
 import { getRandomNumberUpTo, waitSeconds } from "../../utils";
-import { PlayerEntity, playerExists } from "../db";
+import { createPlayer, PlayerEntity, playerExists } from "../db";
 import { fetchPlayerCareer } from "../transfermarkt";
 
 export const addPlayerFromTransfermarkt = async (
@@ -22,9 +22,10 @@ export const addPlayerFromTransfermarkt = async (
     await waitSeconds(randomDelay);
   }
 
+  // TODO skip career fetching when adding a player (we only need a name)
   const career = await fetchPlayerCareer(transfermarktId);
 
-  return PlayerEntity.create({
+  return createPlayer({
     name: career.playerName,
     transfermarktId,
   });
