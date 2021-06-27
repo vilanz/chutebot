@@ -1,5 +1,4 @@
 import { Cheerio, Node } from "cheerio";
-import { logger } from "../../log";
 import { getCachedPlayerCareer, setCachedPlayerCareer } from "../cache";
 import { PlayerCareer, PlayerSpell } from "../types";
 import {
@@ -41,8 +40,6 @@ const extractPlayerSpells = (rows: Cheerio<Node>[]): PlayerSpell[] => {
         matches: 0,
         goals: 0,
       };
-
-      logger.info("partial career fetched", currentClubSeason);
 
       return {
         ...accum,
