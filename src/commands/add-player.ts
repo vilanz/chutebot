@@ -15,11 +15,12 @@ const awaitForPlayerSearchReaction = async (
   playersFound: PlayerSearchResult[],
   message: Message
 ): Promise<PlayerSearchResult | null> => {
-  const playerListNessage = await message.reply(`
-    Jogadores encontrados:\n${playersFound
-      .slice(0, MAX_PLAYERS)
-      .map((p, i) => `${PLAYER_REACTIONS[i]} ${p.desc}`)
-      .join("\n")}
+  const playerFoundList = playersFound
+    .slice(0, MAX_PLAYERS)
+    .map((p, i) => `${PLAYER_REACTIONS[i]} ${p.desc}`)
+    .join("\n");
+  const playersFoundMessage = await message.reply(`
+    Jogadores encontrados:\n${playerFoundList}
   `);
 
   try {
@@ -29,29 +30,28 @@ const awaitForPlayerSearchReaction = async (
       user.id === message.author.id;
 
     PLAYER_REACTIONS.slice(0, playersFound.length).map((R) =>
-      playerListNessage.react(R)
+      playersFoundMessage.react(R)
     );
 
-    const playerWantedReaction = await playerListNessage
+    const wantedPlayerIndex = await playersFoundMessage
       .awaitReactions(isCorrectReactionFromUser, {
         max: 1,
         time: secondsToMs(SECONDS_TO_CONFIRM),
       })
-      .then((r) => r.first()!);
+      .then((r) => r.first()!.emoji.name)
+      .then((emoji) => PLAYER_REACTIONS.findIndex((r) => r === emoji));
 
-    const playerWantedIndex = PLAYER_REACTIONS.findIndex(
-      (r) => r === playerWantedReaction.emoji.name
-    );
-
-    const wantedPlayer = playersFound[playerWantedIndex] ?? null;
+    const wantedPlayer = playersFound[wantedPlayerIndex] ?? null;
 
     if (!wantedPlayer) {
-      throw new Error("got invalid prompt when adding a player");
+      throw new Error(
+        `got invalid prompt ${wantedPlayerIndex} when adding a player at`
+      );
     }
 
     return wantedPlayer;
   } catch {
-    playerListNessage.react("⌚");
+    playersFoundMessage.react("⌚");
     return null;
   }
 };
