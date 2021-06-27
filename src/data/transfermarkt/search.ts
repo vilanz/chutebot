@@ -1,5 +1,9 @@
-import { log } from "../../utils";
-import { getCheerioFromPageHTML, mapCheerioNodesList } from "./utils";
+import { logger } from "../../log";
+import {
+  getCheerioFromPageHTML,
+  getPlayerSearchUrl,
+  mapCheerioNodesList,
+} from "./utils";
 
 export interface PlayerSearchResult {
   desc: string;
@@ -7,17 +11,15 @@ export interface PlayerSearchResult {
 }
 
 export const searchPlayersInTransfermarkt = async (
-  playerName: string
+  query: string
 ): Promise<PlayerSearchResult[]> => {
-  const nameQuery = encodeURIComponent(playerName);
-  const ch = await getCheerioFromPageHTML(
-    `/schnellsuche/ergebnis/schnellsuche?query=${nameQuery}`
-  );
+  const ch = await getCheerioFromPageHTML(getPlayerSearchUrl(query));
 
   const advancedSearchText = ch("div.table-footer a").text().trim();
   const isPlayerSearchPage =
     advancedSearchText === "Pesquisa avançada - jogadores";
   if (!isPlayerSearchPage) {
+    logger.warn("searched %s and probably not a player", query);
     return [];
   }
 
@@ -30,6 +32,8 @@ export const searchPlayersInTransfermarkt = async (
       row.find("tbody > tr")
     );
 
+    const desc = `${playerNameRow.text()} (${clubNameRow.text()})`;
+
     const playerProfileUrl = playerNameRow.find(".hauptlink a").attr("href")!;
     const transfermarktIdString = playerProfileUrl.slice(
       playerProfileUrl.lastIndexOf("/") + 1,
@@ -38,12 +42,12 @@ export const searchPlayersInTransfermarkt = async (
     const transfermarktId = +transfermarktIdString;
     if (Number.isNaN(transfermarktId)) {
       throw new Error(
-        `searchPlayersInTransfermarkt: transfermarktId inválido! (${transfermarktIdString})`
+        `invalid transfermarktId (${transfermarktIdString}) for ${desc}`
       );
     }
 
     return {
-      desc: `${playerNameRow.text()} (${clubNameRow.text()})`,
+      desc,
       transfermarktId,
     };
   });

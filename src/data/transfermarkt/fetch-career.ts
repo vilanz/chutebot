@@ -1,5 +1,5 @@
 import { Cheerio, Node } from "cheerio";
-import { log } from "../../utils";
+import { logger } from "../../log";
 import { getCachedPlayerCareer, setCachedPlayerCareer } from "../cache";
 import { PlayerCareer, PlayerSpell } from "../types";
 import {
@@ -42,11 +42,7 @@ const extractPlayerSpells = (rows: Cheerio<Node>[]): PlayerSpell[] => {
         goals: 0,
       };
 
-      log(
-        `transfermarkt`,
-        currentClubSeason,
-        competitionCol.map((x) => `${x.attr("class")} -> ${x.html()}`)
-      );
+      logger.info("partial career fetched", currentClubSeason);
 
       return {
         ...accum,
@@ -68,14 +64,8 @@ export const fetchPlayerCareer = async (
 ): Promise<PlayerCareer> => {
   const cachedPlayerCareer = getCachedPlayerCareer(transfermarktId);
   if (cachedPlayerCareer) {
-    log("fetchPlayerCareer", `Found cache for ${transfermarktId}`);
     return cachedPlayerCareer;
   }
-
-  log(
-    "fetchPlayerCareer",
-    `Cache miss for ${transfermarktId}, will fetch manually`
-  );
 
   const careerUrl = getTransfermarktPlayerCareerUrl(transfermarktId);
   const ch = await getCheerioFromPageHTML(careerUrl);

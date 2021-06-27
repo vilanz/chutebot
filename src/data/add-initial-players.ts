@@ -1,7 +1,7 @@
 import { addPlayerFromTransfermarkt } from "./actions";
 import { hasPlayers } from "./db";
 
-const DEFAULT_PLAYER_TRANSFERMARKT_IDS = [
+const INITIAL_PLAYER_IDS = [
   423839, // Ribamar,
   68290, // Neymar,
   265660, // Yago Pikachu,
@@ -15,7 +15,7 @@ export const addInitialPlayersIfNeeded = async (): Promise<void> => {
     return;
   }
   await Promise.all(
-    DEFAULT_PLAYER_TRANSFERMARKT_IDS.map(async (transfermarktId) => {
+    INITIAL_PLAYER_IDS.map(async (transfermarktId) => {
       await addPlayerFromTransfermarkt(transfermarktId);
       await waitSeconds(10);
     })

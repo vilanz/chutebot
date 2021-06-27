@@ -1,8 +1,11 @@
 import Discord, { Message } from "discord.js";
-import { formatPlayerSpells, log } from "../utils";
+import { formatPlayerSpells, secondsToMs } from "../utils";
 import { parseCommand, CommandHandler, Commands } from "../command-parser";
 import { getRandomPlayer } from "../data";
 import { fetchPlayerCareer } from "../data/transfermarkt";
+import { logger } from "../log";
+
+const SECONDS_TO_GUESS = 20;
 
 const isCorrectPlayer = (playerName: string) => (message: Discord.Message) => {
   const command = parseCommand(message.content);
@@ -16,8 +19,6 @@ const isCorrectPlayer = (playerName: string) => (message: Discord.Message) => {
   return correct;
 };
 
-const SECONDS_TO_GUESS = 20;
-
 const waitForCorrectPlayer = async (
   playerName: string,
   message: Message
@@ -25,7 +26,7 @@ const waitForCorrectPlayer = async (
   const correctMessage = await message.channel
     .awaitMessages(isCorrectPlayer(playerName), {
       max: 1,
-      time: SECONDS_TO_GUESS * 1000,
+      time: secondsToMs(SECONDS_TO_GUESS),
       errors: ["time"],
     })
     .then((ms) => ms.first()!);
@@ -39,7 +40,7 @@ export const startGuessing: CommandHandler = async (message) => {
   const channelId = message.channel.id;
 
   if (channelsWithSessionsRunning.has(channelId)) {
-    await message.reply("já tem uma sessão rodando.");
+    await message.reply("Já tem uma sessão rodando.");
     return;
   }
 
@@ -48,7 +49,7 @@ export const startGuessing: CommandHandler = async (message) => {
   try {
     const randomPlayer = await getRandomPlayer();
     if (!randomPlayer) {
-      throw new Error("Could not find a random player");
+      throw new Error("could not find a random player");
     }
 
     const randomPlayerCareer = await fetchPlayerCareer(
@@ -56,7 +57,7 @@ export const startGuessing: CommandHandler = async (message) => {
     );
     if (!randomPlayerCareer) {
       throw new Error(
-        `Could not find a career for ${JSON.stringify(randomPlayer)}`
+        `could not find a career for ${JSON.stringify(randomPlayer)}`
       );
     }
 
@@ -72,7 +73,8 @@ export const startGuessing: CommandHandler = async (message) => {
         `${correctMessage.author} acertou! Era o **${randomPlayer.name}**.`
       );
     } catch (err) {
-      log("guessing", "Error (probably ran out of time)", err);
+      // TODO check if it's a timeout error
+      logger.info("no correct player was guessed", err);
       await playerSpellsMessage.reply(
         `Ninguém acertou depois de ${SECONDS_TO_GUESS} segundos.`
       );

@@ -1,8 +1,6 @@
 import cheerio, { Cheerio, CheerioAPI, Node, Element } from "cheerio";
 import fetch from "node-fetch";
-import { log } from "../../utils";
-
-export class RecaptchaError extends Error {}
+import { logger } from "../../log";
 
 export const getCheerioFromPageHTML = async (
   url: string
@@ -11,7 +9,12 @@ export const getCheerioFromPageHTML = async (
   const response = await fetch(transfermarktUrl, {
     method: "GET",
   });
-  log("cheerio", `Got response from ${response.url}.`);
+  logger.info(
+    "got Transfermarkt response",
+    response.status,
+    response.statusText,
+    response.url
+  );
   const html = await response.text();
   return cheerio.load(html);
 };
@@ -35,3 +38,6 @@ export const getQueryParamFromRelativeUrl = (
 
 export const getTransfermarktPlayerCareerUrl = (transfermarktId: number) =>
   `/geosmina/leistungsdatendetails/spieler/${transfermarktId}`;
+
+export const getPlayerSearchUrl = (query: string) =>
+  `/schnellsuche/ergebnis/schnellsuche?query=${encodeURIComponent(query)}`;

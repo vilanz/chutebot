@@ -4,6 +4,7 @@ import { Commands, parseCommand } from "./command-parser";
 import { ping, startGuessing, addPlayer } from "./commands";
 import { syncDatabaseModels } from "./data";
 import { addInitialPlayersIfNeeded } from "./data/add-initial-players";
+import { logger } from "./log";
 
 dotenv.config();
 
@@ -18,7 +19,7 @@ const client = new Discord.Client({
 client.on("ready", async () => {
   await syncDatabaseModels();
   await addInitialPlayersIfNeeded();
-  console.log("Started bot.");
+  logger.info("Started bot.");
 });
 
 client.on("message", async (message) => {

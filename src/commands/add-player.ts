@@ -1,14 +1,15 @@
 import { Message, MessageReaction, User } from "discord.js";
 import { CommandHandler } from "../command-parser";
-import { log } from "../utils";
 import { addPlayerFromTransfermarkt } from "../data/actions";
 import {
   PlayerSearchResult,
   searchPlayersInTransfermarkt,
 } from "../data/transfermarkt";
+import { secondsToMs } from "../utils";
 
 const PLAYER_REACTIONS = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"];
 const MAX_PLAYERS = PLAYER_REACTIONS.length;
+const SECONDS_TO_CONFIRM = 15;
 
 const awaitForPlayerSearchReaction = async (
   playersFound: PlayerSearchResult[],
@@ -34,7 +35,7 @@ const awaitForPlayerSearchReaction = async (
     const playerWantedReaction = await playerListNessage
       .awaitReactions(isCorrectReactionFromUser, {
         max: 1,
-        time: 15000,
+        time: secondsToMs(SECONDS_TO_CONFIRM),
       })
       .then((r) => r.first()!);
 
@@ -42,7 +43,13 @@ const awaitForPlayerSearchReaction = async (
       (r) => r === playerWantedReaction.emoji.name
     );
 
-    return playersFound[playerWantedIndex] ?? null;
+    const wantedPlayer = playersFound[playerWantedIndex] ?? null;
+
+    if (!wantedPlayer) {
+      throw new Error("got invalid prompt when adding a player");
+    }
+
+    return wantedPlayer;
   } catch {
     playerListNessage.react("⌚");
     return null;
@@ -58,8 +65,6 @@ export const addPlayer: CommandHandler = async (message, playerName) => {
 
   const playersFound = await searchPlayersInTransfermarkt(playerName);
 
-  log("add", { playersFound });
-
   if (!playersFound.length) {
     message.reply("Nenhum jogador encontrado.");
     return;
@@ -70,12 +75,7 @@ export const addPlayer: CommandHandler = async (message, playerName) => {
     message
   );
 
-  log("add", { playerWanted: wantedPlayer });
-
   if (!wantedPlayer) {
-    message.reply(
-      "Não conseguimos pegar o link dos detalhes da carreira do jogador. Isso não deveria estar acontecendo."
-    );
     return;
   }
 

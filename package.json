@@ -21,7 +21,8 @@
     "node-fetch": "^2.6.1",
     "sequelize": "^6.6.2",
     "sqlite3": "^5.0.2",
-    "table": "^6.7.1"
+    "table": "^6.7.1",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "@types/jest": "^26.0.23",
