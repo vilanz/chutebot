@@ -26,27 +26,26 @@ const awaitForPlayerSearchReaction = async (
     Jogadores encontrados:\n${playerFoundList}
   `);
 
-  try {
-    const wantedPlayerIndex = await waitForUserReaction(
-      playersFoundMessage,
-      PLAYER_REACTIONS
-    );
-
-    const wantedPlayer = playersFound[wantedPlayerIndex] ?? null;
-
-    if (!wantedPlayer) {
-      throw new Error(
-        `got invalid prompt ${wantedPlayerIndex} when adding a player`
-      );
-    }
-
-    return wantedPlayer;
-  } catch (err) {
-    // TODO check if it was actually a timeout
-    logger.info("time ran out for adding a player", { err });
+  const wantedPlayerIndex = await waitForUserReaction(
+    message.author.id,
+    playersFoundMessage,
+    PLAYER_REACTIONS
+  );
+  if (wantedPlayerIndex === null) {
+    logger.info("time ran out for adding a player");
     playersFoundMessage.react("⌚");
     return null;
   }
+
+  const wantedPlayer = playersFound[wantedPlayerIndex] ?? null;
+
+  if (!wantedPlayer) {
+    throw new Error(
+      `got invalid prompt ${wantedPlayerIndex} when adding a player`
+    );
+  }
+
+  return wantedPlayer;
 };
 
 export const addPlayer: CommandHandler = async (message, playerName) => {
