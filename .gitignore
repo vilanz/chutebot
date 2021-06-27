@@ -9,6 +9,9 @@ lerna-debug.log*
 # SQLite DB
 *.sqlite
 
+# Build
+build
+
 # Environment variables
 .env
 
