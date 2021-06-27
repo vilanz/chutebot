@@ -12,6 +12,7 @@ export const addPlayerFromTransfermarkt = async (
   }
 
   if (useRandomDelay) {
+    // random delay so we don't send a lot of requests to Transfermarkt at once
     const randomDelay = getRandomNumberUpTo(20);
     logger.info(
       "delaying adding %s by %s seconds",

@@ -1,6 +1,10 @@
 import cheerio, { Cheerio, CheerioAPI, Node, Element } from "cheerio";
+import UserAgent from "user-agents";
 import fetch from "node-fetch";
 import { logger } from "../../log";
+
+const getRandomUserAgent = () =>
+  new UserAgent({ platform: "Win32", deviceCategory: "desktop" }).toString();
 
 export const getCheerioFromPageHTML = async (
   url: string
@@ -8,6 +12,9 @@ export const getCheerioFromPageHTML = async (
   const transfermarktUrl = `https://www.transfermarkt.com.br${url}`;
   const response = await fetch(transfermarktUrl, {
     method: "GET",
+    headers: {
+      "User-Agent": getRandomUserAgent(),
+    },
   });
   logger.info("got Transfermarkt response", {
     status: response.status,
