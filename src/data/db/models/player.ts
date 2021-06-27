@@ -1,5 +1,5 @@
 import { STRING, Model, NUMBER } from "sequelize";
-import { sequelizeInstance } from "./instance";
+import { sequelizeInstance } from "../instance";
 
 export class PlayerEntity extends Model {
   public readonly id!: number;
@@ -18,5 +18,3 @@ PlayerEntity.init(
     sequelize: sequelizeInstance,
   }
 );
-
-export const syncDatabaseModels = () => PlayerEntity.sync();
