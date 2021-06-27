@@ -1,6 +1,7 @@
 import { CommandHandler } from "../command-parser";
 
-export const ping: CommandHandler = (message) => {
-  const latency = Math.abs(Date.now() - message.createdTimestamp);
-  message.channel.send(`Pong! (latência: ${latency}ms)`);
+export const ping: CommandHandler = async (message) => {
+  const pingMessage = await message.channel.send(`Ping...`);
+  const latency = pingMessage.createdTimestamp - message.createdTimestamp;
+  pingMessage.edit(`Pong! (${latency}ms)`);
 };
