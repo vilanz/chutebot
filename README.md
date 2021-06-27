@@ -4,12 +4,12 @@ This will be a Discord bot that runs a little quiz game where the clues are a fo
 
 ## TODO
 
-- [x] Scrap a real football database
-- [x] Make scrapped players' career records available for trivia
-- [ ] Handle invalid data from the football database (like missing spells or incomplete names)
-- [ ] Store this stuff in an actual database
+- [x] Use a real football database
+- [x] Make career records available for trivia
+- [x] Store this stuff in an actual database
 - [ ] Store wins
-- [ ] Run this in a production environment
+- [ ] Run in prod
+- [ ] Handle nicknames
 
 ## Current commands
 
