@@ -1,5 +1,5 @@
 import { getBorderCharacters, table, TableUserConfig } from "table";
-import { PlayerSpell } from "../data/types";
+import { PlayerSpell, UserWin } from "../data/types";
 import { sortBySeason } from "./sort-by-season";
 
 const tableWithoutBorders: TableUserConfig = {
@@ -11,8 +11,11 @@ const tableWithoutBorders: TableUserConfig = {
   singleLine: true,
 };
 
-export const formatPlayerSpells = (spells: PlayerSpell[]): string => {
-  const spellColumns = [
+const borderlessTableMarkdown = (columns: unknown[][]) =>
+  `\`\`\`${table(columns, tableWithoutBorders)}\`\`\``;
+
+export const formatPlayerSpells = (spells: PlayerSpell[]): string =>
+  borderlessTableMarkdown([
     ["Temp.", "Time", "Partidas", "Gols"],
     ...sortBySeason(spells).map((spell) => [
       spell.season,
@@ -20,7 +23,10 @@ export const formatPlayerSpells = (spells: PlayerSpell[]): string => {
       spell.matches,
       spell.goals,
     ]),
-  ];
-  const spellsTable = table(spellColumns, tableWithoutBorders);
-  return `\`\`\`${spellsTable}\`\`\``;
-};
+  ]);
+
+export const formatUserWins = (users: UserWin[]) =>
+  borderlessTableMarkdown([
+    ["Usuário", "Vitórias"],
+    ...users.map((u) => [u.userName, u.wins]),
+  ]);

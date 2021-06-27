@@ -2,6 +2,7 @@ import Discord, { Intents } from "discord.js";
 import dotenv from "dotenv";
 import { Commands, parseCommand } from "./command-parser";
 import { ping, startGuessing, addPlayer } from "./commands";
+import { wins } from "./commands/wins";
 import { syncDatabaseModels, addInitialPlayersIfNeeded } from "./data";
 import { logger } from "./log";
 
@@ -34,11 +35,13 @@ const client = new Discord.Client({
 
     try {
       if (name === Commands.Ping) {
-        ping(message, args);
+        await ping(message, args);
       } else if (name === Commands.Start) {
-        startGuessing(message, args);
+        await startGuessing(message, args);
       } else if (name === Commands.AddPlayer) {
-        addPlayer(message, args);
+        await addPlayer(message, args);
+      } else if (name === Commands.Wins) {
+        await wins(message, args);
       }
     } catch (err) {
       logger.error(err);

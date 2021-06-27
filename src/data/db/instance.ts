@@ -5,5 +5,5 @@ import { logger } from "../../log";
 export const sequelizeInstance = new Sequelize({
   dialect: "sqlite",
   storage: path.resolve("./db.sqlite"),
-  logging: (msg) => logger.debug(msg),
+  logging: (msg) => logger.info(msg),
 });

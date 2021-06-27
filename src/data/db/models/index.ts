@@ -1,5 +1,3 @@
-import { PlayerEntity } from "./player";
-
-export const syncDatabaseModels = () => PlayerEntity.sync();
-
-export { PlayerEntity };
+export * from "./player";
+export * from "./user";
+export * from "./sync";

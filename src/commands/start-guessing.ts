@@ -1,7 +1,7 @@
 import Discord, { Message } from "discord.js";
 import { formatPlayerSpells, secondsToMs } from "../utils";
 import { parseCommand, CommandHandler, Commands } from "../command-parser";
-import { getRandomPlayer } from "../data";
+import { addUserWin, getRandomPlayer } from "../data";
 import { fetchPlayerCareer } from "../data/transfermarkt";
 import { logger } from "../log";
 
@@ -69,8 +69,12 @@ export const startGuessing: CommandHandler = async (message) => {
         randomPlayer.name,
         message
       );
+      const winner = correctMessage.author;
+
+      addUserWin(correctMessage.author.id);
+
       await correctMessage.reply(
-        `${correctMessage.author} acertou! Era o **${randomPlayer.name}**.`
+        `${winner} acertou! Era o **${randomPlayer.name}**.`
       );
     } catch (err) {
       // TODO check if it's a timeout error
