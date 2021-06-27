@@ -1,5 +1,9 @@
 import Discord, { Message } from "discord.js";
-import { formatPlayerSpells, secondsToMs } from "../utils";
+import {
+  compareIgnoringAccents,
+  formatPlayerSpells,
+  secondsToMs,
+} from "../utils";
 import { parseCommand, CommandHandler, Commands } from "../command-parser";
 import { addUserWin, getRandomPlayer } from "../data";
 import { logger } from "../log";
@@ -11,7 +15,8 @@ const isCorrectPlayer = (playerName: string) => (message: Discord.Message) => {
   if (!command || command.name !== Commands.Guess) {
     return false;
   }
-  const correct = command.args.toLowerCase() === playerName.toLowerCase();
+  const guess = command.args;
+  const correct = compareIgnoringAccents(playerName, guess);
   if (!correct) {
     message.react("❌");
   }
