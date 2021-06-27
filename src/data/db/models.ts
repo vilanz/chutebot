@@ -1,6 +1,5 @@
-import { Sequelize, STRING, Model, NUMBER } from "sequelize";
-
-const sequelize = new Sequelize("sqlite::memory:");
+import { STRING, Model, NUMBER } from "sequelize";
+import { sequelizeInstance } from "./instance";
 
 export class PlayerEntity extends Model {
   public readonly id!: number;
@@ -16,6 +15,8 @@ PlayerEntity.init(
     transfermarktId: NUMBER,
   },
   {
-    sequelize,
+    sequelize: sequelizeInstance,
   }
 );
+
+export const syncDatabaseModels = () => PlayerEntity.sync();

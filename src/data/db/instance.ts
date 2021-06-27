@@ -1,8 +1,7 @@
+import path from "path";
 import { Sequelize } from "sequelize";
-import { PlayerEntity } from "./models";
 
-export const sequelizeInstance = new Sequelize("sqlite::memory:");
-
-export const syncDatabase = async () => {
-  await PlayerEntity.sync();
-};
+export const sequelizeInstance = new Sequelize({
+  dialect: "sqlite",
+  storage: path.resolve("./db.sqlite"),
+});
