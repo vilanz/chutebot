@@ -1,17 +1,20 @@
 // eslint-disable-next-line max-classes-per-file
-import { STRING, Model, Association, INTEGER } from "sequelize";
-import { sequelizeInstance } from "../instance";
+import { STRING, Model, Association, INTEGER, DATE } from "sequelize";
 import { Player } from "../../types";
+import { sequelizeInstance } from "../instance";
 
 export interface PlayerAttributes {
   transfermarktId: number;
   name: string;
+  lastSpellsUpdate: Date;
 }
 
 export class PlayerEntity extends Model<PlayerAttributes> {
   public readonly transfermarktId!: number;
 
   public readonly name!: string;
+
+  public readonly lastSpellsUpdate!: Date;
 
   public readonly spells?: PlayerSpellEntity[];
 
@@ -29,10 +32,11 @@ export class PlayerEntity extends Model<PlayerAttributes> {
 PlayerEntity.init(
   {
     transfermarktId: {
-      type: STRING,
+      type: INTEGER,
       primaryKey: true,
     },
     name: STRING,
+    lastSpellsUpdate: DATE,
   },
   {
     sequelize: sequelizeInstance,
@@ -65,7 +69,7 @@ export class PlayerSpellEntity extends Model<PlayerSpellAttributes> {
 PlayerSpellEntity.init(
   {
     playerTransfermarktId: {
-      type: STRING,
+      type: INTEGER,
       references: {
         model: PlayerEntity,
         key: "transfermarktId",
@@ -78,7 +82,7 @@ PlayerSpellEntity.init(
   },
   {
     sequelize: sequelizeInstance,
-    modelName: "playerSpells",
+    modelName: "player_spells",
   }
 );
 

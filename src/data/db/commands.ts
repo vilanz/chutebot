@@ -39,6 +39,7 @@ export const createPlayer = async (player: Player) => {
   const entity = await PlayerEntity.create({
     transfermarktId,
     name,
+    lastSpellsUpdate: new Date(),
   });
   if (spells?.length) {
     PlayerSpellEntity.bulkCreate(
