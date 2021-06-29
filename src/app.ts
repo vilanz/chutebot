@@ -6,6 +6,7 @@ import {
   handleTriviaCommand,
 } from "./trivia";
 import { logger } from "./log";
+import { env } from "./env";
 
 syncTriviaDatabase()
   .then(() => addInitialTriviaPlayers())
@@ -34,5 +35,5 @@ syncTriviaDatabase()
       handleTriviaCommand(command, message);
     });
 
-    client.login(process.env.DISCORD_BOT_TOKEN);
+    client.login(env.DISCORD_BOT_TOKEN);
   });
