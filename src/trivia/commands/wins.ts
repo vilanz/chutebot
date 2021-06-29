@@ -1,5 +1,5 @@
 import { CommandHandler } from "../../command-parser";
-import { getUserById } from "../../discord-helpers";
+import { getUserById } from "../../discord";
 import { getUserWins } from "../db";
 import { UserWin } from "../types/user";
 import { formatUserWins } from "../format";

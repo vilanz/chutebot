@@ -5,7 +5,7 @@ import {
   PlayerSearchResult,
   searchPlayersInTransfermarkt,
 } from "../transfermarkt";
-import { waitForUserReaction } from "../../discord-helpers";
+import { waitForUserReaction } from "../../discord";
 import { logger } from "../../log";
 
 const awaitForPlayerSearchReaction = async (
