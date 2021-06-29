@@ -5,6 +5,7 @@ import { wins } from "./trivia/commands/wins";
 import { syncTriviaDatabase, addInitialTriviaPlayers } from "./trivia";
 import { logger } from "./log";
 import { fetchTwitter } from "./goals-feed";
+import { TEST_CHANNEL_ID } from "./discord";
 
 const client = new Discord.Client({
   intents: [
@@ -24,6 +25,9 @@ syncTriviaDatabase()
     });
 
     client.on("message", async (message) => {
+      if (message.channel.id !== TEST_CHANNEL_ID) {
+        return;
+      }
       const command = parseCommand(message.content);
       if (!command || !command.name) {
         return;
