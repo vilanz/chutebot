@@ -1,7 +1,7 @@
 import { CommandHandler } from "../../command-parser";
 import { getUserById } from "../../discord";
-import { getUserWins } from "../db";
 import { UserWin } from "../types/user";
+import { getUserWins } from "../db";
 import { formatUserWins } from "../format";
 
 export const wins: CommandHandler = async (message) => {
