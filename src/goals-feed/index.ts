@@ -1,8 +1,11 @@
-import { Message } from "discord.js";
+import { Client, TextChannel } from "discord.js";
 import axios, { AxiosResponse } from "axios";
 import { ReadStream } from "fs";
 import { env } from "../env";
 import { logger } from "../log";
+import { TEST_CHANNEL_ID } from "../discord";
+
+// TODO clean this terrible mess up
 
 const twitter1Api = axios.create({
   baseURL: "https://api.twitter.com/1.1",
@@ -19,9 +22,12 @@ const twitterApi = axios.create({
 });
 
 twitterApi.interceptors.response.use((response) => {
-  logger.info("rate limit", response.headers["x-rate-limit-remaining"]);
+  logger.info("rate limit %s", response.headers["x-rate-limit-remaining"]);
   return response;
 });
+
+const sleep = async (delay: number) =>
+  new Promise((resolve) => setTimeout(() => resolve(true), delay));
 
 const mapData = <T>(res: AxiosResponse<T>) => res.data;
 
@@ -47,7 +53,7 @@ const deleteRules = async () => {
     });
   }
 };
-
+/*
 interface Tweet {
   data: {
     id: string;
@@ -60,63 +66,97 @@ interface Tweet {
     }[];
   };
 }
+*/
 
-export const fetchTwitter = async (message: Message) => {
+export const fetchTwitter = async (client: Client) => {
   await deleteRules();
   await addRules([
-    /*
     {
-      value: "gol from:goleada_info has:videos",
+      value: "from:FCYahoo has:videos",
       id: "goleada_info tweets",
     },
-    */
+    /*
     {
       value: "cat has:videos",
       id: "will delete lol",
     },
+    */
   ]);
+  const guild = await client.guilds.fetch("299991824091709440");
+  if (!guild) {
+    logger.error("sem guild");
+    return;
+  }
 
-  const stream = await twitterApi
-    .get<ReadStream>(`/tweets/search/stream`, {
-      responseType: "stream",
-      headers: {
-        "User-Agent": "v2FilterStreamJS",
-      },
-      timeout: 20000,
-    })
-    .then(mapData);
+  const channel = (await guild.channels.fetch(TEST_CHANNEL_ID)) as TextChannel;
+
+  if (!channel) {
+    logger.error("sem channel");
+    return;
+  }
+
+  const res = await twitterApi.get<ReadStream>(`/tweets/search/stream`, {
+    responseType: "stream",
+    headers: {
+      "User-Agent": "v2FilterStreamJS",
+    },
+    timeout: 31000,
+  });
+
+  if (res.status !== 200) {
+    logger.warn("res status %s %s", res.status, res.statusText);
+    return;
+  }
+
+  const stream = res.data;
+
+  let timeout = 0;
+
+  async function reconnect() {
+    timeout += 1;
+    await sleep(2 ** timeout * 1000);
+    fetchTwitter(client);
+  }
 
   stream.on("data", async (buffer: Buffer) => {
-    const dataStr = buffer.toString();
     try {
-      const tweet = JSON.parse(dataStr) as Tweet;
-      if (!tweet) {
-        return;
+      const json = JSON.parse(buffer.toString());
+      if (json.connection_issue) {
+        logger.error("error %s", json);
+        reconnect();
+      } else if (json.data) {
+        const tweetId = json.data.id;
+        await twitter1Api
+          .get(`/statuses/show/${tweetId}.json`)
+          .then(mapData)
+          .then((d: any) => {
+            const media = d.extended_entities?.media?.[0];
+            if (!media) {
+              return;
+            }
+            const variants = media.video_info?.variants;
+            if (!variants) {
+              return;
+            }
+            const mp4 = variants.find(
+              (x: any) => x.content_type === "video/mp4"
+            );
+            if (!mp4) {
+              return;
+            }
+            const notif = `${json.data.text}\n${mp4.url}`;
+            channel.send(notif);
+          });
+      } else {
+        logger.error("authError %s", json);
       }
-      const tweetId = tweet.data.id;
-      await twitter1Api
-        .get(`/statuses/show/${tweetId}.json`)
-        .then(mapData)
-        .then((d: any) => {
-          const media = d.extended_entities?.media?.[0];
-          if (!media) {
-            console.log("video has no media");
-            return;
-          }
-          const variants = media.video_info?.variants;
-          if (!variants) {
-            console.log("video has no variants");
-            return;
-          }
-          const mp4 = variants.find((x: any) => x.content_type === "video/mp4");
-          if (!mp4) {
-            console.group("video has no mp4");
-            return;
-          }
-          message.reply(mp4.url);
-        });
     } catch (e) {
-      console.log(e);
+      logger.error("heartbeat");
     }
+  });
+
+  stream.on("error", () => {
+    logger.error("timeout error");
+    reconnect();
   });
 };
