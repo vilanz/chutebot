@@ -1,5 +1,5 @@
 import { getBorderCharacters, table, TableUserConfig } from "table";
-import { PlayerSpell, UserWin } from "../data/types";
+import { PlayerSpell, UserWin } from "../types";
 import { sortBySeason } from "./sort-by-season";
 
 const tableWithoutBorders: TableUserConfig = {

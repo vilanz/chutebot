@@ -1,12 +1,9 @@
 import Discord, { Message } from "discord.js";
-import {
-  compareIgnoringAccents,
-  formatPlayerSpells,
-  secondsToMs,
-} from "../utils";
-import { parseCommand, CommandHandler, Commands } from "../command-parser";
-import { addUserWin, getRandomPlayer } from "../data";
-import { logger } from "../log";
+import { secondsToMs } from "../../utils";
+import { parseCommand, CommandHandler, Commands } from "../../command-parser";
+import { logger } from "../../log";
+import { addUserWin, getRandomPlayer } from "../db";
+import { compareIgnoringAccents, formatPlayerSpells } from "../format";
 
 const SECONDS_TO_GUESS = 20;
 

@@ -1,4 +1,4 @@
-import { PlayerSpell } from "../data/types";
+import { PlayerSpell } from "../types";
 
 const getSeasonDetails = (season: string) => {
   if (!season.includes("/")) {

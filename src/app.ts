@@ -1,9 +1,9 @@
 import Discord, { Intents } from "discord.js";
 import dotenv from "dotenv";
 import { Commands, parseCommand } from "./command-parser";
-import { ping, startGuessing, addPlayer } from "./commands";
-import { wins } from "./commands/wins";
-import { syncDatabaseModels, addInitialPlayersIfNeeded } from "./data";
+import { ping, startGuessing, addPlayer } from "./trivia/commands";
+import { wins } from "./trivia/commands/wins";
+import { syncTriviaDatabase, addInitialTriviaPlayers } from "./trivia";
 import { logger } from "./log";
 
 dotenv.config();
@@ -16,8 +16,8 @@ const client = new Discord.Client({
   ],
 });
 
-syncDatabaseModels()
-  .then(() => addInitialPlayersIfNeeded())
+syncTriviaDatabase()
+  .then(() => addInitialTriviaPlayers())
   .then(() => {
     logger.info("starting bot");
 

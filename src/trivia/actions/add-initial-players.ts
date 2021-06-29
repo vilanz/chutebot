@@ -6,7 +6,7 @@ const INITIAL_PLAYER_IDS = [
   265660, // Yago Pikachu,
 ];
 
-export const addInitialPlayersIfNeeded = async (): Promise<void> => {
+export const addInitialTriviaPlayers = async (): Promise<void> => {
   await Promise.all(
     INITIAL_PLAYER_IDS.map((transfermarktId) =>
       addPlayerFromTransfermarkt(transfermarktId, true)

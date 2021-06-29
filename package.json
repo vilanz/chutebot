@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "start": "tsc && node build/app.js",
+    "build": "tsc",
+    "start": "yarn build && node build/app.js",
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
