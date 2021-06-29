@@ -1,12 +1,10 @@
 import Discord, { Intents } from "discord.js";
-import dotenv from "dotenv";
 import { Commands, parseCommand } from "./command-parser";
 import { ping, startGuessing, addPlayer } from "./trivia/commands";
 import { wins } from "./trivia/commands/wins";
 import { syncTriviaDatabase, addInitialTriviaPlayers } from "./trivia";
 import { logger } from "./log";
-
-dotenv.config();
+import { fetchTwitter } from "./goals-feed";
 
 const client = new Discord.Client({
   intents: [
@@ -41,6 +39,8 @@ syncTriviaDatabase()
           await addPlayer(message, args);
         } else if (name === Commands.Wins) {
           await wins(message, args);
+        } else if (name === "teste-tw") {
+          await fetchTwitter(message);
         }
       } catch (err) {
         logger.error("error when running a command", err);
