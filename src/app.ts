@@ -7,6 +7,7 @@ import {
 } from "./trivia";
 import { logger } from "./log";
 import { env } from "./env";
+import { fetchTwitter } from "./goals-feed";
 
 syncTriviaDatabase()
   .then(() => addInitialTriviaPlayers())
@@ -23,7 +24,7 @@ syncTriviaDatabase()
 
     client.on("ready", async () => {
       logger.info("started bot");
-      // await fetchTwitter(client);
+      await fetchTwitter(client);
     });
 
     client.on("message", async (message) => {

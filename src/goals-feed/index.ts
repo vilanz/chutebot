@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from "axios";
 import { ReadStream } from "fs";
 import { env } from "../env";
 import { logger } from "../log";
-import { FUTEBOL_GUILD, TEST_CHANNEL_ID } from "../discord";
+import { BR_FOOTBALL_CHANNEL_ID, FUTEBOL_GUILD } from "../discord";
 
 // TODO clean this terrible mess up
 
@@ -69,10 +69,12 @@ interface Tweet {
 */
 
 export const fetchTwitter = async (client: Client) => {
+  logger.info("restarting fetchTwitter");
+
   await deleteRules();
   await addRules([
     {
-      value: "from:FCYahoo has:videos",
+      value: "from:DiarioGols has:videos",
       id: "goleada_info tweets",
     },
   ]);
@@ -83,7 +85,9 @@ export const fetchTwitter = async (client: Client) => {
     return;
   }
 
-  const channel = (await guild.channels.fetch(TEST_CHANNEL_ID)) as TextChannel;
+  const channel = (await guild.channels.fetch(
+    BR_FOOTBALL_CHANNEL_ID
+  )) as TextChannel;
   if (!channel) {
     logger.error("sem channel");
     return;
