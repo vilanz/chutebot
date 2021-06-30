@@ -2,8 +2,9 @@ import Discord, { Message } from "discord.js";
 import { secondsToMs } from "../../utils";
 import { parseCommand, CommandHandler, Commands } from "../../command-parser";
 import { logger } from "../../log";
-import { addUserWin, getRandomPlayer } from "../db";
+import { addUserWin, getRandomPlayerId } from "../db";
 import { guessPlayerName, formatPlayerSpells } from "../format";
+import { getUpdatedPlayer } from "../actions/getUpdatedPlayer";
 
 const SECONDS_TO_GUESS = 20;
 
@@ -48,10 +49,12 @@ export const startGuessing: CommandHandler = async (message) => {
   channelsWithSessionsRunning.add(channelId);
 
   try {
-    const randomPlayer = await getRandomPlayer().then((p) => p?.toInterface());
-    if (!randomPlayer) {
+    const randomPlayerId = await getRandomPlayerId();
+    if (!randomPlayerId) {
       throw new Error("could not find a random player");
     }
+
+    const randomPlayer = await getUpdatedPlayer(randomPlayerId);
 
     const playerSpellsString = formatPlayerSpells(randomPlayer.spells);
     const playerSpellsMessage = await message.reply(playerSpellsString);
