@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from "axios";
 import { ReadStream } from "fs";
 import { env } from "../env";
 import { logger } from "../log";
-import { TEST_CHANNEL_ID } from "../discord";
+import { FUTEBOL_GUILD, TEST_CHANNEL_ID } from "../discord";
 
 // TODO clean this terrible mess up
 
@@ -26,8 +26,8 @@ twitterApi.interceptors.response.use((response) => {
   return response;
 });
 
-const sleep = async (delay: number) =>
-  new Promise((resolve) => setTimeout(() => resolve(true), delay));
+const sleepXSeconds = async (seconds: number) =>
+  new Promise((resolve) => setTimeout(() => resolve(true), seconds * 1000));
 
 const mapData = <T>(res: AxiosResponse<T>) => res.data;
 
@@ -75,21 +75,15 @@ export const fetchTwitter = async (client: Client) => {
       value: "from:FCYahoo has:videos",
       id: "goleada_info tweets",
     },
-    /*
-    {
-      value: "cat has:videos",
-      id: "will delete lol",
-    },
-    */
   ]);
-  const guild = await client.guilds.fetch("299991824091709440");
+
+  const guild = await client.guilds.fetch(FUTEBOL_GUILD);
   if (!guild) {
     logger.error("sem guild");
     return;
   }
 
   const channel = (await guild.channels.fetch(TEST_CHANNEL_ID)) as TextChannel;
-
   if (!channel) {
     logger.error("sem channel");
     return;
@@ -114,7 +108,11 @@ export const fetchTwitter = async (client: Client) => {
 
   async function reconnect() {
     timeout += 1;
-    await sleep(2 ** timeout * 1000);
+
+    const sleepDuration = 2 ** timeout;
+    logger.warn("will sleep for %s seconds", sleepDuration);
+    await sleepXSeconds(sleepDuration);
+
     fetchTwitter(client);
   }
 
