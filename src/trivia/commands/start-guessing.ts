@@ -3,7 +3,7 @@ import { secondsToMs } from "../../utils";
 import { parseCommand, CommandHandler, Commands } from "../../command-parser";
 import { logger } from "../../log";
 import { addUserWin, getRandomPlayer } from "../db";
-import { compareIgnoringAccents, formatPlayerSpells } from "../format";
+import { guessPlayerName, formatPlayerSpells } from "../format";
 
 const SECONDS_TO_GUESS = 20;
 
@@ -13,7 +13,7 @@ const isCorrectPlayer = (playerName: string) => (message: Discord.Message) => {
     return false;
   }
   const guess = command.args;
-  const correct = compareIgnoringAccents(playerName, guess);
+  const correct = guessPlayerName(playerName, guess);
   if (!correct) {
     message.react("❌");
   }
