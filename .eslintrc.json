@@ -1,5 +1,6 @@
 {
   "extends": "./node_modules/@vilanz/tooling/eslint",
+  "ignorePatterns": "build",
   "parserOptions": {
     "project": "./tsconfig.json"
   },

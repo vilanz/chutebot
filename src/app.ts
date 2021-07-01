@@ -1,52 +1,30 @@
-import Discord, { Intents } from "discord.js";
-import dotenv from "dotenv";
-import { Commands, parseCommand } from "./command-parser";
-import { ping, startGuessing, addPlayer } from "./commands";
-import { wins } from "./commands/wins";
-import { syncDatabaseModels, addInitialPlayersIfNeeded } from "./data";
-import { logger } from "./log";
+import { parseCommand } from "./core/command-parser";
+import { initTriviaDatabase, handleTriviaCommand } from "./trivia";
+import { logger } from "./core/log";
+import { env } from "./core/env";
+import { streamGoalsFeed } from "./goals-feed";
+import { discordClient } from "./core/discord";
 
-dotenv.config();
+initTriviaDatabase().then(() => {
+  logger.info("starting bot");
 
-const client = new Discord.Client({
-  intents: [
-    Intents.FLAGS.GUILDS,
-    Intents.FLAGS.GUILD_MESSAGES,
-    Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-  ],
-});
-
-syncDatabaseModels()
-  .then(() => addInitialPlayersIfNeeded())
-  .then(() => {
-    logger.info("starting bot");
-
-    client.on("ready", async () => {
-      logger.info("started bot");
-    });
-
-    client.on("message", async (message) => {
-      const command = parseCommand(message.content);
-      if (!command || !command.name) {
-        return;
-      }
-      const { name, args } = command;
-
-      try {
-        if (name === Commands.Ping) {
-          await ping(message, args);
-        } else if (name === Commands.Start) {
-          await startGuessing(message, args);
-        } else if (name === Commands.AddPlayer) {
-          await addPlayer(message, args);
-        } else if (name === Commands.Wins) {
-          await wins(message, args);
-        }
-      } catch (err) {
-        logger.error("error when running a command", err);
-        message.reply("Ocorreu um erro ao tentar executar esse comando.");
-      }
-    });
-
-    client.login(process.env.DISCORD_BOT_TOKEN);
+  discordClient.on("ready", async () => {
+    logger.info("started bot");
+    try {
+      await streamGoalsFeed();
+    } catch (err) {
+      logger.error("twitter stream", err);
+    }
   });
+
+  discordClient.on("message", async (message) => {
+    const command = parseCommand(message.content);
+    if (!command) {
+      return;
+    }
+
+    handleTriviaCommand(command, message);
+  });
+
+  discordClient.login(env.DISCORD_BOT_TOKEN);
+});
