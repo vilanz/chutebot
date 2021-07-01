@@ -1,16 +1,22 @@
 import { CommandHandler } from "../../core/command-parser";
 import { getUserById } from "../../core/discord";
-import { UserWin } from "../types/user";
 import { getUserWins } from "../db";
 import { formatUserWins } from "../format";
 
 export const wins: CommandHandler = async (message) => {
-  const userWins: UserWin[] = await getUserWins().then((users) =>
-    users.map((u) => ({
-      userName: getUserById(u.id, message)!.displayName,
-      wins: u.wins,
-    }))
-  );
+  // TODO clean up this mess
+  const userWins = await getUserWins()
 
-  message.reply(formatUserWins(userWins));
+  const users = await Promise.all(userWins.map(u => getUserById(u.id)
+    .then(discordMember => ({
+      discordMember,
+      u
+    }))))
+
+  const usersWithWins = users.map(u => ({
+    userName: u.discordMember.displayName,
+    wins: u.u.wins
+  }))
+
+  message.reply(formatUserWins(usersWithWins));
 };

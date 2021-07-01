@@ -9,8 +9,12 @@ import { secondsToMs } from "../utils";
 import { discordClient } from "./client";
 import { FUTEBOL_GUILD } from "./consts";
 
-export const getUserById = (id: string, message: Message) =>
-  message.guild?.members.cache.get(id as Snowflake);
+const getFootbalGuild = () => discordClient.guilds
+  .fetch(FUTEBOL_GUILD)
+
+export const getUserById = (id: string) =>
+  getFootbalGuild()
+    .then(g => g.members.fetch(id as Snowflake))
 
 export const waitForUserReaction = async (
   authorId: Snowflake,
@@ -37,6 +41,5 @@ export const waitForUserReaction = async (
 };
 
 export const getChannel = (channelId: Snowflake) =>
-  discordClient.guilds
-    .fetch(FUTEBOL_GUILD)
+  getFootbalGuild()
     .then((g) => g.channels.fetch(channelId) as Promise<TextChannel>);
