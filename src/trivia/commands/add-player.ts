@@ -33,7 +33,7 @@ const awaitForPlayerSearchReaction = async (
   );
   if (wantedPlayerIndex === null) {
     logger.info("time ran out for adding a player");
-    playersFoundMessage.react("⌚");
+    await playersFoundMessage.react("⌚");
     return null;
   }
 
@@ -51,14 +51,14 @@ const awaitForPlayerSearchReaction = async (
 export const addPlayer: CommandHandler = async (message, playerName) => {
   const playerNameWithoutSpaces = playerName?.trim();
   if (!playerNameWithoutSpaces || playerNameWithoutSpaces.length > 80) {
-    message.reply("Precisamos de um nome válido.");
+    await message.reply("Precisamos de um nome válido.");
     return;
   }
 
   const playersFound = await searchPlayersInTransfermarkt(playerName);
 
   if (!playersFound.length) {
-    message.reply("Nenhum jogador encontrado.");
+    await message.reply("Nenhum jogador encontrado.");
     return;
   }
 

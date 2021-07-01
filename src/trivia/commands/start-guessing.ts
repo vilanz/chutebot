@@ -20,7 +20,7 @@ const isCorrectPlayer = (playerName: string) => (message: Discord.Message) => {
   const guess = command.args;
   const correct = guessPlayerName(playerName, guess);
   if (!correct) {
-    message.react("❌");
+    void message.react("❌");
   }
   return correct;
 };
@@ -70,7 +70,7 @@ export const startGuessing: CommandHandler = async (message) => {
       );
       const winner = correctMessage.author;
 
-      addUserWin(correctMessage.author.id);
+      await addUserWin(correctMessage.author.id);
 
       await correctMessage.reply(
         `${winner} acertou! Era o **${randomPlayer.name}**.`

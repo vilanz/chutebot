@@ -1,6 +1,6 @@
 import { Message } from "discord.js";
 import { BotCommand, Commands } from "../../core/command-parser";
-import { BOTSPAM_CHANNEL_ID } from "../../core/discord";
+import { isMessageInBotspam } from "../../core/discord";
 import { logger } from "../../core/log";
 import { addPlayer } from "./add-player";
 import { ping } from "./ping";
@@ -12,11 +12,7 @@ export const handleTriviaCommand = async (
   message: Message
 ) => {
   try {
-    if (
-      message.channel.id !== BOTSPAM_CHANNEL_ID
-      // && message.channel.id !== NATIONAL_TEAMS_CHANNEL_ID
-      // && message.author.id !== MY_USER_ID
-    ) {
+    if (!isMessageInBotspam(message)) {
       return;
     }
     const { name, args } = command;
@@ -31,6 +27,6 @@ export const handleTriviaCommand = async (
     }
   } catch (err) {
     logger.error("error when running a command", err);
-    // message.reply("Ocorreu um erro ao tentar executar esse comando.");
+    await message.reply('⚠')
   }
 };

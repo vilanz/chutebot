@@ -21,7 +21,7 @@ const streamTweets = async (tweetStream: TweetStream) => {
     await waitSeconds(sleepDuration);
     tweetStream.destroy(new Error("just reconnecting"));
 
-    streamTweets(tweetStream);
+    void streamTweets(tweetStream);
   };
 
   tweetStream.on("error", async (err) => {
@@ -58,7 +58,7 @@ const streamTweets = async (tweetStream: TweetStream) => {
 
     const mp4Url = await getTweetVideoUrl(data.id);
 
-    brazilianFootballChannel.send(`**${tweetTextWithoutSpaces}** ${mp4Url}`);
+    void brazilianFootballChannel.send(`**${tweetTextWithoutSpaces}** ${mp4Url}`);
   });
 };
 
@@ -76,5 +76,5 @@ export const streamGoalsFeed = async () => {
     return;
   }
 
-  streamTweets(tweetStream);
+  void streamTweets(tweetStream);
 };

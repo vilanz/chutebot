@@ -7,7 +7,9 @@ import {
 } from "discord.js";
 import { secondsToMs } from "../utils";
 import { discordClient } from "./client";
-import { FUTEBOL_GUILD } from "./consts";
+import { BOTSPAM_CHANNEL_ID, FUTEBOL_GUILD } from "./consts";
+
+// TODO split this file
 
 const getFootbalGuild = () => discordClient.guilds
   .fetch(FUTEBOL_GUILD)
@@ -15,6 +17,12 @@ const getFootbalGuild = () => discordClient.guilds
 export const getUserById = (id: string) =>
   getFootbalGuild()
     .then(g => g.members.fetch(id as Snowflake))
+
+export const getChannel = (channelId: Snowflake) =>
+  getFootbalGuild()
+    .then((g) => g.channels.fetch(channelId) as Promise<TextChannel>);
+
+export const isMessageInBotspam = (message: Message) => message.channel.id !== BOTSPAM_CHANNEL_ID
 
 export const waitForUserReaction = async (
   authorId: Snowflake,
@@ -40,6 +48,3 @@ export const waitForUserReaction = async (
     });
 };
 
-export const getChannel = (channelId: Snowflake) =>
-  getFootbalGuild()
-    .then((g) => g.channels.fetch(channelId) as Promise<TextChannel>);

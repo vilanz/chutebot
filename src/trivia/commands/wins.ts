@@ -18,5 +18,5 @@ export const wins: CommandHandler = async (message) => {
     wins: u.u.wins
   }))
 
-  message.reply(formatUserWins(usersWithWins));
+  await message.reply(formatUserWins(usersWithWins));
 };

@@ -72,7 +72,7 @@ export const addPlayerSpells = async (
   spells: PlayerSpell[]
 ) => {
   if (spells?.length) {
-    PlayerSpellEntity.bulkCreate(
+    await PlayerSpellEntity.bulkCreate(
       spells.map((spell) => {
         const { season, club, goals, matches } = spell;
         return {

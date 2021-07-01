@@ -5,11 +5,10 @@ import { env } from "./core/env";
 import { streamGoalsFeed } from "./goals-feed";
 import { discordClient } from "./core/discord";
 
-initTriviaDatabase().then(() => {
+void initTriviaDatabase().then(async () => {
   logger.info("starting bot");
 
   discordClient.on("ready", async () => {
-    logger.info("started bot");
     try {
       await streamGoalsFeed();
     } catch (err) {
@@ -23,8 +22,9 @@ initTriviaDatabase().then(() => {
       return;
     }
 
-    handleTriviaCommand(command, message);
+    await handleTriviaCommand(command, message);
   });
 
-  discordClient.login(env.DISCORD_BOT_TOKEN);
+  await discordClient.login(env.DISCORD_BOT_TOKEN);
+  logger.info("logged in");
 });
