@@ -74,7 +74,7 @@ export const fetchTwitter = async (client: Client) => {
   await deleteRules();
   await addRules([
     {
-      value: "from:DiarioGols has:videos",
+      value: "from:goleada_info has:videos",
       id: "goleada_info tweets",
     },
   ]);
@@ -136,24 +136,37 @@ export const fetchTwitter = async (client: Client) => {
             if (!media) {
               return;
             }
+
             const variants = media.video_info?.variants;
             if (!variants) {
               return;
             }
-            const mp4 = variants.find(
-              (x: any) => x.content_type === "video/mp4"
-            );
+
+            const mp4 = variants
+              .filter((x: any) => x.content_type === "video/mp4")
+              .reduce((max: any, curr: any) =>
+                max.bitrate > curr.bitrate ? max : curr
+              );
             if (!mp4) {
               return;
             }
-            const notif = `${json.data.text}\n${mp4.url}`;
-            channel.send(notif);
+
+            let msg = json.data.text;
+            try {
+              msg = msg
+                .replace(/https:\/\/t\.co\/\w+/g, "")
+                .replace(/^[ ]+|[ ]+$/g, "");
+            } catch (e) {
+              logger.error(e);
+            }
+
+            channel.send(`**${msg}** ${mp4.url}`);
           });
       } else {
         logger.error("authError %s", json);
       }
     } catch (e) {
-      logger.error("heartbeat");
+      // heartbeat
     }
   });
 
