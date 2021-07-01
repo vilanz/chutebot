@@ -1,6 +1,6 @@
 import { Message } from "discord.js";
 import { BotCommand, Commands } from "../../core/command-parser";
-import { GRINGO_FOOTBALL_CHANNEL_ID } from "../../core/discord";
+import { BOTSPAM_CHANNEL_ID } from "../../core/discord";
 import { logger } from "../../core/log";
 import { addPlayer } from "./add-player";
 import { ping } from "./ping";
@@ -13,7 +13,7 @@ export const handleTriviaCommand = async (
 ) => {
   try {
     if (
-      message.channel.id !== GRINGO_FOOTBALL_CHANNEL_ID
+      message.channel.id !== BOTSPAM_CHANNEL_ID
       // && message.channel.id !== NATIONAL_TEAMS_CHANNEL_ID
       // && message.author.id !== MY_USER_ID
     ) {
