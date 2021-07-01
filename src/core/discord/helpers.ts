@@ -7,7 +7,7 @@ import {
 } from "discord.js";
 import { secondsToMs } from "../utils";
 import { discordClient } from "./client";
-import { BOTSPAM_CHANNEL_ID, FUTEBOL_GUILD } from "./consts";
+import { BOTSPAM_CHANNEL_ID, FUTEBOL_GUILD, MY_USER_ID } from "./consts";
 
 // TODO split this file
 
@@ -24,6 +24,8 @@ export const getChannel = (channelId: Snowflake) =>
 
 export const isMessageInBotspam = (message: Message) => message.channel.id !== BOTSPAM_CHANNEL_ID
 
+export const dmMeError = (err: any) => discordClient.users.fetch(MY_USER_ID).then(me => me.send(err ? JSON.stringify(err) : ''))
+
 export const waitForUserReaction = async (
   authorId: Snowflake,
   message: Message,
@@ -37,7 +39,7 @@ export const waitForUserReaction = async (
   return message
     .awaitReactions(isCorrectReactionFromUser, {
       max: 1,
-      time: secondsToMs(15),
+      time: secondsToMs(20),
     })
     .then((r) => r.first()?.emoji.name ?? null)
     .then((emoji) => {

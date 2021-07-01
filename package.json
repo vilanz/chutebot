@@ -12,9 +12,11 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@types/common-tags": "^1.8.0",
     "@vilanz/tooling": "vilanz/tooling#main",
     "axios": "^0.21.1",
     "cheerio": "^1.0.0-rc.10",
+    "common-tags": "^1.8.0",
     "country-emoji": "^1.5.6",
     "date-fns": "^2.22.1",
     "discord.js": "^13.0.0-dev.5af2ef5fbc7ad11281f38384c360ae79efe63b39",

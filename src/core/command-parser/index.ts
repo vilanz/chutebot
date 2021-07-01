@@ -16,6 +16,7 @@ export enum Commands {
   Guess = "g",
   AddPlayer = "add",
   Wins = "wins",
+  Help = "help"
 }
 
 export const BOT_PREFIX = "c!";
