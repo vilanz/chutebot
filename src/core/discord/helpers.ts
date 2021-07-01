@@ -22,7 +22,7 @@ export const getChannel = (channelId: Snowflake) =>
   getFootbalGuild()
     .then((g) => g.channels.fetch(channelId) as Promise<TextChannel>);
 
-export const isMessageInBotspam = (message: Message) => message.channel.id !== BOTSPAM_CHANNEL_ID
+export const isMessageInBotspam = (message: Message) => message.channel.id === BOTSPAM_CHANNEL_ID
 
 export const sendBotspamMessage = (content: string) => getChannel(BOTSPAM_CHANNEL_ID).then(ch => ch.send(content))
 
