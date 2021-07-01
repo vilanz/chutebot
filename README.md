@@ -1,23 +1,16 @@
-# guess-the-player
+# chutebot
 
-This will be a Discord bot that runs a little quiz game where the clues are a football player's career records.
+A Discord bot for football.
 
-## TODO
+## Features
 
-- [x] Use a real football database
-- [x] Make career records available for trivia
-- [x] Store this stuff in an actual database
-- [x] Store wins
-- [x] Run in prod
-- [ ] Handle nicknames
+### Player quiz
 
-## Current commands
-
-#### `c!add <player name>`
+##### `c!add <player name>`
 
 Gets the player's career record from Transfermarkt and adds it into the pool of available players.
 
-#### `c!start`
+##### `c!start`
 
 Starts a quiz session.
 
@@ -25,9 +18,21 @@ Starts a quiz session.
 
 During a quiz session, guesses the player's name being `[name]`.
 
+##### `c!wins`
+
+Displays a leaderboard of quiz winners.
+
+### Live goals stream
+
+Whenever a goal from an ongoing match is posted on some Twitter accounts, it will be fetched and posted on the channel as well.
+
+TODO: add commands for handling this, it's manual right now
+
+### General
+
 #### `c!ping`
 
-Returns `Pong!` and the response's latency.
+Returns `Pong!` with the response's latency.
 
 ## Getting started
 
