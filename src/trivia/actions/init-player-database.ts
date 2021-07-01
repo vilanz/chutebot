@@ -1,4 +1,5 @@
-import { addPlayerFromTransfermarkt } from "./add-player";
+import { syncTriviaDatabase } from "../db";
+import { addTransfermarktPlayer } from "./add-transfermarkt-player";
 
 const INITIAL_PLAYER_IDS = [
   423839, // Ribamar,
@@ -18,10 +19,11 @@ const INITIAL_PLAYER_IDS = [
   74605, // Walter
 ];
 
-export const addInitialTriviaPlayers = async (): Promise<void> => {
+export const initTriviaDatabase = async () => {
+  await syncTriviaDatabase();
   await Promise.all(
     INITIAL_PLAYER_IDS.map((transfermarktId) =>
-      addPlayerFromTransfermarkt(transfermarktId, true)
+      addTransfermarktPlayer(transfermarktId, true)
     )
   );
 };

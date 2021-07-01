@@ -1,3 +1,3 @@
 export * from "./compare-strings";
-export * from "./format";
+export * from "./tables";
 export * from "./sort-by-season";

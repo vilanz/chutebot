@@ -8,7 +8,7 @@ import {
 import { logger } from "../../core/log";
 import { addUserWin, getRandomPlayerId } from "../db";
 import { guessPlayerName, formatPlayerSpells } from "../format";
-import { getUpdatedPlayer } from "../actions/getUpdatedPlayer";
+import { getUpdatedPlayer } from "../actions";
 
 const SECONDS_TO_GUESS = 20;
 

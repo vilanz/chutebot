@@ -1,5 +1,5 @@
 import { STRING, Model, NUMBER } from "sequelize";
-import { sequelizeInstance } from "../instance";
+import { sequelizeInstance } from "../sequelize";
 
 export interface UserAttributes {
   id: string;

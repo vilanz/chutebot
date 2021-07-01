@@ -1,6 +1,6 @@
 import { Message } from "discord.js";
 import { CommandHandler } from "../../core/command-parser";
-import { addPlayerFromTransfermarkt } from "../actions";
+import { addTransfermarktPlayer } from "../actions";
 import {
   PlayerSearchResult,
   searchPlayersInTransfermarkt,
@@ -71,9 +71,7 @@ export const addPlayer: CommandHandler = async (message, playerName) => {
     return;
   }
 
-  const newPlayer = await addPlayerFromTransfermarkt(
-    wantedPlayer.transfermarktId
-  );
+  const newPlayer = await addTransfermarktPlayer(wantedPlayer.transfermarktId);
 
   if (!newPlayer) {
     await message.reply("Esse jogador já foi adicionado.");

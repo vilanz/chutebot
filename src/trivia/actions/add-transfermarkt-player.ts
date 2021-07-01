@@ -3,7 +3,7 @@ import { getRandomNumberUpTo, waitSeconds } from "../../core/utils";
 import { createPlayer, getPlayerByTransfermarktId, PlayerEntity } from "../db";
 import { fetchPlayerCareer } from "../transfermarkt";
 
-export const addPlayerFromTransfermarkt = async (
+export const addTransfermarktPlayer = async (
   transfermarktId: number,
   useRandomDelay?: boolean
 ): Promise<PlayerEntity | null> => {

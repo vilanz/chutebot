@@ -2,7 +2,7 @@ import { Snowflake } from "discord.js";
 import { differenceInCalendarDays } from "date-fns";
 import { logger } from "../../core/log";
 import { Player, PlayerSpell } from "../types";
-import { sequelizeInstance } from "./instance";
+import { sequelizeInstance } from "./sequelize";
 import { PlayerEntity, UserEntity, PlayerSpellEntity } from "./models";
 
 export const getRandomPlayerId = () =>

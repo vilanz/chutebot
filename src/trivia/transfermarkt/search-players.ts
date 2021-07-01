@@ -3,7 +3,7 @@ import {
   getCheerioFromPageHTML,
   getPlayerSearchUrl,
   mapCheerioNodesList,
-} from "./fetching";
+} from "./cheerio-helpers";
 
 export interface PlayerSearchResult {
   desc: string;
