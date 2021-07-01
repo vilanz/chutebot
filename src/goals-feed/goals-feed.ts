@@ -8,12 +8,12 @@ import { getTweetVideoUrl } from "./twitter-api/twitter-video";
 const streamTweets = async (tweetStream: TweetStream) => {
   const brazilianFootballChannel = await getChannel(BR_FOOTBALL_CHANNEL_ID);
 
-  let timeout = 0;
+  let reconnectTimeout = 0;
   const reconnectToTweetStream = async () => {
-    timeout += 1;
+    reconnectTimeout += 1;
 
-    const sleepDuration = 2 ** timeout;
-    logger.warn("will sleep for %s seconds", sleepDuration);
+    const sleepDuration = 2 ** reconnectTimeout;
+    logger.warn("tweet stream will sleep for %s seconds", sleepDuration);
     await waitSeconds(sleepDuration);
 
     streamTweets(tweetStream);
@@ -47,10 +47,11 @@ const streamTweets = async (tweetStream: TweetStream) => {
       return;
     }
 
-    const mp4Url = await getTweetVideoUrl(data.id);
     const tweetTextWithoutSpaces = data.text
       .replace(/https:\/\/t\.co\/\w+/g, "")
       .replace(/^[ ]+|[ ]+$/g, "");
+
+    const mp4Url = await getTweetVideoUrl(data.id);
 
     brazilianFootballChannel.send(`**${tweetTextWithoutSpaces}** ${mp4Url}`);
   });
@@ -70,5 +71,5 @@ export const streamGoalsFeed = async () => {
     return;
   }
 
-  await streamTweets(tweetStream);
+  streamTweets(tweetStream);
 };

@@ -5,19 +5,6 @@ import { twitterNewAPI } from "./axios";
 // TODO get a better type
 export type TweetStream = ReadStream;
 
-interface Tweet {
-  data: {
-    id: string;
-    text: string;
-    entities: any;
-  };
-  includes: {
-    media: {
-      url: string;
-    }[];
-  };
-}
-
 export const getTweetStream = async (): Promise<TweetStream | null> => {
   const res = await twitterNewAPI.get<ReadStream>(`/tweets/search/stream`, {
     responseType: "stream",
