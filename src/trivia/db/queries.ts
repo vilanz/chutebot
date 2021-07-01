@@ -94,7 +94,6 @@ export const createPlayer = async (player: Player) => {
     lastSpellsUpdate: new Date(),
   });
   await addPlayerSpells(transfermarktId, spells);
-  logger.info("created player %s", entity);
   return entity;
 };
 
