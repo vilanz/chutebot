@@ -1,6 +1,6 @@
 import path from "path";
 import { Sequelize } from "sequelize";
-import { logger } from "../../log";
+import { logger } from "../../core/log";
 
 export const sequelizeInstance = new Sequelize({
   dialect: "sqlite",

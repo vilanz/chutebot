@@ -1,12 +1,12 @@
 import { Message } from "discord.js";
-import { CommandHandler } from "../../command-parser";
+import { CommandHandler } from "../../core/command-parser";
 import { addPlayerFromTransfermarkt } from "../actions";
 import {
   PlayerSearchResult,
   searchPlayersInTransfermarkt,
 } from "../transfermarkt";
-import { waitForUserReaction } from "../../discord";
-import { logger } from "../../log";
+import { waitForUserReaction } from "../../core/discord";
+import { logger } from "../../core/log";
 
 const awaitForPlayerSearchReaction = async (
   playersFound: PlayerSearchResult[],

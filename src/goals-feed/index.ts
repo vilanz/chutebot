@@ -1,9 +1,9 @@
 import { Client, TextChannel } from "discord.js";
 import axios, { AxiosResponse } from "axios";
 import { ReadStream } from "fs";
-import { env } from "../env";
-import { logger } from "../log";
-import { BR_FOOTBALL_CHANNEL_ID, FUTEBOL_GUILD } from "../discord";
+import { env } from "../core/env";
+import { logger } from "../core/log";
+import { BR_FOOTBALL_CHANNEL_ID, FUTEBOL_GUILD } from "../core/discord";
 
 // TODO clean this terrible mess up
 

@@ -1,4 +1,4 @@
-import { logger } from "../../log";
+import { logger } from "../../core/log";
 import {
   getCheerioFromPageHTML,
   getPlayerSearchUrl,

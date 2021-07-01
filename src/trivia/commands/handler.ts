@@ -1,7 +1,7 @@
 import { Message } from "discord.js";
-import { BotCommand, Commands } from "../../command-parser";
-import { TEST_CHANNEL_ID } from "../../discord";
-import { logger } from "../../log";
+import { BotCommand, Commands } from "../../core/command-parser";
+import { TEST_CHANNEL_ID } from "../../core/discord";
+import { logger } from "../../core/log";
 import { addPlayer } from "./add-player";
 import { ping } from "./ping";
 import { startGuessing } from "./start-guessing";

@@ -1,5 +1,5 @@
-import { logger } from "../../log";
-import { getRandomNumberUpTo, waitSeconds } from "../../utils";
+import { logger } from "../../core/log";
+import { getRandomNumberUpTo, waitSeconds } from "../../core/utils";
 import { createPlayer, getPlayerByTransfermarktId, PlayerEntity } from "../db";
 import { fetchPlayerCareer } from "../transfermarkt";
 

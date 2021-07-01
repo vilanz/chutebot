@@ -1,12 +1,12 @@
 import Discord, { Intents } from "discord.js";
-import { parseCommand } from "./command-parser";
+import { parseCommand } from "./core/command-parser";
 import {
   syncTriviaDatabase,
   addInitialTriviaPlayers,
   handleTriviaCommand,
 } from "./trivia";
-import { logger } from "./log";
-import { env } from "./env";
+import { logger } from "./core/log";
+import { env } from "./core/env";
 import { fetchTwitter } from "./goals-feed";
 
 syncTriviaDatabase()

@@ -1,7 +1,7 @@
 import cheerio, { Cheerio, CheerioAPI, Node, Element } from "cheerio";
 import UserAgent from "user-agents";
 import fetch from "node-fetch";
-import { logger } from "../../log";
+import { logger } from "../../core/log";
 
 const getRandomUserAgent = () =>
   new UserAgent({ platform: "Win32", deviceCategory: "desktop" }).toString();

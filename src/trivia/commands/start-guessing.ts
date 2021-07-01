@@ -1,7 +1,11 @@
 import Discord, { Message } from "discord.js";
-import { secondsToMs } from "../../utils";
-import { parseCommand, CommandHandler, Commands } from "../../command-parser";
-import { logger } from "../../log";
+import { secondsToMs } from "../../core/utils";
+import {
+  parseCommand,
+  CommandHandler,
+  Commands,
+} from "../../core/command-parser";
+import { logger } from "../../core/log";
 import { addUserWin, getRandomPlayerId } from "../db";
 import { guessPlayerName, formatPlayerSpells } from "../format";
 import { getUpdatedPlayer } from "../actions/getUpdatedPlayer";
