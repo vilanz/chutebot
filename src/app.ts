@@ -1,27 +1,19 @@
-import Discord, { Intents } from "discord.js";
 import { parseCommand } from "./core/command-parser";
 import { initTriviaDatabase, handleTriviaCommand } from "./trivia";
 import { logger } from "./core/log";
 import { env } from "./core/env";
-import { fetchTwitter } from "./goals-feed";
+import { streamGoalsFeed } from "./goals-feed";
+import { discordClient } from "./core/discord";
 
 initTriviaDatabase().then(() => {
-  const client = new Discord.Client({
-    intents: [
-      Intents.FLAGS.GUILDS,
-      Intents.FLAGS.GUILD_MESSAGES,
-      Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-    ],
-  });
-
   logger.info("starting bot");
 
-  client.on("ready", async () => {
+  discordClient.on("ready", async () => {
     logger.info("started bot");
-    await fetchTwitter(client);
+    await streamGoalsFeed();
   });
 
-  client.on("message", async (message) => {
+  discordClient.on("message", async (message) => {
     const command = parseCommand(message.content);
     if (!command) {
       return;
@@ -30,5 +22,5 @@ initTriviaDatabase().then(() => {
     handleTriviaCommand(command, message);
   });
 
-  client.login(env.DISCORD_BOT_TOKEN);
+  discordClient.login(env.DISCORD_BOT_TOKEN);
 });

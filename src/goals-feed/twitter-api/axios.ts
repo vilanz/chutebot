@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from "axios";
-import { env } from "../core/env";
-import { logger } from "../core/log";
+import { env } from "../../core/env";
+import { logger } from "../../core/log";
 
 const BEARER_TOKEN_HEADER = {
   Authorization: `Bearer ${env.TWITTER_BEARER_TOKEN}`,

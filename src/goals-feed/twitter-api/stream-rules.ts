@@ -1,4 +1,4 @@
-import { mapAxiosData, twitterNewAPI } from "./twitter-api";
+import { mapAxiosData, twitterNewAPI } from "./axios";
 
 interface TwitterRule {
   value: string;
