@@ -5,8 +5,8 @@ import { sortBySeason } from "./sort-by-season";
 const tableWithoutBorders: TableUserConfig = {
   border: getBorderCharacters("void"),
   columnDefault: {
-    paddingLeft: 2,
-    paddingRight: 2,
+    paddingLeft: 0,
+    paddingRight: 0,
   },
   singleLine: true,
 };
@@ -16,7 +16,7 @@ const borderlessTableMarkdown = (columns: unknown[][]) =>
 
 export const formatPlayerSpells = (spells: PlayerSpell[]): string =>
   borderlessTableMarkdown([
-    ["Temp.", "Time", "Partidas", "Gols"],
+    ["T", "C", "P", "G"],
     ...sortBySeason(spells).map((spell) => [
       spell.season,
       spell.club,
