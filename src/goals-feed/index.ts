@@ -1,58 +1,13 @@
 import { Client, TextChannel } from "discord.js";
-import axios, { AxiosResponse } from "axios";
 import { ReadStream } from "fs";
-import { env } from "../core/env";
 import { logger } from "../core/log";
 import { BR_FOOTBALL_CHANNEL_ID, FUTEBOL_GUILD } from "../core/discord";
+import { addRules, deleteAllRules } from "./stream-rules";
+import { mapAxiosData, twitterNewAPI, twitterOldAPI } from "./twitter-api";
+import { waitSeconds } from "../core/utils";
 
 // TODO clean this terrible mess up
 
-const twitter1Api = axios.create({
-  baseURL: "https://api.twitter.com/1.1",
-  headers: {
-    Authorization: `Bearer ${env.TWITTER_BEARER_TOKEN}`,
-  },
-});
-
-const twitterApi = axios.create({
-  baseURL: "https://api.twitter.com/2",
-  headers: {
-    Authorization: `Bearer ${env.TWITTER_BEARER_TOKEN}`,
-  },
-});
-
-twitterApi.interceptors.response.use((response) => {
-  logger.info("rate limit %s", response.headers["x-rate-limit-remaining"]);
-  return response;
-});
-
-const sleepXSeconds = async (seconds: number) =>
-  new Promise((resolve) => setTimeout(() => resolve(true), seconds * 1000));
-
-const mapData = <T>(res: AxiosResponse<T>) => res.data;
-
-interface TwitterRule {
-  value: string;
-  id: string;
-}
-
-const addRules = (rules: TwitterRule[]) =>
-  twitterApi.post("/tweets/search/stream/rules", {
-    add: rules,
-  });
-
-const deleteRules = async () => {
-  const allRules = await twitterApi
-    .get<{ data: TwitterRule[] }>("/tweets/search/stream/rules")
-    .then(mapData);
-  if (allRules.data) {
-    await twitterApi.post("/tweets/search/stream/rules", {
-      delete: {
-        ids: allRules.data.map((x) => x.id),
-      },
-    });
-  }
-};
 /*
 interface Tweet {
   data: {
@@ -71,7 +26,7 @@ interface Tweet {
 export const fetchTwitter = async (client: Client) => {
   logger.info("restarting fetchTwitter");
 
-  await deleteRules();
+  await deleteAllRules();
   await addRules([
     {
       value: "from:goleada_info has:videos",
@@ -93,7 +48,7 @@ export const fetchTwitter = async (client: Client) => {
     return;
   }
 
-  const res = await twitterApi.get<ReadStream>(`/tweets/search/stream`, {
+  const res = await twitterNewAPI.get<ReadStream>(`/tweets/search/stream`, {
     responseType: "stream",
     headers: {
       "User-Agent": "v2FilterStreamJS",
@@ -115,7 +70,7 @@ export const fetchTwitter = async (client: Client) => {
 
     const sleepDuration = 2 ** timeout;
     logger.warn("will sleep for %s seconds", sleepDuration);
-    await sleepXSeconds(sleepDuration);
+    await waitSeconds(sleepDuration);
 
     fetchTwitter(client);
   }
@@ -128,9 +83,9 @@ export const fetchTwitter = async (client: Client) => {
         reconnect();
       } else if (json.data) {
         const tweetId = json.data.id;
-        await twitter1Api
+        await twitterOldAPI
           .get(`/statuses/show/${tweetId}.json`)
-          .then(mapData)
+          .then(mapAxiosData)
           .then((d: any) => {
             const media = d.extended_entities?.media?.[0];
             if (!media) {
