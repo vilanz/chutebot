@@ -19,6 +19,7 @@ const streamTweets = async (tweetStream: TweetStream) => {
     const sleepDuration = 2 ** reconnectTimeout;
     logger.warn("tweet stream will sleep for %s seconds", sleepDuration);
     await waitSeconds(sleepDuration);
+    tweetStream.destroy(new Error("just reconnecting"));
 
     streamTweets(tweetStream);
   };

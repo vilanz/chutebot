@@ -1,10 +1,10 @@
 import { AxiosError } from "axios";
+import { IncomingMessage } from "http";
 import { ReadStream } from "fs";
 import { logger } from "../../core/log";
 import { mapAxiosData, twitterNewAPI } from "./axios";
 
-// TODO get a better type
-export type TweetStream = ReadStream;
+export type TweetStream = IncomingMessage;
 
 export const getTweetStream = async (): Promise<TweetStream | null> => {
   try {
