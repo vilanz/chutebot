@@ -24,8 +24,6 @@ const streamTweets = async (tweetStream: TweetStream) => {
     streamTweets(tweetStream);
   };
 
-  logger.info("stream %s %O", typeof tweetStream, tweetStream);
-
   tweetStream.on("error", async (err) => {
     logger.error("streaming error (likely a timeout)", err);
     await reconnectToTweetStream();
