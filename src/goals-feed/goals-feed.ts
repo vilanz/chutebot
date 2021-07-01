@@ -1,12 +1,16 @@
 import { logger } from "../core/log";
-import { BR_FOOTBALL_CHANNEL_ID, getChannel } from "../core/discord";
+import {
+  // BR_FOOTBALL_CHANNEL_ID,
+  getChannel,
+  TEST_CHANNEL_ID,
+} from "../core/discord";
 import { addRules, deleteAllRules } from "./twitter-api";
 import { waitSeconds } from "../core/utils";
 import { getTweetStream, TweetStream } from "./twitter-api/stream-tweets";
 import { getTweetVideoUrl } from "./twitter-api/twitter-video";
 
 const streamTweets = async (tweetStream: TweetStream) => {
-  const brazilianFootballChannel = await getChannel(BR_FOOTBALL_CHANNEL_ID);
+  const brazilianFootballChannel = await getChannel(TEST_CHANNEL_ID);
 
   let reconnectTimeout = 0;
   const reconnectToTweetStream = async () => {
@@ -18,6 +22,8 @@ const streamTweets = async (tweetStream: TweetStream) => {
 
     streamTweets(tweetStream);
   };
+
+  logger.info("stream %s %O", typeof tweetStream, tweetStream);
 
   tweetStream.on("error", async (err) => {
     logger.error("streaming error (likely a timeout)", err);

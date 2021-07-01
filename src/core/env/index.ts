@@ -1,4 +1,3 @@
-import { resolve } from "path";
 import dotenv from "dotenv";
 
 export interface Env {
@@ -6,11 +5,13 @@ export interface Env {
   TWITTER_BEARER_TOKEN: string;
 }
 
-// we need to parse it to unknown first
 // TODO handle invalid envs
-const getEnv = (): unknown =>
-  dotenv.config({
-    path: resolve(__dirname, "../.env"),
-  }).parsed!;
 
-export const env = getEnv() as Env;
+// we need to parse it to unknown first
+const parsedEnv: unknown = dotenv.config({
+  path: "./.env",
+}).parsed!;
+
+console.log(parsedEnv);
+
+export const env = parsedEnv as Env;

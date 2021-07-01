@@ -1,4 +1,5 @@
-import axios, { AxiosResponse } from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
+import { fromUnixTime } from "date-fns";
 import { env } from "../../core/env";
 import { logger } from "../../core/log";
 
@@ -19,10 +20,27 @@ export const twitterOldAPI = axios.create({
 
 export const mapAxiosData = (res: AxiosResponse) => res.data;
 
-twitterNewAPI.interceptors.response.use((response) => {
+const logResponseRateLimit = (res: AxiosResponse) => {
+  const resetUnixTime = res.headers["x-rate-limit-reset"];
   logger.info(
-    "Rate limit remaining for Twitter v2: %s",
-    response.headers["x-rate-limit-remaining"]
+    "rate limit info for %s: %s remaining out of %s (reset in %s seconds)",
+    res.config.url,
+    res.headers["x-rate-limit-remaining"],
+    res.headers["x-rate-limit-limit"],
+    resetUnixTime ? fromUnixTime(resetUnixTime).toISOString() : "n/a"
   );
-  return response;
-});
+};
+
+twitterNewAPI.interceptors.response.use(
+  (response) => {
+    logResponseRateLimit(response);
+    return response;
+  },
+  (err) => {
+    const axiosErr = err as AxiosError;
+    if (axiosErr.isAxiosError && axiosErr.response) {
+      logResponseRateLimit(axiosErr.response);
+    }
+    return err;
+  }
+);

@@ -1,10 +1,10 @@
 {
-  "name": "guess-the-player",
+  "name": "chutebot",
   "author": "vilanz",
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cp .env build/.env",
     "start": "yarn build && node build/app.js",
     "test": "jest",
     "typecheck": "tsc --noEmit",
