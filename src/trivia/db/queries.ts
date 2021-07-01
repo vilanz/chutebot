@@ -37,7 +37,7 @@ export const hasPlayers = async (): Promise<boolean> => {
 
 export const removeOldPlayerSpells = async (
   transfermarktId: number
-): Promise<void> => {
+): Promise<boolean> => {
   const lastSpellsUpdate = await PlayerEntity.findOne({
     attributes: ["lastSpellsUpdate"],
     where: {
@@ -49,14 +49,14 @@ export const removeOldPlayerSpells = async (
       "removeOldSpells: player not found, something is wrong %s",
       transfermarktId
     );
-    return;
+    return false;
   }
 
   const now = new Date();
   const daysSinceLastUpdate = differenceInCalendarDays(now, lastSpellsUpdate);
   logger.info("daysSinceLastUpdate: %s", daysSinceLastUpdate);
   if (daysSinceLastUpdate < 7) {
-    return;
+    return false;
   }
 
   await PlayerSpellEntity.destroy({
@@ -64,6 +64,7 @@ export const removeOldPlayerSpells = async (
       playerTransfermarktId: transfermarktId,
     },
   });
+  return true
 };
 
 export const addPlayerSpells = async (
