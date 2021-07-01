@@ -10,7 +10,11 @@ initTriviaDatabase().then(() => {
 
   discordClient.on("ready", async () => {
     logger.info("started bot");
-    await streamGoalsFeed();
+    try {
+      await streamGoalsFeed();
+    } catch (err) {
+      logger.error("twitter stream", err);
+    }
   });
 
   discordClient.on("message", async (message) => {
