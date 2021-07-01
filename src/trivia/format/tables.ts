@@ -6,7 +6,7 @@ const tableWithoutBorders: TableUserConfig = {
   border: getBorderCharacters("void"),
   columnDefault: {
     paddingLeft: 0,
-    paddingRight: 0,
+    paddingRight: 1,
   },
   singleLine: true,
 };
@@ -16,7 +16,7 @@ const borderlessTableMarkdown = (columns: unknown[][]) =>
 
 export const formatPlayerSpells = (spells: PlayerSpell[]): string =>
   borderlessTableMarkdown([
-    ["T", "C", "P", "G"],
+    ["T", "C", "J", "G"],
     ...sortBySeason(spells).map((spell) => [
       spell.season,
       spell.club,
