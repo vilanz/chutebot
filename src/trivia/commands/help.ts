@@ -3,7 +3,7 @@ import { CommandHandler } from "../../core/command-parser";
 
 const HELP_MESSAGE = stripIndents`
 **c!start**
-Inicia uma sessão de quiz.
+Inicia uma sessão de quiz que durará 25 segundos.
 
 **c!g <nome do jogador>**
 Adivinhar o nome do jogador no quiz atual.

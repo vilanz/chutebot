@@ -10,7 +10,7 @@ import { addUserWin, getRandomPlayerId } from "../db";
 import { guessPlayerName, formatPlayerSpells } from "../format";
 import { getUpdatedPlayer } from "../actions";
 
-const SECONDS_TO_GUESS = 20;
+const SECONDS_TO_GUESS = 25;
 
 const isCorrectPlayer = (playerName: string) => (message: Discord.Message) => {
   const command = parseCommand(message.content);
