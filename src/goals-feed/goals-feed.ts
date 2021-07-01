@@ -1,13 +1,9 @@
 import { logger } from "../core/log";
 import { BR_FOOTBALL_CHANNEL_ID, getChannel } from "../core/discord";
-import {
-  addRules,
-  deleteAllRules,
-  mapAxiosData,
-  twitterOldAPI,
-} from "./twitter-api";
+import { addRules, deleteAllRules } from "./twitter-api";
 import { waitSeconds } from "../core/utils";
 import { getTweetStream, TweetStream } from "./twitter-api/stream-tweets";
+import { getTweetVideoUrl } from "./twitter-api/twitter-video";
 
 const streamTweets = async (tweetStream: TweetStream) => {
   const brazilianFootballChannel = await getChannel(BR_FOOTBALL_CHANNEL_ID);
@@ -23,64 +19,40 @@ const streamTweets = async (tweetStream: TweetStream) => {
     streamTweets(tweetStream);
   };
 
-  tweetStream.on("error", (err) => {
+  tweetStream.on("error", async (err) => {
     logger.error("streaming error (likely a timeout)", err);
-    reconnectToTweetStream();
+    await reconnectToTweetStream();
   });
 
   tweetStream.on("data", async (buffer: Buffer) => {
+    let json: any;
     try {
-      const json = JSON.parse(buffer.toString());
-
-      if (json.connection_issue) {
-        logger.error("Connection issue: %s", json);
-        await reconnectToTweetStream();
-        return;
-      }
-
-      if (!json.data) {
-        logger.error("Likely authentication error: %s", json);
-        return;
-      }
-
-      const tweetId = json.data.id;
-      await twitterOldAPI
-        .get(`/statuses/show/${tweetId}.json`)
-        .then(mapAxiosData)
-        .then((d: any) => {
-          const media = d.extended_entities?.media?.[0];
-          if (!media) {
-            return;
-          }
-
-          const variants = media.video_info?.variants;
-          if (!variants) {
-            return;
-          }
-
-          const mp4 = variants
-            .filter((x: any) => x.content_type === "video/mp4")
-            .reduce((max: any, curr: any) =>
-              max.bitrate > curr.bitrate ? max : curr
-            );
-          if (!mp4) {
-            return;
-          }
-
-          let msg = json.data.text;
-          try {
-            msg = msg
-              .replace(/https:\/\/t\.co\/\w+/g, "")
-              .replace(/^[ ]+|[ ]+$/g, "");
-          } catch (e) {
-            logger.error(e);
-          }
-
-          brazilianFootballChannel.send(`**${msg}** ${mp4.url}`);
-        });
+      json = JSON.parse(buffer.toString());
     } catch (e) {
       // heartbeat signal, it's fine
+      return;
     }
+
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    const { connection_issue, data } = json;
+
+    if (connection_issue) {
+      logger.error("issue with connecting to a tweet stream: %s", json);
+      await reconnectToTweetStream();
+      return;
+    }
+
+    if (!data) {
+      logger.error("likely authentication error: %s", json);
+      return;
+    }
+
+    const mp4Url = await getTweetVideoUrl(data.id);
+    const tweetTextWithoutSpaces = data.text
+      .replace(/https:\/\/t\.co\/\w+/g, "")
+      .replace(/^[ ]+|[ ]+$/g, "");
+
+    brazilianFootballChannel.send(`**${tweetTextWithoutSpaces}** ${mp4Url}`);
   });
 };
 
