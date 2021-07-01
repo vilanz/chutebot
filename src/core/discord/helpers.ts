@@ -24,6 +24,8 @@ export const getChannel = (channelId: Snowflake) =>
 
 export const isMessageInBotspam = (message: Message) => message.channel.id !== BOTSPAM_CHANNEL_ID
 
+export const sendBotspamMessage = (content: string) => getChannel(BOTSPAM_CHANNEL_ID).then(ch => ch.send(content))
+
 export const dmMeError = (err: any) => discordClient.users.fetch(MY_USER_ID).then(me => me.send(err ? JSON.stringify(err) : ''))
 
 export const waitForUserReaction = async (
