@@ -26,6 +26,12 @@ void initTriviaDatabase().then(async () => {
     await handleTriviaCommand(command, message);
   });
 
+  discordClient.on("rateLimit", (rateLimitData) => {
+    logger.warn("discord rate limit", {
+      rateLimitData,
+    });
+  });
+
   const botToken = argv.staging
     ? env.DISCORD_STAGING_BOT_TOKEN
     : env.DISCORD_PROD_BOT_TOKEN;
