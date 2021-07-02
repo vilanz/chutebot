@@ -6,7 +6,6 @@ import {
   searchPlayersInTransfermarkt,
 } from "../transfermarkt";
 import { waitForUserReaction } from "../../core/discord";
-import { logger } from "../../core/log";
 
 const awaitForPlayerSearchReaction = async (
   playersFound: PlayerSearchResult[],
