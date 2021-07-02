@@ -1,15 +1,15 @@
 import { parseCommand } from "./core/command-parser";
 import { initTriviaDatabase, handleTriviaCommand } from "./trivia";
 import { logger } from "./core/log";
-import { env } from "./core/env";
 import { streamGoalsFeed } from "./goals-feed";
 import { discordClient, sendBotspamMessage } from "./core/discord";
+import { argv, env } from "./core/env";
 
 void initTriviaDatabase().then(async () => {
   logger.info("starting bot");
 
   discordClient.on("ready", async () => {
-    await sendBotspamMessage('Bot iniciado.')
+    await sendBotspamMessage("Bot iniciado.");
     try {
       await streamGoalsFeed();
     } catch (err) {
@@ -26,6 +26,10 @@ void initTriviaDatabase().then(async () => {
     await handleTriviaCommand(command, message);
   });
 
-  await discordClient.login(env.DISCORD_BOT_TOKEN);
+  const botToken = argv.staging
+    ? env.DISCORD_STAGING_BOT_TOKEN
+    : env.DISCORD_PROD_BOT_TOKEN;
+
+  await discordClient.login(botToken);
   logger.info("logged in");
 });
