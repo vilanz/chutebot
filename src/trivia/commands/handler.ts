@@ -28,11 +28,11 @@ export const handleTriviaCommand = async (
     } else if (name === Commands.Wins) {
       await wins(message, args);
     } else if (name === Commands.Help) {
-      await help(message, args)
+      await help(message, args);
     }
   } catch (err) {
     logger.error("error when running a command", err);
-    void dmMeError(err)
-    await message.reply('⚠')
+    void dmMeError(err);
+    await message.react("⚠");
   }
 };
