@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: "bot",
-      script: "./src/start-pm2.js",
+      script: "./build/bot.js",
       env: {
         NODE_ENV: "production",
       },
