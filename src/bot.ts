@@ -1,20 +1,15 @@
 import { parseCommand } from "./core/command-parser";
 import { initTriviaDatabase, handleTriviaCommand } from "./trivia";
 import { logger } from "./core/log";
-import { streamGoalsFeed } from "./goals-feed";
-import { discordClient, sendBotspamMessage } from "./core/discord";
+import { discordClient, dmMeError, sendBotspamMessage } from "./core/discord";
 import { botToken } from "./core/env";
+import { handleTwitterCommand } from "./goals-feed/handler";
 
 void initTriviaDatabase().then(async () => {
   logger.info("starting bot");
 
   discordClient.on("ready", async () => {
     await sendBotspamMessage("Bot iniciado.");
-    try {
-      await streamGoalsFeed();
-    } catch (err) {
-      logger.error("twitter stream", err);
-    }
   });
 
   discordClient.on("message", async (message) => {
@@ -23,7 +18,14 @@ void initTriviaDatabase().then(async () => {
       return;
     }
 
-    await handleTriviaCommand(command, message);
+    try {
+      void handleTriviaCommand(command, message);
+      void handleTwitterCommand(command, message);
+    } catch (err) {
+      logger.error("error when running a command", err);
+      void dmMeError(err);
+      await message.react("⚠");
+    }
   });
 
   discordClient.on("rateLimit", (rateLimitData) => {

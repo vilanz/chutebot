@@ -1,15 +1,31 @@
+import { Message } from "discord.js";
 import { logger } from "../core/log";
 import { getChannel, BR_TEAMS_CHANNEL } from "../core/discord";
-import { addRules, deleteAllRules } from "./twitter-api";
+import {
+  addRules,
+  deleteAllRules,
+  getTweetStream,
+  TweetStream,
+  getTweetVideoUrl,
+} from "./twitter-api";
 import { waitSeconds } from "../core/utils";
-import { getTweetStream, TweetStream } from "./twitter-api/stream-tweets";
-import { getTweetVideoUrl } from "./twitter-api/twitter-video";
 
-const streamTweets = async (tweetStream: TweetStream) => {
+// TODO not use a local variable for this
+let tweetStream: TweetStream | null = null;
+
+const streamTweets = async () => {
+  if (!tweetStream || tweetStream.destroyed) {
+    return;
+  }
+
   const brazilianFootballChannel = await getChannel(BR_TEAMS_CHANNEL);
 
   let reconnectTimeout = 0;
   const reconnectToTweetStream = async () => {
+    if (!tweetStream || tweetStream.destroyed) {
+      return;
+    }
+
     reconnectTimeout += 1;
 
     const sleepDuration = 2 ** reconnectTimeout;
@@ -17,7 +33,7 @@ const streamTweets = async (tweetStream: TweetStream) => {
     await waitSeconds(sleepDuration);
     tweetStream.destroy(new Error("just reconnecting"));
 
-    void streamTweets(tweetStream);
+    void streamTweets();
   };
 
   tweetStream.on("error", async (err) => {
@@ -60,7 +76,7 @@ const streamTweets = async (tweetStream: TweetStream) => {
   });
 };
 
-export const streamGoalsFeed = async () => {
+export const streamGoalsFeed = async (message: Message) => {
   await deleteAllRules();
   await addRules([
     {
@@ -69,10 +85,16 @@ export const streamGoalsFeed = async () => {
     },
   ]);
 
-  const tweetStream = await getTweetStream();
-  if (!tweetStream) {
-    return;
-  }
+  tweetStream = await getTweetStream();
+  void message.react("👍");
 
-  void streamTweets(tweetStream);
+  void streamTweets();
+};
+
+export const stopGoalsFeed = async (message: Message) => {
+  if (tweetStream && !tweetStream.destroyed) {
+    tweetStream.destroy(new Error("matamo"));
+    void message.react("👍");
+  }
+  tweetStream = null;
 };

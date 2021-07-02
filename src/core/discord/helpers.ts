@@ -7,7 +7,7 @@ import {
 } from "discord.js";
 import { secondsToMs } from "../utils";
 import { discordClient } from "./client";
-import { BOTSPAM_CHANNEL, GUILD, OWNER_USER } from "./consts";
+import { BOTSPAM_CHANNEL, BR_TEAMS_CHANNEL, GUILD, OWNER_USER } from "./consts";
 
 // TODO split this file
 
@@ -23,6 +23,12 @@ export const getChannel = (channelId: Snowflake) =>
 
 export const isMessageInBotspam = (message: Message) =>
   message.channel.id === BOTSPAM_CHANNEL;
+
+export const isMessageInFootball = (message: Message) =>
+  message.channel.id === BR_TEAMS_CHANNEL;
+
+export const isMessageByOwner = (message: Message) =>
+  message.author.id === OWNER_USER;
 
 export const sendBotspamMessage = (content: string) =>
   getChannel(BOTSPAM_CHANNEL).then((ch) => ch.send(content));
