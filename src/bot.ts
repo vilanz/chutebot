@@ -3,7 +3,7 @@ import { initTriviaDatabase, handleTriviaCommand } from "./trivia";
 import { logger } from "./core/log";
 import { streamGoalsFeed } from "./goals-feed";
 import { discordClient, sendBotspamMessage } from "./core/discord";
-import { argv, env } from "./core/env";
+import { botToken } from "./core/env";
 
 void initTriviaDatabase().then(async () => {
   logger.info("starting bot");
@@ -31,10 +31,6 @@ void initTriviaDatabase().then(async () => {
       rateLimitData,
     });
   });
-
-  const botToken = argv.staging
-    ? env.DISCORD_STAGING_BOT_TOKEN
-    : env.DISCORD_PROD_BOT_TOKEN;
 
   await discordClient.login(botToken);
   logger.info("logged in");

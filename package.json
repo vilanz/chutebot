@@ -12,7 +12,6 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@types/yargs": "^17.0.0",
     "@vilanz/tooling": "vilanz/tooling#main",
     "axios": "^0.21.1",
     "cheerio": "^1.0.0-rc.10",
@@ -28,8 +27,7 @@
     "ts-node": "^10.0.0",
     "typescript": "^4.3.4",
     "user-agents": "^1.0.695",
-    "winston": "^3.3.3",
-    "yargs": "^17.0.1"
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "@types/common-tags": "^1.8.0",

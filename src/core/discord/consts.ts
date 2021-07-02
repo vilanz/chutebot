@@ -1,10 +1,10 @@
 import { Snowflake } from "discord.js";
-import { argv } from "../env";
+import { isStaging } from "../env";
 
 const stagingTestChannel = "846499603187761205";
 
 const prodOrStaging = (prod: Snowflake, staging: Snowflake) =>
-  argv.staging ? staging : prod;
+  isStaging ? staging : prod;
 
 export const GUILD = prodOrStaging("299991824091709440", "846499603187761202");
 
