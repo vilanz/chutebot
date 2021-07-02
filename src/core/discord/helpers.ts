@@ -7,26 +7,30 @@ import {
 } from "discord.js";
 import { secondsToMs } from "../utils";
 import { discordClient } from "./client";
-import { BOTSPAM_CHANNEL_ID, FUTEBOL_GUILD, MY_USER_ID } from "./consts";
+import { BOTSPAM_CHANNEL, GUILD, OWNER_USER } from "./consts";
 
 // TODO split this file
 
-const getFootbalGuild = () => discordClient.guilds
-  .fetch(FUTEBOL_GUILD)
+const getFootbalGuild = () => discordClient.guilds.fetch(GUILD);
 
 export const getUserById = (id: string) =>
-  getFootbalGuild()
-    .then(g => g.members.fetch(id as Snowflake))
+  getFootbalGuild().then((g) => g.members.fetch(id as Snowflake));
 
 export const getChannel = (channelId: Snowflake) =>
-  getFootbalGuild()
-    .then((g) => g.channels.fetch(channelId) as Promise<TextChannel>);
+  getFootbalGuild().then(
+    (g) => g.channels.fetch(channelId) as Promise<TextChannel>
+  );
 
-export const isMessageInBotspam = (message: Message) => message.channel.id === BOTSPAM_CHANNEL_ID
+export const isMessageInBotspam = (message: Message) =>
+  message.channel.id === BOTSPAM_CHANNEL;
 
-export const sendBotspamMessage = (content: string) => getChannel(BOTSPAM_CHANNEL_ID).then(ch => ch.send(content))
+export const sendBotspamMessage = (content: string) =>
+  getChannel(BOTSPAM_CHANNEL).then((ch) => ch.send(content));
 
-export const dmMeError = (err: any) => discordClient.users.fetch(MY_USER_ID).then(me => me.send(err ? JSON.stringify(err) : ''))
+export const dmMeError = (err: any) =>
+  discordClient.users
+    .fetch(OWNER_USER)
+    .then((me) => me.send(err ? JSON.stringify(err) : ""));
 
 export const waitForUserReaction = async (
   authorId: Snowflake,
@@ -51,4 +55,3 @@ export const waitForUserReaction = async (
       return reactions.findIndex((r) => r === emoji);
     });
 };
-
