@@ -1,4 +1,4 @@
-import { stripIndents } from 'common-tags'
+import { stripIndents } from "common-tags";
 import { CommandHandler } from "../../core/command-parser";
 
 const HELP_MESSAGE = stripIndents`
@@ -23,9 +23,9 @@ Latência do bot.
 > Ainda serão adicionados comandos para mexer com isso :praydair:
 
 *Código fonte: vilanz/chutebot no GitHub*
-`
+`;
 
 export const help: CommandHandler = async (message) => {
   // TODO usar Messageembed
-  void message.reply(HELP_MESSAGE)
-}
+  await message.reply(HELP_MESSAGE);
+};

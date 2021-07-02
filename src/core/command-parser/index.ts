@@ -18,6 +18,7 @@ export enum Commands {
   Wins = "wins",
   Help = "help",
   GoalFeed = "goalfeed",
+  Remove = "remove",
 }
 
 export const BOT_PREFIX = "c!";
@@ -41,3 +42,5 @@ export const parseCommand = (content: string): BotCommand | null => {
     args: commandArgs.join(" "),
   };
 };
+
+export const noop = () => {};

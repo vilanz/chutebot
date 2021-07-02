@@ -64,7 +64,7 @@ export const removeOldPlayerSpells = async (
       playerTransfermarktId: transfermarktId,
     },
   });
-  return true
+  return true;
 };
 
 export const addPlayerSpells = async (

@@ -3,11 +3,13 @@ import {
   BotCommand,
   CommandHandler,
   Commands,
+  noop,
 } from "../../core/command-parser";
-import { isMessageInBotspam } from "../../core/discord";
+import { isMessageByOwner, isMessageInBotspam } from "../../core/discord";
 import { addPlayer } from "./add-player";
 import { help } from "./help";
 import { ping } from "./ping";
+import { removePlayer } from "./remove-player";
 import { startGuessing } from "./start-guessing";
 import { wins } from "./wins";
 
@@ -16,7 +18,7 @@ export const handleTriviaCommand = async (
   message: Message
 ): Promise<CommandHandler | void> => {
   if (!isMessageInBotspam(message)) {
-    return () => {};
+    return noop;
   }
   switch (name) {
     case Commands.Ping:
@@ -29,7 +31,12 @@ export const handleTriviaCommand = async (
       return wins(message, args);
     case Commands.Help:
       return help(message, args);
+    case Commands.Remove:
+      if (!isMessageByOwner(message)) {
+        return noop;
+      }
+      return removePlayer(message, args);
     default:
-      return () => {};
+      return noop;
   }
 };
