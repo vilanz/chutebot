@@ -61,6 +61,7 @@ export const startGuessing: CommandHandler = async (message) => {
     const randomPlayer = await getUpdatedPlayer(randomPlayerId);
 
     const playerSpellsString = formatPlayerSpells(randomPlayer.spells);
+    logger.info("sent player table with %s length", playerSpellsString.length); // Discord forbids >2000 chars
     const playerSpellsMessage = await message.reply(playerSpellsString);
 
     try {

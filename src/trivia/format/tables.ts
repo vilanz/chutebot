@@ -1,14 +1,17 @@
 import { Alignment, getBorderCharacters, table, TableUserConfig } from "table";
 import { PlayerSpell, UserWin } from "../types";
+import { removeClubLabels } from "./clubs";
 import { sortBySeason } from "./sort-by-season";
+import { removetrailingWhitespace } from "./whitespace";
 
 const tableWithoutBorders: TableUserConfig = {
   border: getBorderCharacters("norc"),
   columnDefault: {
-    paddingLeft: 2,
-    paddingRight: 2,
+    paddingLeft: 1,
+    paddingRight: 1,
   },
   drawVerticalLine: () => false,
+  drawHorizontalLine: (i, qt) => i > 0 && i < qt,
 };
 
 const borderlessTableMarkdown = (
@@ -19,7 +22,7 @@ const borderlessTableMarkdown = (
     ...tableWithoutBorders,
     columns: columnAlignments.map((align) => ({ alignment: align })),
   });
-  return `\`\`\`${tableString}\`\`\``;
+  return `\`\`\`${removetrailingWhitespace(tableString)}\`\`\``;
 };
 
 export const formatPlayerSpells = (spells: PlayerSpell[]): string =>
@@ -28,7 +31,7 @@ export const formatPlayerSpells = (spells: PlayerSpell[]): string =>
       ["Temp.", "Clube", "Jogos", "Gols"],
       ...sortBySeason(spells).map((spell) => [
         spell.season,
-        spell.club,
+        removeClubLabels(spell.club),
         spell.matches,
         spell.goals,
       ]),
