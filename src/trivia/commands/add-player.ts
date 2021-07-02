@@ -32,7 +32,6 @@ const awaitForPlayerSearchReaction = async (
     PLAYER_REACTIONS
   );
   if (wantedPlayerIndex === null) {
-    logger.info("time ran out for adding a player");
     await playersFoundMessage.react("⌚");
     return null;
   }
