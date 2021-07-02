@@ -3,13 +3,18 @@ import { createLogger, format, transports } from "winston";
 export const logger = createLogger({
   format: format.combine(
     format.errors({ stack: true }),
+    format.timestamp({
+      format: "YYYY-MM-DD HH:mm:ss Z",
+    }),
     format.splat(),
-    format.timestamp(),
-    format.prettyPrint()
+    format.json()
   ),
-  transports: [new transports.File({ filename: "guess-the-player.log" })],
+  transports: [
+    new transports.File({
+      filename: "log",
+      dirname: "logs",
+      zippedArchive: true,
+      maxsize: 400000, // 400 KB
+    }),
+  ],
 });
-
-if (process.env.NODE_ENV !== "production") {
-  logger.add(new transports.Console());
-}
