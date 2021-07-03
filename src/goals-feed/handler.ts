@@ -1,19 +1,10 @@
 import { Message } from "discord.js";
-import { BotCommand, CommandHandler, Commands } from "../core/command-parser";
+import { BotCommand, Commands } from "../core/command-parser";
 import { isMessageByOwner, isMessageInFootball } from "../core/discord";
 import { GoalFeedStream } from "./goals-feed";
 
-// messy :/
+// using a variable for this isn't so great :/
 const goalFeedStream = new GoalFeedStream();
-
-const twitterCommand: CommandHandler = async (message, args) => {
-  // TODO clean up /shrug
-  if (args === "start") {
-    await goalFeedStream.streamGoalsFeed(message);
-  } else if (args === "stop") {
-    await goalFeedStream.stopGoalsFeed(message);
-  }
-};
 
 export const handleTwitterCommand = async (
   { name, args }: BotCommand,
@@ -23,6 +14,10 @@ export const handleTwitterCommand = async (
     return;
   }
   if (name === Commands.GoalFeed) {
-    await twitterCommand(message, args);
+    if (args === "start") {
+      await goalFeedStream.startGoalsFeed(message);
+    } else if (args === "stop") {
+      await goalFeedStream.stopGoalsFeed(message);
+    }
   }
 };
