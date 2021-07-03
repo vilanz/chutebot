@@ -3,7 +3,7 @@ import { initTriviaDatabase, handleTriviaCommand } from "./trivia";
 import { logger } from "./core/log";
 import { discordClient, dmMeError, sendBotspamMessage } from "./core/discord";
 import { botToken } from "./core/env";
-import { handleTwitterCommand } from "./goals-feed/handler";
+import { handleGoalFeedCommand } from "./goal-feed";
 
 void (async () => {
   await initTriviaDatabase();
@@ -22,7 +22,7 @@ void (async () => {
 
     try {
       await handleTriviaCommand(command, message);
-      await handleTwitterCommand(command, message);
+      await handleGoalFeedCommand(command, message);
     } catch (err) {
       logger.error("error when running a command", err);
       await dmMeError(err);

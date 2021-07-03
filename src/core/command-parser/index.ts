@@ -17,7 +17,7 @@ export enum Commands {
   AddPlayer = "add",
   Wins = "wins",
   Help = "help",
-  GoalFeed = "goals",
+  GoalFeed = "feed",
   Remove = "remove",
 }
 

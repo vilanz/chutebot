@@ -18,7 +18,7 @@ export const twitterOldAPI = axios.create({
   headers: BEARER_TOKEN_HEADER,
 });
 
-export const mapAxiosData = (res: AxiosResponse) => res.data;
+export const mapAxiosData = <T>(res: AxiosResponse<T>) => res.data;
 
 const logResponseData = (res: AxiosResponse) => {
   const resetUnixTime = res.headers["x-rate-limit-reset"];

@@ -13,8 +13,9 @@ export const logger = createLogger({
     new transports.File({
       filename: "log",
       dirname: "logs",
+      level: "warn",
       zippedArchive: true,
-      maxsize: 400000, // 400 KB
     }),
+    new transports.Console(),
   ],
 });
