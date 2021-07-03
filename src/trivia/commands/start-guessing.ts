@@ -20,6 +20,7 @@ const isCorrectPlayer = (playerName: string) => (message: Discord.Message) => {
   const guess = command.args;
   const correct = guessPlayerName(playerName, guess);
   if (!correct) {
+    // eslint-disable-next-line no-void
     void message.react("❌");
   }
   return correct;

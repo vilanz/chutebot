@@ -10,6 +10,6 @@ export const removePlayer: CommandHandler = async (message, args) => {
   if (player) {
     const playerName = player?.name || "n/a";
     await player.destroy();
-    void message.reply(`${playerName} deletado 👍`);
+    await message.reply(`${playerName} deletado 👍`);
   }
 };

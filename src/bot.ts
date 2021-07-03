@@ -5,7 +5,9 @@ import { discordClient, dmMeError, sendBotspamMessage } from "./core/discord";
 import { botToken } from "./core/env";
 import { handleTwitterCommand } from "./goals-feed/handler";
 
-void initTriviaDatabase().then(async () => {
+void (async () => {
+  await initTriviaDatabase();
+
   logger.info("starting bot");
 
   discordClient.on("ready", async () => {
@@ -19,11 +21,11 @@ void initTriviaDatabase().then(async () => {
     }
 
     try {
-      void handleTriviaCommand(command, message);
-      void handleTwitterCommand(command, message);
+      await handleTriviaCommand(command, message);
+      await handleTwitterCommand(command, message);
     } catch (err) {
       logger.error("error when running a command", err);
-      void dmMeError(err);
+      await dmMeError(err);
       await message.react("⚠");
     }
   });
@@ -36,4 +38,4 @@ void initTriviaDatabase().then(async () => {
 
   await discordClient.login(botToken);
   logger.info("logged in");
-});
+})();

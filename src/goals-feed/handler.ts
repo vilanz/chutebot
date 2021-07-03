@@ -1,14 +1,17 @@
 import { Message } from "discord.js";
 import { BotCommand, CommandHandler, Commands } from "../core/command-parser";
 import { isMessageByOwner, isMessageInFootball } from "../core/discord";
-import { stopGoalsFeed, streamGoalsFeed } from "./goals-feed";
+import { GoalFeedStream } from "./goals-feed";
 
-const twitterCommand: CommandHandler = (message, args) => {
+// messy :/
+const goalFeedStream = new GoalFeedStream();
+
+const twitterCommand: CommandHandler = async (message, args) => {
   // TODO clean up /shrug
   if (args === "start") {
-    void streamGoalsFeed(message);
+    await goalFeedStream.streamGoalsFeed(message);
   } else if (args === "stop") {
-    void stopGoalsFeed(message);
+    await goalFeedStream.stopGoalsFeed(message);
   }
 };
 
@@ -20,6 +23,6 @@ export const handleTwitterCommand = async (
     return;
   }
   if (name === Commands.GoalFeed) {
-    void twitterCommand(message, args);
+    await twitterCommand(message, args);
   }
 };

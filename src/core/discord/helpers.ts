@@ -36,7 +36,9 @@ export const sendBotspamMessage = (content: string) =>
 export const dmMeError = (err: any) =>
   discordClient.users
     .fetch(OWNER_USER)
-    .then((me) => me.send(err ? JSON.stringify(err) : ""));
+    .then((me) =>
+      me.send(err ? JSON.stringify(err) : "boa to gostando de ver")
+    );
 
 export const waitForUserReaction = async (
   authorId: Snowflake,
