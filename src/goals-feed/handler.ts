@@ -1,23 +1,33 @@
-import { Message } from "discord.js";
-import { BotCommand, Commands } from "../core/command-parser";
-import { isMessageByOwner, isMessageInFootball } from "../core/discord";
+import { Message, TextChannel } from "discord.js";
+import { BotCommand, Commands, getSubcommand } from "../core/command-parser";
+import { isMessageByOwner } from "../core/discord";
 import { GoalFeedStream } from "./goals-feed";
+import { getRulesByChannel } from "./twitter-api";
 
-// using a variable for this isn't so great :/
 const goalFeedStream = new GoalFeedStream();
 
 export const handleTwitterCommand = async (
   { name, args }: BotCommand,
   message: Message
 ) => {
-  if (!isMessageInFootball(message) || !isMessageByOwner(message)) {
+  if (name !== Commands.GoalFeed || !isMessageByOwner(message)) {
     return;
   }
-  if (name === Commands.GoalFeed) {
-    if (args === "start") {
-      await goalFeedStream.startGoalsFeed(message);
-    } else if (args === "stop") {
-      await goalFeedStream.stopGoalsFeed(message);
-    }
+
+  const [subcommand, subcommandArgs] = getSubcommand(args);
+
+  const goalFeed = await goalFeedStream.addGoalFeedToChannel(
+    message.channel as TextChannel
+  );
+
+  if (subcommand === "stream") {
+    await goalFeed.streamTweets();
+  } else if (subcommand === "reset-channel-rules") {
+    await goalFeed.resetRules(subcommandArgs);
+  } else if (subcommand === "get-channel-rules") {
+    const allRules = await getRulesByChannel(message.channel.id);
+    await message.reply(JSON.stringify(allRules) ?? "não tem regras 🤔");
   }
+
+  await message.react("👍");
 };

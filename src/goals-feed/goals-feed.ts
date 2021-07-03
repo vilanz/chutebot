@@ -1,50 +1,59 @@
-import { Message } from "discord.js";
+/* eslint-disable max-classes-per-file */
+/* eslint-disable class-methods-use-this */
+import { Snowflake, TextChannel } from "discord.js";
 import { logger } from "../core/log";
-import { getChannel, BR_TEAMS_CHANNEL } from "../core/discord";
-import { getTweetStream, TweetStream, getTweetVideoUrl } from "./twitter-api";
+import {
+  getTweetStream,
+  TweetStream,
+  getTweetVideoUrl,
+  deleteRules,
+  addRule,
+} from "./twitter-api";
 import { waitSeconds } from "../core/utils";
 
 const STREAM_STOPPED_BY_COMMAND = "stopped with c!goalfeed stop";
 
-export class GoalFeedStream {
-  tweetStream: TweetStream | null = null;
+const streamDown = (tweetStream: TweetStream | null): boolean =>
+  !tweetStream || tweetStream.destroyed;
 
-  noStream(): boolean {
-    return !this.tweetStream || this.tweetStream.destroyed;
+class ChannelGoalFeed {
+  channel: TextChannel;
+
+  tweetStream: TweetStream;
+
+  constructor(channel: TextChannel, tweetStream: TweetStream) {
+    this.channel = channel;
+    this.tweetStream = tweetStream;
   }
 
-  async startGoalsFeed(message: Message) {
-    this.tweetStream = await getTweetStream();
-    await message.react("👍");
-    await this.streamTweets();
-  }
-
-  async stopGoalsFeed(message: Message) {
-    this.tweetStream?.destroy(new Error(STREAM_STOPPED_BY_COMMAND));
-    if (this.tweetStream?.destroyed) {
-      await message.react("👍");
+  async resetRules(rule: string) {
+    await deleteRules(this.channel.id);
+    if (rule.trim()) {
+      await addRule(this.channel.id, rule);
     }
   }
 
   async streamTweets() {
-    if (this.noStream()) {
+    if (streamDown(this.tweetStream)) {
       return;
     }
 
     logger.error("starting to stream tweets");
 
-    const brazilianFootballChannel = await getChannel(BR_TEAMS_CHANNEL);
-
     let reconnectTimeout = 0;
     const reconnectToTweetStream = async () => {
-      if (this.noStream()) {
+      if (streamDown(this.tweetStream)) {
         return;
       }
 
       reconnectTimeout += 1;
 
       const sleepDuration = 2 ** reconnectTimeout;
-      logger.warn("tweet stream will sleep for %s seconds", sleepDuration);
+      logger.warn(
+        "tweet stream in %s will sleep for %s seconds",
+        this.channel.id,
+        sleepDuration
+      );
       await waitSeconds(sleepDuration);
       this.tweetStream?.destroy(new Error("just reconnecting"));
 
@@ -69,8 +78,13 @@ export class GoalFeedStream {
         return;
       }
 
+      // TODO type this correctly
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      const { connection_issue, data } = json;
+      const { connection_issue, data, matching_rules } = json;
+
+      if (!matching_rules.some((rule: any) => rule.tag === this.channel.id)) {
+        return;
+      }
 
       if (connection_issue) {
         logger.error("issue with connecting to a tweet stream: %s", json);
@@ -89,9 +103,32 @@ export class GoalFeedStream {
 
       const mp4Url = await getTweetVideoUrl(data.id);
 
-      await brazilianFootballChannel.send(
-        `**${tweetTextWithoutSpaces}** ${mp4Url}`
-      );
+      await this.channel.send(`**${tweetTextWithoutSpaces}** ${mp4Url}`);
     });
+  }
+}
+
+export class GoalFeedStream {
+  tweetStream: TweetStream | null = null;
+
+  goalFeedMap = new Map<Snowflake, ChannelGoalFeed>();
+
+  async addGoalFeedToChannel(channel: TextChannel): Promise<ChannelGoalFeed> {
+    if (streamDown(this.tweetStream)) {
+      logger.info(
+        "starting tweet stream (destroyed: %s)",
+        this.tweetStream?.destroyed
+      );
+      this.tweetStream = await getTweetStream();
+    }
+
+    const existingGoalFeed = this.goalFeedMap.get(channel.id);
+    if (existingGoalFeed) {
+      return existingGoalFeed;
+    }
+
+    const newGoalFeed = new ChannelGoalFeed(channel, this.tweetStream!);
+    this.goalFeedMap.set(channel.id, newGoalFeed);
+    return newGoalFeed;
   }
 }

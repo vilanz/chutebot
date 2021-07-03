@@ -17,7 +17,7 @@ export enum Commands {
   AddPlayer = "add",
   Wins = "wins",
   Help = "help",
-  GoalFeed = "goalfeed",
+  GoalFeed = "goals",
   Remove = "remove",
 }
 
@@ -41,6 +41,11 @@ export const parseCommand = (content: string): BotCommand | null => {
     name: commandName.toLowerCase(),
     args: commandArgs.join(" "),
   };
+};
+
+export const getSubcommand = (args: string) => {
+  const [subcommand, ...subcommandArgs] = args.split(" ");
+  return [subcommand, subcommandArgs.join(" ")];
 };
 
 export const noop = () => {};
