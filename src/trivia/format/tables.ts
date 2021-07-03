@@ -1,14 +1,18 @@
-import { Alignment, getBorderCharacters, table, TableUserConfig } from "table";
+import {
+  ColumnUserConfig,
+  getBorderCharacters,
+  table,
+  TableUserConfig,
+} from "table";
 import { PlayerSpell, UserWin } from "../types";
 import { removeClubLabels } from "./clubs";
 import { sortBySeason } from "./sort-by-season";
-import { removetrailingWhitespace } from "./whitespace";
 
 const tableWithoutBorders: TableUserConfig = {
   border: getBorderCharacters("norc"),
   columnDefault: {
-    paddingLeft: 1,
-    paddingRight: 1,
+    paddingLeft: 0,
+    paddingRight: 0,
   },
   drawVerticalLine: () => false,
   drawHorizontalLine: (i, qt) => i > 0 && i < qt,
@@ -16,16 +20,16 @@ const tableWithoutBorders: TableUserConfig = {
 
 const borderlessTableMarkdown = (
   columns: unknown[][],
-  columnAlignments: Alignment[]
+  config: ColumnUserConfig[]
 ) => {
   const tableString = table(columns, {
     ...tableWithoutBorders,
-    columns: columnAlignments.map((align) => ({ alignment: align })),
+    columns: config,
   });
-  return `\`\`\`${removetrailingWhitespace(tableString)}\`\`\``;
+  return `\`\`\`${tableString}\`\`\``;
 };
 
-export const formatPlayerSpells = (spells: PlayerSpell[]): string =>
+export const formatPlayerSpells = (spells: PlayerSpell[]) =>
   borderlessTableMarkdown(
     [
       ["Temp.", "Clube", "Jogos", "Gols"],
@@ -36,10 +40,26 @@ export const formatPlayerSpells = (spells: PlayerSpell[]): string =>
         spell.goals,
       ]),
     ],
-    ["left", "left", "right", "right"]
+    [
+      {
+        alignment: "left",
+        paddingRight: 2,
+      },
+      {
+        alignment: "left",
+        paddingRight: 2,
+      },
+      {
+        alignment: "right",
+        paddingRight: 2,
+      },
+      {
+        alignment: "right",
+      },
+    ]
   );
 
-const MAX_USERNAME_LENGTH = 25;
+const MAX_USERNAME_LENGTH = 30;
 
 export const formatUserWins = (users: UserWin[]) =>
   borderlessTableMarkdown(
@@ -47,5 +67,12 @@ export const formatUserWins = (users: UserWin[]) =>
       ["Usuário", "Vitórias"],
       ...users.map((u) => [u.userName.slice(0, MAX_USERNAME_LENGTH), u.wins]),
     ],
-    ["left", "right"]
+    [
+      {
+        alignment: "left",
+      },
+      {
+        alignment: "right",
+      },
+    ]
   );
