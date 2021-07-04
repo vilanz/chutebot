@@ -3,13 +3,13 @@ import { Snowflake, TextChannel } from "discord.js";
 import { logger } from "../core/log";
 import {
   TweetStream,
-  getTweetVideoUrl,
   resetChannelRules,
   getTweetStream,
   getChannelRules,
 } from "./twitter-api";
 import { waitSeconds } from "../core/utils";
 import { getChannel } from "../core/discord";
+import { sendTweetToSubbedChannels } from "./twitter-api/send-streamed-tweet";
 
 export const STREAM_STOPPED_BY_COMMAND = "stopped with c!goalfeed stop";
 const STREAM_RESTARTED = "restarted";
@@ -81,59 +81,18 @@ export class GoalFeedStream {
       const reason = err?.message;
       if (reason === STREAM_STOPPED_BY_COMMAND) {
         logger.info("successfully stopped tweet stream!");
-        return;
+      } else {
+        logger.error("streaming error (likely a timeout or restart)", err);
+        await reconnectToTweetStream();
       }
-      logger.error("streaming error (likely a timeout or restart)", err);
-      await reconnectToTweetStream();
     });
 
     this.tweetStream?.on("data", async (buffer: Buffer) => {
-      let json: any;
-      try {
-        json = JSON.parse(buffer.toString());
-      } catch (e) {
-        // just a heartbeat signal, it's fine
-        return;
-      }
-
-      // TODO type this correctly
-
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      const { connection_issue, data, matching_rules } = json;
-
-      const matchedChannels = [...this.channelSubscriptions].filter(
-        (channelId) =>
-          matching_rules.some((rule: any) => rule.tag === channelId)
-      );
-
-      if (!matchedChannels.length) {
-        logger.warn("tweet did not match any channel", { json });
-        return;
-      }
-
-      if (connection_issue) {
-        logger.error("connection issue with a tweet stream", { json });
-        await reconnectToTweetStream();
-        return;
-      }
-
-      if (!data) {
-        logger.error("likely tweet stream authentication error: %s", json);
-        return;
-      }
-
-      const tweetTextWithoutSpaces = data.text
-        .replace(/https:\/\/t\.co\/\w+/g, "")
-        .replace(/^[ ]+|[ ]+$/g, "");
-
-      const mp4Url = await getTweetVideoUrl(data.id);
-
-      await Promise.all(
-        matchedChannels.map(async (channelId) => {
-          const channel = await getChannel(channelId);
-          await channel.send(`**${tweetTextWithoutSpaces}** ${mp4Url}`);
-        })
-      );
+      await sendTweetToSubbedChannels({
+        buffer,
+        subbedChannels: this.channelSubscriptions,
+        reconnect: () => this.streamTweets(),
+      });
     });
   }
 }

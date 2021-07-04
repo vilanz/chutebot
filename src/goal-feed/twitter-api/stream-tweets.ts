@@ -3,6 +3,11 @@ import { mapAxiosData, twitterNewAPI } from "./axios";
 
 export type TweetStream = IncomingMessage;
 
+export enum StreamStoppage {
+  COMMAND = "stopped via command",
+  RESTARTING = "stopped to restart",
+}
+
 export const getTweetStream = async (): Promise<TweetStream> =>
   twitterNewAPI
     .get<TweetStream>(`/tweets/search/stream`, {

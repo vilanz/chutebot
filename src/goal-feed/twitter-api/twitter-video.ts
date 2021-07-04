@@ -30,7 +30,11 @@ export const getTweetVideoUrl = async (
   )?.video_info?.variants;
 
   if (!videoVariants?.length) {
-    logger.warn("no video variants found for tweet %s", tweetId);
+    logger.warn(
+      "no video variants found for tweet %s with entites %O",
+      tweetId,
+      detailedTweet.extended_entities
+    );
     return null;
   }
 
