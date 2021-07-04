@@ -16,5 +16,11 @@ export const wins: CommandHandler = async (message) => {
     })
   );
 
-  await message.reply(formatUserWins(userWinsWithDisplayNames));
+  await message.reply({
+    embeds: [
+      {
+        description: formatUserWins(userWinsWithDisplayNames),
+      },
+    ],
+  });
 };

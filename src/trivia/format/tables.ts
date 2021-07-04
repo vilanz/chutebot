@@ -11,8 +11,8 @@ import { sortBySeason } from "./sort-by-season";
 const tableWithoutBorders: TableUserConfig = {
   border: getBorderCharacters("norc"),
   columnDefault: {
-    paddingLeft: 0,
-    paddingRight: 0,
+    paddingLeft: 2,
+    paddingRight: 2,
   },
   drawVerticalLine: () => false,
   drawHorizontalLine: (i, qt) => i > 0 && i < qt,
@@ -43,15 +43,12 @@ export const formatPlayerSpells = (spells: PlayerSpell[]) =>
     [
       {
         alignment: "left",
-        paddingRight: 2,
       },
       {
         alignment: "left",
-        paddingRight: 2,
       },
       {
         alignment: "right",
-        paddingRight: 2,
       },
       {
         alignment: "right",
