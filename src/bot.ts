@@ -30,12 +30,6 @@ void (async () => {
     }
   });
 
-  discordClient.on("rateLimit", (rateLimitData) => {
-    logger.warn("discord rate limit", {
-      rateLimitData,
-    });
-  });
-
   await discordClient.login(botToken);
   logger.info("logged in");
 })();
