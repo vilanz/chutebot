@@ -15,7 +15,7 @@ test.each([
   ["20/21", "2007"],
   ["20/21", "2020"],
 ])("seasons greater than the other", (a, b) => {
-  expect(compareSeason(a, b)).not.toBeGreaterThanOrEqual(0);
+  expect(compareSeason(a, b)).toBeLessThan(0);
 });
 
 test.each([
@@ -24,4 +24,12 @@ test.each([
   ["20/21", "20/21"],
 ])("seasons equal to the other", (a, b) => {
   expect(compareSeason(a, b)).toBe(0);
+});
+
+test.each([
+  ["64/65", "65/66"],
+  ["64/65", "79/80"],
+  ["60/61", "1978"],
+])("old seasons", (a, b) => {
+  expect(compareSeason(a, b)).toBeGreaterThan(0);
 });

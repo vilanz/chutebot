@@ -1,5 +1,17 @@
 import { PlayerSpell } from "../types";
 
+const currentYear = new Date().getFullYear();
+
+const getHalfSeasonYear = (season: string): number => {
+  const seasonAs21thCentury = +season + 2000;
+  if (seasonAs21thCentury > currentYear) {
+    // 70s, 80s, 90s, etc.
+    // oh boy I hope this bot isn't running anymore by 2060!
+    return +season + 1900;
+  }
+  return seasonAs21thCentury;
+};
+
 const getSeasonDetails = (season: string) => {
   if (!season.includes("/")) {
     return {
@@ -7,7 +19,7 @@ const getSeasonDetails = (season: string) => {
       end: +season,
     };
   }
-  const [start, end] = season.split("/").map((x) => parseInt(x, 10) + 2000);
+  const [start, end] = season.split("/").map((x) => getHalfSeasonYear(x));
   return {
     start,
     end,
