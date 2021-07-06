@@ -19,6 +19,7 @@ export enum Commands {
   Help = "help",
   GoalFeed = "feed",
   Remove = "remove",
+  ListPlayerIds = "list-player-ids",
 }
 
 export const BOT_PREFIX = "c!";

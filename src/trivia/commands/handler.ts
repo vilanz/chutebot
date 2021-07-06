@@ -5,9 +5,10 @@ import {
   Commands,
   noop,
 } from "../../core/command-parser";
-import { isMessageByOwner, isMessageInBotspam } from "../../core/discord";
+import { isMessageInBotspam } from "../../core/discord";
 import { addPlayer } from "./add-player";
 import { help } from "./help";
+import { listPlayerIds } from "./list-player-ids";
 import { ping } from "./ping";
 import { removePlayer } from "./remove-player";
 import { startGuessing } from "./start-guessing";
@@ -32,10 +33,9 @@ export const handleTriviaCommand = async (
     case Commands.Help:
       return help(message, args);
     case Commands.Remove:
-      if (!isMessageByOwner(message)) {
-        return noop;
-      }
       return removePlayer(message, args);
+    case Commands.ListPlayerIds:
+      return listPlayerIds(message, args);
     default:
       return noop;
   }

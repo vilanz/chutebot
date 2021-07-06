@@ -1,5 +1,6 @@
 import { Snowflake } from "discord.js";
 import { differenceInCalendarDays } from "date-fns";
+import { Op } from "sequelize/types";
 import { logger } from "../../core/log";
 import { Player, PlayerSpell } from "../types";
 import { sequelizeInstance } from "./sequelize";
@@ -15,6 +16,16 @@ export const getPlayerByTransfermarktId = (transfermarktId: number) =>
   PlayerEntity.findOne({
     where: {
       transfermarktId,
+    },
+    include: [PlayerEntity.associations.spells],
+  });
+
+export const searchPlayersByName = (name: string): Promise<PlayerEntity[]> =>
+  PlayerEntity.findAll({
+    where: {
+      name: {
+        [Op.like]: `%${name}%`,
+      },
     },
     include: [PlayerEntity.associations.spells],
   });
