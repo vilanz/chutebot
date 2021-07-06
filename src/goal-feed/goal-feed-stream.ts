@@ -6,6 +6,7 @@ import {
   resetChannelRules,
   getTweetStream,
   getChannelRules,
+  deleteChannelRules,
 } from "./twitter-api";
 import { waitSeconds } from "../core/utils";
 import { getChannel } from "../core/discord";
@@ -27,15 +28,13 @@ export class GoalFeedStream {
     return !!this.tweetStream && !this.tweetStream.destroyed;
   }
 
-  resetChannelRules(channel: TextChannel, rule: string): Promise<void> {
-    return resetChannelRules(channel.id, rule);
-  }
-
-  subscribeToChannel(channel: TextChannel): void {
+  async subscribeToChannel(channel: TextChannel, rule: string): Promise<void> {
+    await resetChannelRules(channel.id, rule);
     this.channelSubscriptions.add(channel.id);
   }
 
-  unsubscribeToChannel(channel: TextChannel): void {
+  async unsubscribeToChannel(channel: TextChannel): Promise<void> {
+    await deleteChannelRules(channel.id);
     this.channelSubscriptions.delete(channel.id);
   }
 
@@ -68,9 +67,7 @@ export class GoalFeedStream {
       reconnectTimeout += 1;
 
       const sleepDuration = 2 ** reconnectTimeout;
-      logger.warn("tweet stream in will sleep for %s seconds", {
-        streamUp: this.streamUp,
-      });
+      logger.warn("tweet stream will restart in %s seconds", sleepDuration);
       await waitSeconds(sleepDuration);
       this.destroyTweetStream(STREAM_RESTARTED);
 
@@ -80,7 +77,9 @@ export class GoalFeedStream {
     this.tweetStream?.on("error", async (err) => {
       const reason = err?.message;
       if (reason === STREAM_STOPPED_BY_COMMAND) {
-        logger.info("successfully stopped tweet stream!");
+        logger.info("successfully stopped tweet stream");
+      } else if (reason === STREAM_RESTARTED) {
+        logger.info("stream will restart");
       } else {
         logger.error("streaming error (likely a timeout or restart)", err);
         await reconnectToTweetStream();

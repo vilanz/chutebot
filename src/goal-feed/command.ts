@@ -34,15 +34,15 @@ export const handleGoalFeedCommand = async (
 
     await message.reply(statusMessage);
   } else if (subcommand === "sub") {
-    goalFeedStream.subscribeToChannel(channel);
-    await message.reply(`Stream irá postar gols no ${channel}.`);
-  } else if (subcommand === "unsub") {
-    goalFeedStream.unsubscribeToChannel(channel);
-    await message.reply(`Stream não irá mais postar gols no ${channel}.`);
-  } else if (subcommand === "set-channel-rules") {
-    await goalFeedStream.resetChannelRules(channel, subcommandArgs);
+    if (!subcommandArgs.trim()) {
+      return;
+    }
+    await goalFeedStream.subscribeToChannel(channel, subcommandArgs);
     await message.reply(
-      `Os gols em ${channel} irão ser filtrados por "${subcommandArgs}".`
+      `Stream irá postar gols no ${channel} que sejam "${subcommandArgs} has:videos".`
     );
+  } else if (subcommand === "unsub") {
+    await goalFeedStream.unsubscribeToChannel(channel);
+    await message.reply(`Stream não irá mais postar gols no ${channel}.`);
   }
 };
