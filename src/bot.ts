@@ -1,12 +1,12 @@
 import { parseCommand } from "./core/command-parser";
-import { initTriviaDatabase, handleTriviaCommand } from "./trivia";
+import { handleTriviaCommand, syncTriviaDatabase } from "./trivia";
 import { logger } from "./core/log";
 import { discordClient, dmMeError, sendBotspamMessage } from "./core/discord";
 import { botToken } from "./core/env";
 import { handleGoalFeedCommand } from "./goal-feed";
 
 void (async () => {
-  await initTriviaDatabase();
+  await syncTriviaDatabase();
 
   logger.info("starting bot");
 

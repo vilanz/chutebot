@@ -1,11 +1,12 @@
 import { Message } from "discord.js";
 import { CommandHandler } from "../../core/command-parser";
-import { addTransfermarktPlayer } from "../actions";
 import {
+  fetchPlayerCareer,
   PlayerSearchResult,
   searchPlayersInTransfermarkt,
 } from "../transfermarkt";
 import { waitForUserReaction } from "../../core/discord";
+import { createPlayer, getPlayerByTransfermarktId } from "../db";
 
 const awaitForPlayerSearchReaction = async (
   playersFound: PlayerSearchResult[],
@@ -69,11 +70,25 @@ export const addPlayer: CommandHandler = async (message, playerName) => {
     return;
   }
 
-  const newPlayer = await addTransfermarktPlayer(wantedPlayer.transfermarktId);
+  const { transfermarktId } = wantedPlayer;
 
-  if (!newPlayer) {
+  if (await getPlayerByTransfermarktId(transfermarktId)) {
     await message.reply("Esse jogador já foi adicionado.");
-  } else {
-    await message.reply(`**${newPlayer.name}** adicionado com sucesso.`);
+    return;
   }
+
+  const career = await fetchPlayerCareer(transfermarktId);
+
+  if (!career.spells.length) {
+    await message.reply("Esse jogador não tem clubes na carreira. :analise:");
+    return;
+  }
+
+  const newPlayerEntity = await createPlayer({
+    name: career.name,
+    transfermarktId,
+    spells: career.spells,
+  });
+
+  await message.reply(`**${newPlayerEntity.name}** adicionado com sucesso.`);
 };
