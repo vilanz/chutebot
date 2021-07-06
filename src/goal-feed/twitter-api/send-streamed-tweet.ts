@@ -35,16 +35,6 @@ type TweetStreamBufferJSON =
   | TweetStreamBufferData
   | TweetStreamBufferError;
 
-const isConnectionIssue = (
-  bufferJSON: TweetStreamBufferJSON
-): bufferJSON is TweetStreamBufferConnectionIssue =>
-  !!(bufferJSON as TweetStreamBufferConnectionIssue).connection_issue;
-
-const isErrors = (
-  bufferJSON: TweetStreamBufferJSON
-): bufferJSON is TweetStreamBufferError =>
-  !!(bufferJSON as TweetStreamBufferError).errors?.length;
-
 export const sendTweetToSubbedChannels = async ({
   buffer,
   subbedChannels,
@@ -58,13 +48,13 @@ export const sendTweetToSubbedChannels = async ({
 
   const json: TweetStreamBufferJSON = JSON.parse(buffer.toString());
 
-  if (isConnectionIssue(json)) {
+  if ("connection_issue" in json) {
     logger.error("connection issue with a tweet stream", { json });
     await reconnect();
     return;
   }
 
-  if (isErrors(json)) {
+  if ("errors" in json) {
     logger.error("tweet stream error", { json });
     return;
   }
