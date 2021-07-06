@@ -7,7 +7,12 @@ export const listPlayerIds: CommandHandler = async (message, args) => {
     return;
   }
 
-  const players = await searchPlayersByName(args);
+  const playerName = args.trim();
+  if (!playerName) {
+    return;
+  }
+
+  const players = await searchPlayersByName(playerName);
   const formattedPlayers = players
     .map(
       (p) =>
@@ -15,5 +20,5 @@ export const listPlayerIds: CommandHandler = async (message, args) => {
     )
     .join("\n");
 
-  await message.reply(formattedPlayers);
+  await message.reply(formattedPlayers ?? "Ninguém encontrado.");
 };

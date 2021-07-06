@@ -19,7 +19,7 @@ export enum Commands {
   Help = "help",
   GoalFeed = "feed",
   Remove = "remove",
-  ListPlayerIds = "list-player-ids",
+  ListPlayerIds = "list-ids",
   PlayerCount = "count",
 }
 
