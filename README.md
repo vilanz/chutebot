@@ -1,10 +1,10 @@
 # chutebot
 
-A Discord bot for football.
+Football bot for Discord with a live goal feed and player career trivia.
 
 ## Features
 
-### Player quiz
+### Player trivia
 
 ##### `c!add <player name>`
 
@@ -12,21 +12,25 @@ Gets the player's career record from Transfermarkt and adds it into the pool of 
 
 ##### `c!start`
 
-Starts a quiz session.
+Starts a trivia session, listing a random anonymous player's career.
 
 ##### `c!g [name]`
 
-During a quiz session, guesses the player's name being `[name]`.
+Guess the player in the current trivia session.
 
 ##### `c!wins`
 
 Displays a leaderboard of quiz winners.
 
+##### `c!count`
+
+Displays how many players have been added.
+
 ### Live goals stream
 
-Whenever a goal from an ongoing match is posted on some Twitter accounts, it will be fetched and posted on the channel as well.
+#### `c!feed start | kill | sub <twitter query> | unsub` _(admin-only)_
 
-TODO: add commands for handling this, it's manual right now
+Whenever a tweet matching a query specified in `c!feed sub` is posted, if it has a video, the video will be posted on the channel where the command was run earlier.
 
 ### General
 
@@ -34,11 +38,17 @@ TODO: add commands for handling this, it's manual right now
 
 Returns `Pong!` with the response's latency.
 
+## TODO
+
+- Replace Sequelize with a better alternative for TypeScript, like TypeORM
+- Use the official Commando framework instead of handmade command parsing
+- Send logs to AWS CloudWatch instead of a local file
+
 ## Getting started
 
-#### `yarn start`
+#### `pm2 start pm2.config.js`
 
-Runs the bot.
+Runs the bot. Use `--env prod` for production.
 
 #### `yarn test`
 
