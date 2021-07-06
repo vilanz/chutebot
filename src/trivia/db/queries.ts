@@ -6,6 +6,8 @@ import { Player, PlayerSpell } from "../types";
 import { sequelizeInstance } from "./sequelize";
 import { PlayerEntity, UserEntity, PlayerSpellEntity } from "./models";
 
+// TODO extract this mess into repositories or something
+
 export const getRandomPlayerId = () =>
   PlayerEntity.findOne({
     attributes: ["transfermarktId"],
@@ -19,6 +21,8 @@ export const getPlayerByTransfermarktId = (transfermarktId: number) =>
     },
     include: [PlayerEntity.associations.spells],
   });
+
+export const getPlayerCount = (): Promise<number> => PlayerEntity.count();
 
 export const searchPlayersByName = (name: string): Promise<PlayerEntity[]> =>
   PlayerEntity.findAll({

@@ -10,6 +10,7 @@ import { addPlayer } from "./add-player";
 import { help } from "./help";
 import { listPlayerIds } from "./list-player-ids";
 import { ping } from "./ping";
+import { playerCount } from "./player-count";
 import { removePlayer } from "./remove-player";
 import { startGuessing } from "./start-guessing";
 import { wins } from "./wins";
@@ -36,6 +37,8 @@ export const handleTriviaCommand = async (
       return removePlayer(message, args);
     case Commands.ListPlayerIds:
       return listPlayerIds(message, args);
+    case Commands.PlayerCount:
+      return playerCount(message, args);
     default:
       return noop;
   }
