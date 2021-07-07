@@ -16,9 +16,9 @@ const getFootbalGuild = () => discordClient.guilds.fetch(GUILD);
 export const getUserById = (id: string) =>
   getFootbalGuild().then((g) => g.members.fetch(id as Snowflake));
 
-export const getChannel = (channelId: Snowflake) =>
+export const getChannel = (channelId: Snowflake): Promise<TextChannel | null> =>
   getFootbalGuild().then(
-    (g) => g.channels.fetch(channelId) as Promise<TextChannel>
+    (g) => g.channels.fetch(channelId) as Promise<TextChannel | null>
   );
 
 export const isMessageInBotspam = (message: Message) =>
@@ -31,7 +31,7 @@ export const isMessageByOwner = (message: Message) =>
   message.author.id === OWNER_USER;
 
 export const sendBotspamMessage = (content: string) =>
-  getChannel(BOTSPAM_CHANNEL).then((ch) => ch.send(content));
+  getChannel(BOTSPAM_CHANNEL).then((ch) => ch?.send(content));
 
 export const dmMeError = (err: any) =>
   discordClient.users
