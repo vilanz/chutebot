@@ -34,7 +34,7 @@ export const deleteChannelRules = async (
   });
 };
 
-export const resetChannelRules = async (
+export const addChannelRules = async (
   channelId: Snowflake,
   rule: string
 ): Promise<void> => {
@@ -45,8 +45,13 @@ export const resetChannelRules = async (
         tag: channelId,
       },
     ],
-    delete: {
-      ids: [channelId],
-    },
   });
+};
+
+export const resetChannelRules = async (
+  channelId: Snowflake,
+  rule: string
+): Promise<void> => {
+  await deleteChannelRules(channelId);
+  await addChannelRules(channelId, rule)
 };

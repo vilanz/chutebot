@@ -18,8 +18,6 @@ export const handleGoalFeedCommand = async (
 
   const channel = message.channel as TextChannel;
 
-  logger.info('ch %O', { ch: message.channel })
-
   // TODO fix this mess with Commando
 
   if (subcommand === "start") {
