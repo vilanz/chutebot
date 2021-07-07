@@ -42,7 +42,7 @@ export const resetChannelRules = async (
   await twitterNewAPI.post("/tweets/search/stream/rules", {
     add: [
       {
-        value: `${rule} has:videos`,
+        value: `${rule} filter:videos`,
         tag: channelId,
       },
     ],
