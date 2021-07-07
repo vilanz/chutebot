@@ -17,19 +17,15 @@ export const getAllRules = (): Promise<TwitterRule[]> =>
     .then(mapAxiosData)
     .then((d) => d.data ?? []);
 
-export const getChannelRules = (
-  channelIds: Snowflake[]
-): Promise<TwitterRule[]> =>
-  getAllRules().then((rules) =>
-    rules.filter((x) => x.tag && channelIds.includes(x.tag as Snowflake))
-  );
-
 export const deleteChannelRules = async (
   channelId: Snowflake
 ): Promise<void> => {
+  const channelRules = await getAllRules()
+    .then(rules => rules.filter(r => r.tag === channelId))
+    .then(rules => rules.map(x => x.id))
   await twitterNewAPI.post("/tweets/search/stream/rules", {
     delete: {
-      ids: [channelId],
+      ids: [channelRules],
     },
   });
 };

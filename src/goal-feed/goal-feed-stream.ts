@@ -26,12 +26,12 @@ export class GoalFeedStream {
     return !!this.tweetStream && !this.tweetStream.destroyed;
   }
 
-  async subscribeToChannel(channel: TextChannel, rule: string): Promise<void> {
-    await resetChannelRules(channel.id, rule);
+  async subscribeToChannel(channelId: Snowflake, rule: string): Promise<void> {
+    await resetChannelRules(channelId, rule);
   }
 
-  async unsubscribeToChannel(channel: TextChannel): Promise<void> {
-    await deleteChannelRules(channel.id);
+  async unsubscribeToChannel(channelId: Snowflake): Promise<void> {
+    await deleteChannelRules(channelId);
   }
 
   async getSubbedChannels(): Promise<{ ch: TextChannel | null; rule: string }[]> {

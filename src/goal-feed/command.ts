@@ -1,4 +1,4 @@
-import { Message, TextChannel } from "discord.js";
+import { Message, Snowflake, TextChannel } from "discord.js";
 import { BotCommand, Commands, getSubcommand } from "../core/command-parser";
 import { isMessageByOwner } from "../core/discord";
 import { GoalFeedStream, STREAM_STOPPED_BY_COMMAND } from "./goal-feed-stream";
@@ -37,12 +37,13 @@ export const handleGoalFeedCommand = async (
     if (!subcommandArgs.trim()) {
       return;
     }
-    await goalFeedStream.subscribeToChannel(channel, subcommandArgs);
+    const [channelId, rule] = getSubcommand(subcommandArgs);
+    await goalFeedStream.subscribeToChannel(channelId as Snowflake, rule);
     await message.reply(
       `Stream irá postar gols no ${channel} que sejam "${subcommandArgs} has:videos".`
     );
   } else if (subcommand === "unsub") {
-    await goalFeedStream.unsubscribeToChannel(channel);
+    await goalFeedStream.unsubscribeToChannel(subcommandArgs as Snowflake);
     await message.reply(`Stream não irá mais postar gols no ${channel}.`);
   }
 };
