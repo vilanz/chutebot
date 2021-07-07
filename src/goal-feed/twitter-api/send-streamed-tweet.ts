@@ -1,4 +1,4 @@
-import { Snowflake } from "discord.js";
+import { Snowflake, TextChannel } from "discord.js";
 import { getChannel } from "../../core/discord/helpers";
 import { logger } from "../../core/log";
 import { TwitterRule } from "./stream-rules";
@@ -6,7 +6,6 @@ import { getTweetVideoUrl } from "./twitter-video";
 
 interface HandleTweetStreamData {
   buffer: Buffer;
-  subbedChannels: Set<Snowflake>;
   reconnect: () => Promise<void>;
 }
 
@@ -37,7 +36,6 @@ type TweetStreamBufferJSON =
 
 export const sendTweetToSubbedChannels = async ({
   buffer,
-  subbedChannels,
   reconnect,
 }: HandleTweetStreamData): Promise<void> => {
   const bufferStr = buffer.toString();
@@ -59,9 +57,12 @@ export const sendTweetToSubbedChannels = async ({
     return;
   }
 
-  const matchedChannels = [...subbedChannels].filter((channelId) =>
-    json.matching_rules.some((rule: any) => rule.tag === channelId)
-  );
+  // TODO clean up this mess
+  let matchedChannels: TextChannel[] = await Promise.all(
+    json.matching_rules
+      .map(rule => getChannel(rule.tag as Snowflake).catch(() => null))
+  )
+  matchedChannels = matchedChannels.filter(ch => ch !== null)
 
   if (!matchedChannels.length) {
     logger.warn("tweet did not match any channel", { json });
@@ -78,8 +79,7 @@ export const sendTweetToSubbedChannels = async ({
   }
 
   await Promise.all(
-    matchedChannels.map(async (channelId) => {
-      const channel = await getChannel(channelId);
+    matchedChannels.map(async (channel) => {
       await channel.send(`**${tweetTextWithoutSpaces}** ${mp4Url}`);
     })
   );

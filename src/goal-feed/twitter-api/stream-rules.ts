@@ -11,8 +11,7 @@ interface TwitterRuleResponse {
   data?: TwitterRule[];
 }
 
-// TODO filter by channel?
-const getAllRules = (): Promise<TwitterRule[]> =>
+export const getAllRules = (): Promise<TwitterRule[]> =>
   twitterNewAPI
     .get<TwitterRuleResponse>(`/tweets/search/stream/rules`)
     .then(mapAxiosData)

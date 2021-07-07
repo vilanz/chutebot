@@ -27,7 +27,7 @@ export const handleGoalFeedCommand = async (
     await message.reply("Stream destruída.");
   } else if (subcommand === "status") {
     const subbedChannels = await goalFeedStream.getSubbedChannels();
-    const channelRules = subbedChannels.map(({ ch, rule }) => `${ch}: ${rule}`);
+    const channelRules = subbedChannels.map(({ ch, rule }) => `${ch ?? 'N/A'}: ${rule}`);
 
     const upMessage = goalFeedStream.streamUp() ? "ativa" : "inativa";
     const statusMessage = [`Stream ${upMessage}!`, ...channelRules].join("\n");

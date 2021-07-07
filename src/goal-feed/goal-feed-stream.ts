@@ -5,8 +5,8 @@ import {
   TweetStream,
   resetChannelRules,
   getTweetStream,
-  getChannelRules,
   deleteChannelRules,
+  getAllRules,
 } from "./twitter-api";
 import { waitSeconds } from "../core/utils";
 import { getChannel } from "../core/discord";
@@ -16,8 +16,6 @@ export const STREAM_STOPPED_BY_COMMAND = "stopped with c!goalfeed stop";
 const STREAM_RESTARTED = "restarted";
 
 export class GoalFeedStream {
-  private channelSubscriptions = new Set<Snowflake>();
-
   private tweetStream: TweetStream | null = null;
 
   destroyTweetStream(reason: string): void {
@@ -30,23 +28,18 @@ export class GoalFeedStream {
 
   async subscribeToChannel(channel: TextChannel, rule: string): Promise<void> {
     await resetChannelRules(channel.id, rule);
-    this.channelSubscriptions.add(channel.id);
   }
 
   async unsubscribeToChannel(channel: TextChannel): Promise<void> {
     await deleteChannelRules(channel.id);
-    this.channelSubscriptions.delete(channel.id);
   }
 
-  async getSubbedChannels(): Promise<{ ch: TextChannel; rule: string }[]> {
-    const subbedChannelRules = await getChannelRules([
-      ...this.channelSubscriptions,
-    ]);
+  async getSubbedChannels(): Promise<{ ch: TextChannel | null; rule: string }[]> {
+    const allRules = await getAllRules();
     return Promise.all(
-      subbedChannelRules
-        .filter((rule) => !!rule.tag)
+      allRules
         .map(async (rule) => ({
-          ch: await getChannel(rule.tag as Snowflake),
+          ch: await getChannel(rule.tag as Snowflake).catch(() => null),
           rule: rule.value,
         }))
     );
@@ -89,7 +82,6 @@ export class GoalFeedStream {
     this.tweetStream?.on("data", async (buffer: Buffer) => {
       await sendTweetToSubbedChannels({
         buffer,
-        subbedChannels: this.channelSubscriptions,
         reconnect: () => this.streamTweets(),
       });
     });
