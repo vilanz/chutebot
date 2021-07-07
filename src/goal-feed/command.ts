@@ -1,6 +1,7 @@
 import { Message, TextChannel } from "discord.js";
 import { BotCommand, Commands, getSubcommand } from "../core/command-parser";
 import { isMessageByOwner } from "../core/discord";
+import { logger } from "../core/log";
 import { GoalFeedStream, STREAM_STOPPED_BY_COMMAND } from "./goal-feed-stream";
 
 const goalFeedStream = new GoalFeedStream();
@@ -16,6 +17,8 @@ export const handleGoalFeedCommand = async (
   const [subcommand, subcommandArgs] = getSubcommand(args);
 
   const channel = message.channel as TextChannel;
+
+  logger.info('ch %O', { ch: message.channel })
 
   // TODO fix this mess with Commando
 
@@ -39,7 +42,7 @@ export const handleGoalFeedCommand = async (
     }
     await goalFeedStream.subscribeToChannel(channel, subcommandArgs);
     await message.reply(
-      `Stream irá postar gols no ${channel} que sejam "${subcommandArgs} has:videos".`
+      `Stream irá postar gols no ${channel} que sejam "${subcommandArgs} filter:videos".`
     );
   } else if (subcommand === "unsub") {
     await goalFeedStream.unsubscribeToChannel(channel);
