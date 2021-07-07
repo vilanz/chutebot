@@ -57,18 +57,6 @@ export const sendTweetToSubbedChannels = async ({
     return;
   }
 
-  // TODO clean up this mess
-  let matchedChannels: TextChannel[] = await Promise.all(
-    json.matching_rules
-      .map(rule => getChannel(rule.tag as Snowflake).catch(() => null))
-  )
-  matchedChannels = matchedChannels.filter(ch => ch !== null)
-
-  if (!matchedChannels.length) {
-    logger.warn("tweet did not match any channel", { json });
-    return;
-  }
-
   const tweetTextWithoutSpaces = json.data.text
     .replace(/https:\/\/t\.co\/\w+/g, "")
     .replace(/^[ ]+|[ ]+$/g, "");
@@ -78,8 +66,20 @@ export const sendTweetToSubbedChannels = async ({
     return;
   }
 
+  // TODO clean up this mess
+  const matchedChannels: Array<TextChannel | null> = await Promise.all(
+    json.matching_rules
+      .map(rule => getChannel(rule.tag as Snowflake).catch(() => null))
+  )
+  const validMatchedChannels: TextChannel[] = matchedChannels.filter(ch => ch !== null)
+
+  if (!validMatchedChannels.length) {
+    logger.warn("tweet did not match any channel", { json });
+    return;
+  }
+
   await Promise.all(
-    matchedChannels.map(async (channel) => {
+    validMatchedChannels.map(async (channel) => {
       await channel.send(`**${tweetTextWithoutSpaces}** ${mp4Url}`);
     })
   );
