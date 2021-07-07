@@ -19,10 +19,10 @@ interface DetailedTweet {
 }
 
 export const getTweetVideoUrl = async (
-  tweetId: number
+  tweetId: string
 ): Promise<string | null> => {
   const detailedTweet: DetailedTweet = await twitterOldAPI
-    .get(`/statuses/show/${tweetId}.json`)
+    .get(`/statuses/show.json?id=${tweetId}`)
     .then(mapAxiosData);
 
   const videoVariants = detailedTweet.extended_entities?.media?.find(

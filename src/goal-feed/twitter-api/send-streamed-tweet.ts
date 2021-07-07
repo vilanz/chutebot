@@ -61,7 +61,7 @@ export const sendTweetToSubbedChannels = async ({
     .replace(/https:\/\/t\.co\/\w+/g, "")
     .replace(/^[ ]+|[ ]+$/g, "");
 
-  const mp4Url = await getTweetVideoUrl(+json.data.id);
+  const mp4Url = await getTweetVideoUrl(json.data.id);
   if (!mp4Url) {
     return;
   }
