@@ -1,31 +1,44 @@
 import { stripIndents } from "common-tags";
 import { CommandHandler } from "../../core/command-parser";
 
-const HELP_MESSAGE = stripIndents`
-**c!start**
-Inicia uma sessão de quiz que durará 25 segundos.
-
-**c!g <nome do jogador>**
-Adivinhar o nome do jogador no quiz atual.
-
-**c!wins**
-High scores do quiz.
-
-**c!add <nome do jogador>**
-Busca 5 jogadores no Transfermarkt com esse nome e mostra eles. Quem mandou a mensagem, dentro de 20 segundos, pode reagir pra escolher e adicionar um jogador específico.
-
-**c!ping**
-Latência do bot.
-
-> Caso ocorrer um erro em um comando, o bot reagirá com ⚠.
-
-> Gols postados no @goleada_info podem ser imediatamente postados no chat, mas ainda é manual e vai ter de me pingar :bola:
-> Ainda serão adicionados comandos para mexer com isso :praydair:
-
-*Código fonte: vilanz/chutebot no GitHub*
+const NOTES = stripIndents`
+- Caso ocorrer um erro ao executar um comando, o bot reagirá com ⚠ à mensagem que invocou o comando.
+- A postagem de gols do Twitter nos canais é controlada via comandos admin.
+- Código fonte: https://github.com/vilanz/chutebot
 `;
 
 export const help: CommandHandler = async (message) => {
-  // TODO usar Messageembed
-  await message.reply(HELP_MESSAGE);
+  await message.reply({
+    embeds: [{
+      title: 'Comandos',
+      fields: [{
+        name: 'c!start',
+        value: 'Inicia uma sessão de trivia que durará 25 segundos.',
+        inline: true
+      }, {
+        name: 'c!g <jogador>',
+        value: 'Adivinhar o nome do jogador na sessão de trivia atual.',
+        inline: true
+      }, {
+        name: 'c!add <pesquisa>',
+        value: 'Escolher um de até 5 jogadores para serem adicionados ao bot.',
+        inline: true
+      }, {
+        name: 'c!wins',
+        value: 'High scores do trivia.',
+        inline: true
+      }, {
+        name: 'c!help',
+        value: 'Mostra esse guia.',
+        inline: true
+      }, {
+        name: 'c!ping',
+        value: 'Latência do bot.',
+        inline: true
+      }, {
+        name: 'Notas',
+        value: NOTES
+      }]
+    }]
+  });
 };
