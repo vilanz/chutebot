@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 /* eslint-disable class-methods-use-this */
 import { Snowflake, TextChannel } from "discord.js";
 import { logger } from "../core/log";
@@ -7,20 +8,18 @@ import {
   getTweetStream,
   deleteChannelRules,
   getAllRules,
+  sendTweetToSubbedChannels
 } from "./twitter-api";
 import { waitSeconds } from "../core/utils";
 import { getChannel } from "../core/discord";
-import { sendTweetToSubbedChannels } from "./twitter-api/send-streamed-tweet";
 
-export const STREAM_STOPPED_BY_COMMAND = "stopped with c!goalfeed stop";
-const STREAM_RESTARTED = "restarted";
+class StreamKilledError extends Error { }
+class StreamRestartedError extends Error { }
 
 export class GoalFeedStream {
   private tweetStream: TweetStream | null = null;
 
-  destroyTweetStream(reason: string): void {
-    this.tweetStream?.destroy(new Error(reason));
-  }
+  private reconnectTimeout: number = 0;
 
   streamUp(): boolean {
     return !!this.tweetStream && !this.tweetStream.destroyed;
@@ -39,7 +38,7 @@ export class GoalFeedStream {
     return Promise.all(
       allRules
         .map(async (rule) => ({
-          ch: await getChannel(rule.tag as Snowflake).catch(() => null),
+          ch: await getChannel(rule.tag as Snowflake),
           rule: rule.value,
         }))
     );
@@ -55,35 +54,43 @@ export class GoalFeedStream {
 
     this.tweetStream = await getTweetStream();
 
-    let reconnectTimeout = 0;
     const reconnectToTweetStream = async () => {
-      reconnectTimeout += 1;
+      const sleepDuration = 2 ** this.reconnectTimeout;
+      logger.warn("tweet stream scheduled to restart in %d seconds", sleepDuration);
 
-      const sleepDuration = 2 ** reconnectTimeout;
-      logger.warn("tweet stream will restart in %s seconds", sleepDuration);
       await waitSeconds(sleepDuration);
-      this.destroyTweetStream(STREAM_RESTARTED);
 
-      await this.streamTweets();
+      this.reconnectTimeout += 1;
+      this.destroyTweetStream(new StreamRestartedError());
     };
 
     this.tweetStream?.on("error", async (err) => {
-      const reason = err?.message;
-      if (reason === STREAM_STOPPED_BY_COMMAND) {
-        logger.info("successfully stopped tweet stream");
-      } else if (reason === STREAM_RESTARTED) {
-        logger.info("stream will restart");
-      } else {
-        logger.error("streaming error (likely a timeout or restart)", err);
-        await reconnectToTweetStream();
+      if (err instanceof StreamKilledError) {
+        logger.info("successfully killed tweet stream");
+        return
       }
+      if (err instanceof StreamRestartedError) {
+        logger.info("tweet stream will restart");
+        await this.streamTweets();
+        return
+      }
+      logger.error("tweet stream error", err);
+      await reconnectToTweetStream();
     });
 
     this.tweetStream?.on("data", async (buffer: Buffer) => {
       await sendTweetToSubbedChannels({
         buffer,
-        reconnect: () => this.streamTweets(),
+        reconnect: reconnectToTweetStream,
       });
     });
+  }
+
+  killTweetStream() {
+    this.destroyTweetStream(new StreamKilledError());
+  }
+
+  private destroyTweetStream(error: Error): void {
+    this.tweetStream?.destroy(error);
   }
 }

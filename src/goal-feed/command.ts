@@ -1,7 +1,7 @@
-import { Message, Snowflake, TextChannel } from "discord.js";
+import { Message, Snowflake } from "discord.js";
 import { BotCommand, Commands, getSubcommand } from "../core/command-parser";
 import { isMessageByOwner } from "../core/discord";
-import { GoalFeedStream, STREAM_STOPPED_BY_COMMAND } from "./goal-feed-stream";
+import { GoalFeedStream } from "./goal-feed-stream";
 
 const goalFeedStream = new GoalFeedStream();
 
@@ -15,15 +15,13 @@ export const handleGoalFeedCommand = async (
 
   const [subcommand, subcommandArgs] = getSubcommand(args);
 
-  const channel = message.channel as TextChannel;
-
   // TODO fix this mess with Commando
 
   if (subcommand === "start") {
     await goalFeedStream.streamTweets();
     await message.reply("Stream iniciada.");
   } else if (subcommand === "kill") {
-    goalFeedStream.destroyTweetStream(STREAM_STOPPED_BY_COMMAND);
+    goalFeedStream.killTweetStream();
     await message.reply("Stream destruída.");
   } else if (subcommand === "status") {
     const subbedChannels = await goalFeedStream.getSubbedChannels();
@@ -39,11 +37,12 @@ export const handleGoalFeedCommand = async (
     }
     const [channelId, rule] = getSubcommand(subcommandArgs);
     await goalFeedStream.subscribeToChannel(channelId as Snowflake, rule);
-    await message.reply(
-      `Stream irá postar gols no ${channel} que sejam "${subcommandArgs} has:videos".`
-    );
+    await message.react('👍');
   } else if (subcommand === "unsub") {
+    if (!subcommandArgs.trim()) {
+      return;
+    }
     await goalFeedStream.unsubscribeToChannel(subcommandArgs as Snowflake);
-    await message.reply(`Stream não irá mais postar gols no ${channel}.`);
+    await message.reply('👍');
   }
 };
