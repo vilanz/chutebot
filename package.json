@@ -4,7 +4,13 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "build": "tsc && cp .env build/.env",
+    "start": "pm2 start pm2.config.js",
+    "start:prod": "yarn start --env prod",
+    "rebuild": "yarn stop && yarn build && yarn start",
+    "rebuild:prod": "yarn restart --env prod",
+    "stop": "pm2 stop bot || echo Already stopped",
+    "kill": "pm2 delete bot",
+    "build": "rm -rf build && tsc && cp .env build/.env",
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
@@ -45,6 +51,7 @@
     "eslint-plugin-react-hooks": "4.0.8",
     "jest": "^26.6.3",
     "nodemon": "^2.0.7",
+    "pm2": "^5.1.0",
     "prettier": "2.3.0",
     "prettier-eslint": "12.0.0",
     "ts-jest": "^26.5.6"
