@@ -1,4 +1,6 @@
 import {
+  Guild,
+  GuildMember,
   Message,
   MessageReaction,
   Snowflake,
@@ -11,15 +13,16 @@ import { BOTSPAM_CHANNEL, BR_TEAMS_CHANNEL, GUILD, OWNER_USER } from "./consts";
 
 // TODO split this file
 
-const getFootbalGuild = () => discordClient.guilds.fetch(GUILD);
+const getGuild = (): Guild => discordClient.guilds.cache.get(GUILD)!;
 
-export const getUserById = (id: string) =>
-  getFootbalGuild().then((g) => g.members.fetch(id as Snowflake));
+export const getUserById = async (id: string): Promise<GuildMember | null> =>
+  getGuild().members.fetch(id as Snowflake).then(m => m || null);
 
 export const getChannel = (channelId: Snowflake): Promise<TextChannel | null> =>
-  getFootbalGuild().then(
-    (g) => g.channels.fetch(channelId) as Promise<TextChannel | null>
-  );
+  getGuild().channels.fetch(channelId) as Promise<TextChannel | null>
+
+export const isMessageInCorrectGuild = (message: Message) =>
+  message.guild?.id === GUILD;
 
 export const isMessageInBotspam = (message: Message) =>
   message.channel.id === BOTSPAM_CHANNEL;

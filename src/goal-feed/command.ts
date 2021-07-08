@@ -1,6 +1,6 @@
 import { Message, Snowflake } from "discord.js";
 import { BotCommand, Commands, getSubcommand } from "../core/command-parser";
-import { isMessageByOwner } from "../core/discord";
+import { isMessageByOwner, isMessageInCorrectGuild } from "../core/discord";
 import { GoalFeedStream } from "./goal-feed-stream";
 
 const goalFeedStream = new GoalFeedStream();
@@ -9,7 +9,9 @@ export const handleGoalFeedCommand = async (
   { name, args }: BotCommand,
   message: Message
 ) => {
-  if (name !== Commands.GoalFeed || !isMessageByOwner(message)) {
+  if (name !== Commands.GoalFeed
+    || !isMessageByOwner(message)
+    || !isMessageInCorrectGuild(message)) {
     return;
   }
 

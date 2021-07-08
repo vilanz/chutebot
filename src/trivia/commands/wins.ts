@@ -10,7 +10,7 @@ export const wins: CommandHandler = async (message) => {
     userWins.map(async (userWin) => {
       const discordUser = await getUserById(userWin.id);
       return {
-        userName: discordUser.displayName,
+        userName: discordUser?.displayName ?? 'N/A',
         wins: userWin.wins,
       };
     })
