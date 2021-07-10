@@ -9,7 +9,7 @@ export const wins: CommandHandler = async (message) => {
 
   const userWinsWithDisplayNames: UserWin[] = await Promise.all(
     userWins.map(async (userWin) => {
-      const discordUser = await getUserById(userWin.id);
+      const discordUser = await getUserById(userWin.id).catch(() => null);
       return {
         userName: discordUser?.displayName ?? "N/A",
         wins: userWin.wins,

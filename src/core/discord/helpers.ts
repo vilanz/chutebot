@@ -16,10 +16,12 @@ import { BOTSPAM_CHANNEL, BR_TEAMS_CHANNEL, GUILD, OWNER_USER } from "./consts";
 const getGuild = (): Guild => discordClient.guilds.cache.get(GUILD)!;
 
 export const getUserById = async (id: string): Promise<GuildMember | null> =>
-  getGuild().members.fetch(id as Snowflake).then(m => m || null);
+  getGuild()
+    .members.fetch(id as Snowflake)
+    .then((m) => m || null);
 
 export const getChannel = (channelId: Snowflake): Promise<TextChannel | null> =>
-  getGuild().channels.fetch(channelId) as Promise<TextChannel | null>
+  getGuild().channels.fetch(channelId) as Promise<TextChannel | null>;
 
 export const isMessageInCorrectGuild = (message: Message) =>
   message.guild?.id === GUILD;
