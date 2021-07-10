@@ -1,75 +1,58 @@
-import {
-  ColumnUserConfig,
-  getBorderCharacters,
-  table,
-  TableUserConfig,
-} from "table";
+import { MessageEmbed } from "discord.js";
 import { PlayerSpell, UserWin } from "../types";
 import { removeClubLabels } from "./clubs";
 import { sortBySeason } from "./sort-by-season";
 
-const tableWithoutBorders: TableUserConfig = {
-  border: getBorderCharacters("norc"),
-  columnDefault: {
-    paddingLeft: 2,
-    paddingRight: 2,
-  },
-  drawVerticalLine: () => false,
-  drawHorizontalLine: (i, qt) => i > 0 && i < qt,
-};
+const breakLines = <T extends unknown>(
+  list: T[],
+  mapping: (t: T, i: number) => string
+) => list.map((x, i) => mapping(x, i)).join("\n");
 
-const borderlessTableMarkdown = (
-  columns: unknown[][],
-  config: ColumnUserConfig[]
-) => {
-  const tableString = table(columns, {
-    ...tableWithoutBorders,
-    columns: config,
-  });
-  return `\`\`\`${tableString}\`\`\``;
+export const formatPlayerSpells = (spells: PlayerSpell[]): MessageEmbed => {
+  const sortedSpells = sortBySeason(spells);
+  return new MessageEmbed()
+    .setTitle("Quem é?")
+    .addField(
+      "Temp.",
+      breakLines(sortedSpells, (x) => x.season),
+      true
+    )
+    .addField(
+      "Time",
+      breakLines(sortedSpells, (x) => removeClubLabels(x.club)),
+      true
+    )
+    .addField(
+      "P (G)",
+      breakLines(sortedSpells, (x) => `${x.matches} (${x.goals})`),
+      true
+    )
+    .setColor("AQUA")
+    .setTimestamp(Date.now());
 };
-
-export const formatPlayerSpells = (spells: PlayerSpell[]) =>
-  borderlessTableMarkdown(
-    [
-      ["Temp.", "Clube", "Jogos", "Gols"],
-      ...sortBySeason(spells).map((spell) => [
-        spell.season,
-        removeClubLabels(spell.club),
-        spell.matches,
-        spell.goals,
-      ]),
-    ],
-    [
-      {
-        alignment: "left",
-      },
-      {
-        alignment: "left",
-      },
-      {
-        alignment: "right",
-      },
-      {
-        alignment: "right",
-      },
-    ]
-  );
 
 const MAX_USERNAME_LENGTH = 30;
 
-export const formatUserWins = (users: UserWin[]) =>
-  borderlessTableMarkdown(
-    [
-      ["Usuário", "Vitórias"],
-      ...users.map((u) => [u.userName.slice(0, MAX_USERNAME_LENGTH), u.wins]),
-    ],
-    [
-      {
-        alignment: "left",
-      },
-      {
-        alignment: "right",
-      },
-    ]
-  );
+export const formatUserWins = (userWins: UserWin[]): MessageEmbed =>
+  new MessageEmbed()
+    .setTitle("Placar")
+    .addField(
+      "\u200b",
+      breakLines(userWins, (_, i) => `${i + 1}.`),
+      true
+    )
+    .addField(
+      "Usuário",
+      breakLines(userWins, (x) =>
+        x.userName.padEnd(MAX_USERNAME_LENGTH, "\u200b")
+      ),
+      true
+    )
+    .addField(
+      "Vitórias",
+      breakLines(userWins, (x) => x.wins.toString()),
+      true
+    )
+    .setTimestamp(Date.now())
+    .setColor("GOLD")
+    .setURL("http://google.com");

@@ -2,25 +2,22 @@ import { CommandHandler } from "../../core/command-parser";
 import { getUserById } from "../../core/discord";
 import { getUserWins } from "../db";
 import { formatUserWins } from "../format";
+import { UserWin } from "../types";
 
 export const wins: CommandHandler = async (message) => {
   const userWins = await getUserWins();
 
-  const userWinsWithDisplayNames = await Promise.all(
+  const userWinsWithDisplayNames: UserWin[] = await Promise.all(
     userWins.map(async (userWin) => {
       const discordUser = await getUserById(userWin.id);
       return {
-        userName: discordUser?.displayName ?? 'N/A',
+        userName: discordUser?.displayName ?? "N/A",
         wins: userWin.wins,
       };
     })
   );
 
   await message.reply({
-    embeds: [
-      {
-        description: formatUserWins(userWinsWithDisplayNames),
-      },
-    ],
+    embeds: [formatUserWins(userWinsWithDisplayNames)],
   });
 };

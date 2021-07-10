@@ -49,11 +49,7 @@ export const startGuessing: CommandHandler = async (message) => {
     const randomPlayer = await getUpdatedPlayer(randomPlayerId);
 
     const playerSpellsMessage = await message.reply({
-      embeds: [
-        {
-          description: formatPlayerSpells(randomPlayer.spells),
-        },
-      ],
+      embeds: [formatPlayerSpells(randomPlayer.spells)],
     });
 
     const correctMessage = await waitForMessage(
