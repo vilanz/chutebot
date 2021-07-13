@@ -3,14 +3,16 @@ import UserAgent from "user-agents";
 import fetch from "node-fetch";
 import { logger } from "../../core/log";
 
+export const getFullTransfermarktUrl = (partialUrl: string) =>
+  `https://www.transfermarkt.com.br${partialUrl}`;
+
 const getRandomUserAgent = () =>
   new UserAgent({ platform: "Win32", deviceCategory: "desktop" }).toString();
 
 export const getCheerioFromPageHTML = async (
   url: string
 ): Promise<CheerioAPI> => {
-  const transfermarktUrl = `https://www.transfermarkt.com.br${url}`;
-  const response = await fetch(transfermarktUrl, {
+  const response = await fetch(getFullTransfermarktUrl(url), {
     method: "GET",
     headers: {
       "User-Agent": getRandomUserAgent(),

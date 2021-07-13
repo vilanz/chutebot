@@ -1,13 +1,20 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { logger } from "../../core/log";
 import {
   getCheerioFromPageHTML,
+  getFullTransfermarktUrl,
   getPlayerSearchUrl,
   mapCheerioNodesList,
 } from "./cheerio-helpers";
 
 export interface PlayerSearchResult {
-  desc: string;
   transfermarktId: number;
+  transfermarktUrl: string;
+  name: string;
+  club: string;
+  age: string;
+  country: string;
+  image: string;
 }
 
 export const searchPlayersInTransfermarkt = async (
@@ -28,27 +35,38 @@ export const searchPlayersInTransfermarkt = async (
   );
 
   return allPlayerRows.map((row) => {
-    const [playerNameRow, clubNameRow] = mapCheerioNodesList(
-      row.find("tbody > tr")
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [nameAndClubColumn, _position, _club, age, country] =
+      mapCheerioNodesList(row.find("> td"));
+    const [playerColumn, clubNameRow] = mapCheerioNodesList(
+      nameAndClubColumn.find("tbody > tr")
     );
 
-    const desc = `${playerNameRow.text()} (${clubNameRow.text()})`;
+    let playerImageUrl = playerColumn.find("img").attr("src")!;
+    if (playerImageUrl) {
+      playerImageUrl = playerImageUrl.replace("/small", "/medium");
+    }
 
-    const playerProfileUrl = playerNameRow.find(".hauptlink a").attr("href")!;
-    const transfermarktIdString = playerProfileUrl.slice(
-      playerProfileUrl.lastIndexOf("/") + 1,
-      playerProfileUrl.length
+    const transfermarktUrl = playerColumn.find(".hauptlink a").attr("href")!;
+    const transfermarktIdString = transfermarktUrl.slice(
+      transfermarktUrl.lastIndexOf("/") + 1,
+      transfermarktUrl.length
     );
     const transfermarktId = +transfermarktIdString;
     if (Number.isNaN(transfermarktId)) {
       throw new Error(
-        `invalid transfermarktId (${transfermarktIdString}) for ${desc}`
+        `invalid transfermarktId (${transfermarktIdString}) for query ${query}`
       );
     }
 
     return {
-      desc,
       transfermarktId,
+      transfermarktUrl: getFullTransfermarktUrl(transfermarktUrl),
+      name: playerColumn.text(),
+      club: clubNameRow.text(),
+      age: age.text(),
+      country: country.find("img").attr("title") ?? "N/A",
+      image: playerImageUrl,
     };
   });
 };

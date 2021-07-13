@@ -1,4 +1,4 @@
-import { Message } from "discord.js";
+import { Message, MessageEmbed } from "discord.js";
 import { CommandHandler } from "../../core/command-parser";
 import {
   fetchPlayerCareer,
@@ -12,19 +12,25 @@ const awaitForPlayerSearchReaction = async (
   playersFound: PlayerSearchResult[],
   message: Message
 ): Promise<PlayerSearchResult | null> => {
-  const MAX_PLAYERS = 5;
+  const MAX_SHOWN_PLAYERS = 5;
   const PLAYER_REACTIONS = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"].slice(
     0,
     playersFound.length
   );
 
-  const playerFoundList = playersFound
-    .slice(0, MAX_PLAYERS)
-    .map((p, i) => `${PLAYER_REACTIONS[i]} ${p.desc}`)
-    .join("\n");
-  const playersFoundMessage = await message.reply(`
-    Jogadores encontrados:\n${playerFoundList}
-  `);
+  const playersFoundMessage = await message.reply({
+    embeds: playersFound
+      .slice(0, MAX_SHOWN_PLAYERS)
+      .map((p, i) =>
+        new MessageEmbed()
+          .setTitle(`${p.name} ${PLAYER_REACTIONS[i]}`)
+          .setURL(p.transfermarktUrl)
+          .setThumbnail(p.image)
+          .addField("Clube", p.club, true)
+          .addField("Idade", p.age, true)
+          .addField("País", p.country, true)
+      ),
+  });
 
   const wantedPlayerIndex = await waitForUserReaction(
     message.author.id,
@@ -32,7 +38,9 @@ const awaitForPlayerSearchReaction = async (
     PLAYER_REACTIONS
   );
   if (wantedPlayerIndex === null) {
-    await playersFoundMessage.react("⌚");
+    await playersFoundMessage.reply(
+      "Nenhum jogador foi escolhido dentro de 20 segundos."
+    );
     return null;
   }
 
@@ -73,7 +81,7 @@ export const addPlayer: CommandHandler = async (message, playerName) => {
   const { transfermarktId } = wantedPlayer;
 
   if (await getPlayerByTransfermarktId(transfermarktId)) {
-    await message.reply("Esse jogador já foi adicionado.");
+    await message.reply(`O **${wantedPlayer.name}** já foi adicionado antes.`);
     return;
   }
 
