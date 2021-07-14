@@ -1,6 +1,6 @@
 import path from "path";
-import { getChutebotCommandsMap, parseCommand } from "./core/command-parser";
 import { syncTriviaDatabase } from "./trivia";
+import { getChutebotCommandsMap, parseCommand } from "./core/command-parser";
 import { logger } from "./core/log";
 import { discordClient, dmMeError, sendBotspamMessage } from "./core/discord";
 import { botToken } from "./core/env";

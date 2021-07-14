@@ -3,7 +3,7 @@ import { ChutebotCommand, getSubcommand } from "../../core/command-parser";
 import { isMessageByOwner } from "../../core/discord";
 import { goalFeedStream } from "../goal-feed-stream";
 
-const SubGoalFeedCommand: ChutebotCommand = {
+export default {
   commandName: "feed sub",
   permission: (message) => isMessageByOwner(message),
   handler: async (message, args) => {
@@ -14,6 +14,4 @@ const SubGoalFeedCommand: ChutebotCommand = {
     await goalFeedStream.subscribeToChannel(channelId as Snowflake, rule);
     await message.react("👍");
   },
-};
-
-export default SubGoalFeedCommand;
+} as ChutebotCommand;

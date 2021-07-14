@@ -1,11 +1,11 @@
 import { Message, MessageEmbed } from "discord.js";
-import { CommandHandler } from "../../core/command-parser";
+import { ChutebotCommand } from "../../core/command-parser";
 import {
   fetchPlayerCareer,
   PlayerSearchResult,
   searchPlayersInTransfermarkt,
 } from "../transfermarkt";
-import { waitForUserReaction } from "../../core/discord";
+import { isMessageInBotspam, waitForUserReaction } from "../../core/discord";
 import { createPlayer, getPlayerByTransfermarktId } from "../db";
 
 const awaitForPlayerSearchReaction = async (
@@ -55,48 +55,54 @@ const awaitForPlayerSearchReaction = async (
   return wantedPlayer;
 };
 
-export const addPlayer: CommandHandler = async (message, playerName) => {
-  const playerNameWithoutSpaces = playerName?.trim();
-  if (!playerNameWithoutSpaces || playerNameWithoutSpaces.length > 80) {
-    await message.reply("Precisamos de um nome válido.");
-    return;
-  }
+export default {
+  commandName: "add",
+  permission: (message) => isMessageInBotspam(message),
+  handler: async (message, playerName) => {
+    const playerNameWithoutSpaces = playerName?.trim();
+    if (!playerNameWithoutSpaces || playerNameWithoutSpaces.length > 80) {
+      await message.reply("Precisamos de um nome válido.");
+      return;
+    }
 
-  const playersFound = await searchPlayersInTransfermarkt(playerName);
+    const playersFound = await searchPlayersInTransfermarkt(playerName);
 
-  if (!playersFound.length) {
-    await message.reply("Nenhum jogador encontrado.");
-    return;
-  }
+    if (!playersFound.length) {
+      await message.reply("Nenhum jogador encontrado.");
+      return;
+    }
 
-  const wantedPlayer = await awaitForPlayerSearchReaction(
-    playersFound,
-    message
-  );
+    const wantedPlayer = await awaitForPlayerSearchReaction(
+      playersFound,
+      message
+    );
 
-  if (!wantedPlayer) {
-    return;
-  }
+    if (!wantedPlayer) {
+      return;
+    }
 
-  const { transfermarktId } = wantedPlayer;
+    const { transfermarktId } = wantedPlayer;
 
-  if (await getPlayerByTransfermarktId(transfermarktId)) {
-    await message.reply(`O **${wantedPlayer.name}** já foi adicionado antes.`);
-    return;
-  }
+    if (await getPlayerByTransfermarktId(transfermarktId)) {
+      await message.reply(
+        `O **${wantedPlayer.name}** já foi adicionado antes.`
+      );
+      return;
+    }
 
-  const career = await fetchPlayerCareer(transfermarktId);
+    const career = await fetchPlayerCareer(transfermarktId);
 
-  if (!career.spells.length) {
-    await message.reply("Esse jogador não tem clubes na carreira. :analise:");
-    return;
-  }
+    if (!career.spells.length) {
+      await message.reply("Esse jogador não tem clubes na carreira. :analise:");
+      return;
+    }
 
-  const newPlayerEntity = await createPlayer({
-    name: career.name,
-    transfermarktId,
-    spells: career.spells,
-  });
+    const newPlayerEntity = await createPlayer({
+      name: career.name,
+      transfermarktId,
+      spells: career.spells,
+    });
 
-  await message.reply(`**${newPlayerEntity.name}** adicionado com sucesso.`);
-};
+    await message.reply(`**${newPlayerEntity.name}** adicionado com sucesso.`);
+  },
+} as ChutebotCommand;

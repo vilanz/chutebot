@@ -2,7 +2,7 @@ import { ChutebotCommand } from "../../core/command-parser";
 import { isMessageByOwner } from "../../core/discord";
 import { goalFeedStream } from "../goal-feed-stream";
 
-const StatusGoalFeedCommand: ChutebotCommand = {
+export default {
   commandName: "feed status",
   permission: (message) => isMessageByOwner(message),
   handler: async (message) => {
@@ -16,6 +16,4 @@ const StatusGoalFeedCommand: ChutebotCommand = {
 
     await message.reply(statusMessage);
   },
-};
-
-export default StatusGoalFeedCommand;
+} as ChutebotCommand;
