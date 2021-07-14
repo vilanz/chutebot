@@ -20,12 +20,12 @@ export const getAllRules = (): Promise<TwitterRule[]> =>
 export const deleteChannelRules = async (
   channelId: Snowflake
 ): Promise<void> => {
-  const channelRules = await getAllRules()
+  const channelRuleIds = await getAllRules()
     .then(rules => rules.filter(r => r.tag === channelId))
     .then(rules => rules.map(x => x.id))
   const deleteResult = await twitterNewAPI.post("/tweets/search/stream/rules", {
     delete: {
-      ids: [channelRules],
+      ids: channelRuleIds,
     },
   });
   const deleteErrors = deleteResult.data?.errors
