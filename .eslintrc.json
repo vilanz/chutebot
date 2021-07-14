@@ -7,6 +7,8 @@
   "rules": {
     "no-console": "off", // this is a Node app
     "@typescript-eslint/no-floating-promises": "warn",
-    "no-void": "off"
+    "no-void": "off",
+    "class-methods-use-this": "off",
+    "import/no-default-export": "off"
   }
 }
