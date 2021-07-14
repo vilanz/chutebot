@@ -1,6 +1,5 @@
-import { Snowflake } from "discord.js";
 import { ChutebotCommand } from "../../core/command-parser";
-import { isMessageByOwner } from "../../core/discord";
+import { isMessageByOwner, parseChannelMention } from "../../core/discord";
 import { goalFeedStream } from "../goal-feed-stream";
 
 export default {
@@ -10,7 +9,13 @@ export default {
     if (!args.trim()) {
       return;
     }
-    await goalFeedStream.unsubscribeToChannel(args as Snowflake);
+    
+    const channelId = parseChannelMention(args)    
+    if (!channelId) {
+      throw new Error('unsub sem channel')
+    }
+
+    await goalFeedStream.unsubscribeToChannel(channelId);
     await message.react("👍");
   },
 } as ChutebotCommand;

@@ -36,13 +36,14 @@ void (async () => {
         return;
       }
 
-      const equivalentCommand = chutebotCommandsMap.get(command.name);
+      const commandHandler = chutebotCommandsMap.get(command.name);
 
-      if (!equivalentCommand || !equivalentCommand.permission(message)) {
+      if (!commandHandler || !commandHandler.permission(message)) {
         return;
       }
 
-      await equivalentCommand.handler(message, command.args);
+      logger.info('running command %s with command %O', commandHandler.commandName, command)
+      await commandHandler.handler(message, command.args);
     } catch (err) {
       await message.react("⚠");
       logger.error("error when running a command", err);

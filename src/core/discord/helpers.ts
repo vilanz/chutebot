@@ -49,7 +49,10 @@ export const sendBotspamMessage = async (content: string): Promise<void> => {
 
 export const dmMeError = async (err: any): Promise<void> => {
   const me = await discordClient.users.fetch(OWNER_USER);
-  await me.send(err ? JSON.stringify(err) : "eita");
+  const stringifiedError = err
+    ? JSON.stringify(err, Object.getOwnPropertyNames(err), 2)
+    : 'eita'
+  await me.send(stringifiedError);
 };
 
 export const waitForUserReaction = async (
@@ -89,3 +92,13 @@ export const waitForMessage = async (
     })
     .then((ms) => ms.first()!)
     .catch(() => null);
+
+export const parseChannelMention = (message: string): Snowflake | null => {
+  const matches = message.match(/^<#!?(\d+)>$/);
+
+  if (!matches) {
+    return null
+  }
+
+  return matches[1] as Snowflake;
+}
