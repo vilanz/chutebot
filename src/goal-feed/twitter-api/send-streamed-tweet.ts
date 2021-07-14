@@ -67,10 +67,10 @@ export const sendTweetToSubbedChannels = async ({
   }
 
   // TODO clean up this mess
-  const matchedChannels: Array<TextChannel | null> = await Promise.all(
-    json.matching_rules
-      .map(rule => getChannel(rule.tag as Snowflake))
-  )
+  const matchedChannels: Array<TextChannel | null> = json
+    .matching_rules
+    .map(rule => getChannel(rule.tag as Snowflake))
+
   const validMatchedChannels: TextChannel[] = matchedChannels
     .filter(c => c !== null) as TextChannel[] // uuh why do I have to cast this lol
 

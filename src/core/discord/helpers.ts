@@ -21,29 +21,33 @@ export const getUserById = async (id: string): Promise<GuildMember | null> =>
     .then((m) => m || null)
     .catch(() => null);
 
-export const getChannel = (channelId: Snowflake): Promise<TextChannel | null> =>
-  getGuild().channels.fetch(channelId) as Promise<TextChannel | null>;
+export const getChannel = (channelId: Snowflake): TextChannel | null =>
+  getGuild().channels.cache.get(channelId) as TextChannel ?? null;
 
-export const isMessageInCorrectGuild = (message: Message) =>
+export const isMessageInCorrectGuild = (message: Message): boolean =>
   message.guild?.id === GUILD;
 
-export const isMessageIn = (message: Message, channelId: Snowflake) =>
+export const isMessageIn = (message: Message, channelId: Snowflake): boolean =>
   message.channel.id === channelId;
 
 // TODO remove these two
-export const isMessageInBotspam = (message: Message) =>
+export const isMessageInBotspam = (message: Message): boolean =>
   isMessageIn(message, BOTSPAM_CHANNEL);
 
-export const isMessageInFootball = (message: Message) =>
+export const isMessageInFootball = (message: Message): boolean =>
   isMessageIn(message, BR_TEAMS_CHANNEL);
 
-export const isMessageByOwner = (message: Message) =>
+export const isMessageByOwner = (message: Message): boolean =>
   message.author.id === OWNER_USER;
 
-export const sendBotspamMessage = (content: string) =>
-  getChannel(BOTSPAM_CHANNEL).then((ch) => ch?.send(content));
+export const sendBotspamMessage = async (content: string): Promise<void> => {
+  const botspamChannel = getChannel(BOTSPAM_CHANNEL)
+  if (botspamChannel) {
+    await botspamChannel.send(content)
+  }
+}
 
-export const dmMeError = async (err: any) => {
+export const dmMeError = async (err: any): Promise<void> => {
   const me = await discordClient.users.fetch(OWNER_USER);
   await me.send(err ? JSON.stringify(err) : "eita");
 };

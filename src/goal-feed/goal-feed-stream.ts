@@ -12,8 +12,8 @@ import {
 import { waitSeconds } from "../core/utils";
 import { getChannel } from "../core/discord";
 
-class StreamKilledError extends Error {}
-class StreamRestartedError extends Error {}
+class StreamKilledError extends Error { }
+class StreamRestartedError extends Error { }
 
 class GoalFeedStream {
   private tweetStream: TweetStream | null = null;
@@ -38,7 +38,7 @@ class GoalFeedStream {
     const allRules = await getAllRules();
     return Promise.all(
       allRules.map(async (rule) => ({
-        ch: await getChannel(rule.tag as Snowflake),
+        ch: getChannel(rule.tag as Snowflake),
         rule: rule.value,
       }))
     );
