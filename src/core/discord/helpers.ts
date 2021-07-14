@@ -18,7 +18,8 @@ const getGuild = (): Guild => discordClient.guilds.cache.get(GUILD)!;
 export const getUserById = async (id: string): Promise<GuildMember | null> =>
   getGuild()
     .members.fetch(id as Snowflake)
-    .then((m) => m || null);
+    .then((m) => m || null)
+    .catch(() => null);
 
 export const getChannel = (channelId: Snowflake): Promise<TextChannel | null> =>
   getGuild().channels.fetch(channelId) as Promise<TextChannel | null>;
@@ -26,11 +27,15 @@ export const getChannel = (channelId: Snowflake): Promise<TextChannel | null> =>
 export const isMessageInCorrectGuild = (message: Message) =>
   message.guild?.id === GUILD;
 
+export const isMessageIn = (message: Message, channelId: Snowflake) =>
+  message.channel.id === channelId;
+
+// TODO remove these two
 export const isMessageInBotspam = (message: Message) =>
-  message.channel.id === BOTSPAM_CHANNEL;
+  isMessageIn(message, BOTSPAM_CHANNEL);
 
 export const isMessageInFootball = (message: Message) =>
-  message.channel.id === BR_TEAMS_CHANNEL;
+  isMessageIn(message, BR_TEAMS_CHANNEL);
 
 export const isMessageByOwner = (message: Message) =>
   message.author.id === OWNER_USER;
@@ -38,12 +43,10 @@ export const isMessageByOwner = (message: Message) =>
 export const sendBotspamMessage = (content: string) =>
   getChannel(BOTSPAM_CHANNEL).then((ch) => ch?.send(content));
 
-export const dmMeError = (err: any) =>
-  discordClient.users
-    .fetch(OWNER_USER)
-    .then((me) =>
-      me.send(err ? JSON.stringify(err) : "boa to gostando de ver")
-    );
+export const dmMeError = async (err: any) => {
+  const me = await discordClient.users.fetch(OWNER_USER);
+  await me.send(err ? JSON.stringify(err) : "eita");
+};
 
 export const waitForUserReaction = async (
   authorId: Snowflake,
