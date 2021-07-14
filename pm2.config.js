@@ -9,6 +9,7 @@ module.exports = {
       env_prod: {
         BOT_MODE: "prod",
       },
+      shutdown_with_message: true,
     },
   ],
 };

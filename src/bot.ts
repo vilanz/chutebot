@@ -6,6 +6,16 @@ import { discordClient, dmMeError, sendBotspamMessage } from "./core/discord";
 import { botToken } from "./core/env";
 
 void (async () => {
+  process.on("message", async (msg) => {
+    if (msg !== "shutdown") {
+      return;
+    }
+    if (discordClient.readyTimestamp) {
+      await sendBotspamMessage("Bot irá parar.");
+    }
+    process.exit(0);
+  });
+
   await syncTriviaDatabase();
 
   logger.info("starting bot");
