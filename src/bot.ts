@@ -1,9 +1,5 @@
 import path from "path";
-import {
-  ChutebotCommand,
-  getChutebotCommands,
-  parseCommand,
-} from "./core/command-parser";
+import { getChutebotCommandsMap, parseCommand } from "./core/command-parser";
 import { syncTriviaDatabase } from "./trivia";
 import { logger } from "./core/log";
 import { discordClient, dmMeError, sendBotspamMessage } from "./core/discord";
@@ -14,13 +10,10 @@ void (async () => {
 
   logger.info("starting bot");
 
-  const commandsMap = new Map<string, ChutebotCommand>();
-  const chutebotCommands = await getChutebotCommands(
-    path.join(__dirname, "./commands")
+  const chutebotCommandsMap = await getChutebotCommandsMap(
+    path.join(__dirname, "./goal-feed/commands"),
+    path.join(__dirname, "./trivia/commands")
   );
-  chutebotCommands.forEach((command) => {
-    commandsMap.set(command.commandName, command);
-  });
 
   discordClient.on("ready", async () => {
     await sendBotspamMessage("Bot iniciado.");
@@ -33,7 +26,7 @@ void (async () => {
         return;
       }
 
-      const equivalentCommand = commandsMap.get(command.name);
+      const equivalentCommand = chutebotCommandsMap.get(command.name);
 
       if (!equivalentCommand || !equivalentCommand.permission(message)) {
         return;

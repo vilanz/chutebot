@@ -58,13 +58,16 @@ export const getSubcommand = (args: string) => {
   return [subcommand, subcommandArgs.join(" ")];
 };
 
-export const getChutebotCommands = async (
-  commandsPath: string
-): Promise<ChutebotCommand[]> => {
-  const commandFilenames = fs
-    .readdirSync(commandsPath)
+const getJSFilesInPath = (p: string): string[] =>
+  fs
+    .readdirSync(p)
     .filter((file) => file.endsWith(".js"))
-    .map((file) => path.join(commandsPath, file));
+    .map((file) => path.join(p, file));
+
+const getExportedCommandsInDirs = async (
+  ...commandPaths: string[]
+): Promise<ChutebotCommand[]> => {
+  const commandFilenames = commandPaths.flatMap(getJSFilesInPath);
 
   return Promise.all(
     commandFilenames.map((filename) =>
@@ -73,6 +76,17 @@ export const getChutebotCommands = async (
       )
     )
   );
+};
+
+export const getChutebotCommandsMap = async (
+  ...commandPaths: string[]
+): Promise<Map<string, ChutebotCommand>> => {
+  const commandsMap = new Map();
+  const allCommands = await getExportedCommandsInDirs(...commandPaths);
+  allCommands.forEach((command) => {
+    commandsMap.set(command.commandName, command);
+  });
+  return commandsMap;
 };
 
 export const noop = () => {};

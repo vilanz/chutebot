@@ -1,5 +1,4 @@
 /* eslint-disable max-classes-per-file */
-/* eslint-disable class-methods-use-this */
 import { Snowflake, TextChannel } from "discord.js";
 import { logger } from "../core/log";
 import {
@@ -8,15 +7,15 @@ import {
   getTweetStream,
   deleteChannelRules,
   getAllRules,
-  sendTweetToSubbedChannels
+  sendTweetToSubbedChannels,
 } from "./twitter-api";
 import { waitSeconds } from "../core/utils";
 import { getChannel } from "../core/discord";
 
-class StreamKilledError extends Error { }
-class StreamRestartedError extends Error { }
+class StreamKilledError extends Error {}
+class StreamRestartedError extends Error {}
 
-export class GoalFeedStream {
+class GoalFeedStream {
   private tweetStream: TweetStream | null = null;
 
   private reconnectTimeout: number = 0;
@@ -33,14 +32,15 @@ export class GoalFeedStream {
     await deleteChannelRules(channelId);
   }
 
-  async getSubbedChannels(): Promise<{ ch: TextChannel | null; rule: string }[]> {
+  async getSubbedChannels(): Promise<
+    { ch: TextChannel | null; rule: string }[]
+  > {
     const allRules = await getAllRules();
     return Promise.all(
-      allRules
-        .map(async (rule) => ({
-          ch: await getChannel(rule.tag as Snowflake),
-          rule: rule.value,
-        }))
+      allRules.map(async (rule) => ({
+        ch: await getChannel(rule.tag as Snowflake),
+        rule: rule.value,
+      }))
     );
   }
 
@@ -56,7 +56,10 @@ export class GoalFeedStream {
 
     const reconnectToTweetStream = async () => {
       const sleepDuration = 2 ** this.reconnectTimeout;
-      logger.warn("tweet stream scheduled to restart in %d seconds", sleepDuration);
+      logger.warn(
+        "tweet stream scheduled to restart in %d seconds",
+        sleepDuration
+      );
 
       await waitSeconds(sleepDuration);
 
@@ -67,12 +70,12 @@ export class GoalFeedStream {
     this.tweetStream?.on("error", async (err) => {
       if (err instanceof StreamKilledError) {
         logger.info("successfully killed tweet stream");
-        return
+        return;
       }
       if (err instanceof StreamRestartedError) {
         logger.info("tweet stream will restart");
         await this.streamTweets();
-        return
+        return;
       }
       logger.error("tweet stream error", err);
       await reconnectToTweetStream();
@@ -94,3 +97,5 @@ export class GoalFeedStream {
     this.tweetStream?.destroy(error);
   }
 }
+
+export const goalFeedStream = new GoalFeedStream();
