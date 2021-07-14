@@ -1,5 +1,5 @@
 import { Snowflake, TextChannel } from "discord.js";
-import { getChannel } from "../../core/discord/helpers";
+import { getChannel, sendBotspamMessage } from "../../core/discord/helpers";
 import { logger } from "../../core/log";
 import { TwitterRule } from "./stream-rules";
 import { getTweetVideoUrl } from "./twitter-video";
@@ -54,6 +54,7 @@ export const sendTweetToSubbedChannels = async ({
 
   if ("errors" in json) {
     logger.error("tweet stream error", { json });
+    await sendBotspamMessage('Deu erro na stream ao ao buscar vídeos de gols 👀')
     return;
   }
 

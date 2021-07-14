@@ -11,6 +11,7 @@ import {
   TwitterRule,
 } from "./twitter-api";
 import { waitSeconds } from "../core/utils";
+import { sendBotspamMessage } from "../core/discord";
 
 class StreamKilledError extends Error { }
 class StreamRestartedError extends Error { }
@@ -48,10 +49,12 @@ class GoalFeedStream {
 
     const reconnectToTweetStream = async () => {
       const sleepDuration = 2 ** this.reconnectTimeout;
+
       logger.warn(
         "tweet stream scheduled to restart in %d seconds",
         sleepDuration
       );
+      await sendBotspamMessage('Tendo que reconectar ao Twitter pra buscar vídeos de gols 👀')
 
       await waitSeconds(sleepDuration);
 
@@ -70,6 +73,7 @@ class GoalFeedStream {
         return;
       }
       logger.error("tweet stream error", err);
+      await sendBotspamMessage("Deu erro na stream ao ao buscar vídeos de gols 👀")
       await reconnectToTweetStream();
     });
 
