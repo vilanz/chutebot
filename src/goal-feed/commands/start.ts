@@ -3,7 +3,7 @@ import { isMessageByOwner } from "../../core/discord";
 import { goalFeedStream } from "../goal-feed-stream";
 
 export default {
-  commandName: "feed start",
+  commandName: "feed-start",
   permission: (message) => isMessageByOwner(message),
   handler: async (message) => {
     await goalFeedStream.streamTweets();

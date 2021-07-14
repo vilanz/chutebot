@@ -4,7 +4,7 @@ import { isMessageByOwner } from "../../core/discord";
 import { goalFeedStream } from "../goal-feed-stream";
 
 export default {
-  commandName: "feed sub",
+  commandName: "feed-sub",
   permission: (message) => isMessageByOwner(message),
   handler: async (message, args) => {
     if (!args.trim()) {

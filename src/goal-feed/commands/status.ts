@@ -3,7 +3,7 @@ import { isMessageByOwner } from "../../core/discord";
 import { goalFeedStream } from "../goal-feed-stream";
 
 export default {
-  commandName: "feed status",
+  commandName: "feed-status",
   permission: (message) => isMessageByOwner(message),
   handler: async (message) => {
     const subbedChannels = await goalFeedStream.getSubbedChannels();
