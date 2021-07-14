@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file */
-import { Snowflake, TextChannel } from "discord.js";
+import { Snowflake } from "discord.js";
 import { logger } from "../core/log";
 import {
   TweetStream,
@@ -8,9 +8,9 @@ import {
   deleteChannelRules,
   getAllRules,
   sendTweetToSubbedChannels,
+  TwitterRule,
 } from "./twitter-api";
 import { waitSeconds } from "../core/utils";
-import { getChannel } from "../core/discord";
 
 class StreamKilledError extends Error { }
 class StreamRestartedError extends Error { }
@@ -32,16 +32,8 @@ class GoalFeedStream {
     await deleteChannelRules(channelId);
   }
 
-  async getSubbedChannels(): Promise<
-    { ch: TextChannel | null; rule: string }[]
-  > {
-    const allRules = await getAllRules();
-    return Promise.all(
-      allRules.map(async (rule) => ({
-        ch: getChannel(rule.tag as Snowflake),
-        rule: rule.value,
-      }))
-    );
+  async getSubbedChannelRules(): Promise<TwitterRule[]> {
+    return getAllRules();
   }
 
   async streamTweets(): Promise<void> {
