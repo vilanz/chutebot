@@ -17,11 +17,13 @@ export default {
         "Adivinhar o nome do jogador na sessão de trivia atual."
       )
       .addField("c!wins", "High scores do trivia.")
-      .addField("c!add <pesquisa>", "Adicionar jogadores ao bot.");
+      .addField("c!add <pesquisa>", "Adicionar jogadores ao bot.")
+      .setColor("GOLD");
     const GENERAL_EMBED = new MessageEmbed()
       .setTitle("Comandos gerais")
       .addField("c!help", "Mostra esse guia.")
-      .addField("c!ping", "Latência do bot.");
+      .addField("c!ping", "Latência do bot.")
+      .setColor("AQUA");
     const NOTES_EMBED = new MessageEmbed()
       .setTitle("Notas")
       .addField(
@@ -32,7 +34,8 @@ export default {
         "Postagem de gols do Twitter",
         "Controlados via comandos admin."
       )
-      .addField("Código fonte", "https://github.com/vilanz/chutebot");
+      .addField("Código fonte", "https://github.com/vilanz/chutebot")
+      .setColor("RED");
     await message.reply({
       embeds: [TRIVIA_EMBED, GENERAL_EMBED, NOTES_EMBED],
     });

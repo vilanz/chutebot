@@ -29,6 +29,7 @@ const awaitForPlayerSearchReaction = async (
           .addField("Clube", p.club, true)
           .addField("Idade", p.age, true)
           .addField("País", p.country, true)
+          .setColor("RANDOM")
       ),
   });
 

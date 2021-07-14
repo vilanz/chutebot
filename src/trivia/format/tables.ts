@@ -3,6 +3,8 @@ import { PlayerSpell, UserWin } from "../types";
 import { removeClubLabels } from "./clubs";
 import { sortBySeason } from "./sort-by-season";
 
+// TODO this isn't tables anymore, extract this back to the commands
+
 const breakLines = <T extends unknown>(
   list: T[],
   mapping: (t: T, i: number) => string
@@ -54,5 +56,4 @@ export const formatUserWins = (userWins: UserWin[]): MessageEmbed =>
       true
     )
     .setTimestamp(Date.now())
-    .setColor("GOLD")
-    .setURL("http://google.com");
+    .setColor("GOLD");
