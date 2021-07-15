@@ -42,7 +42,7 @@ void (async () => {
         return;
       }
 
-      logger.info('running command %s with command %O', commandHandler.commandName, command)
+      logger.info('running command %s with command %s', commandHandler.commandName, command)
       await commandHandler.handler(message, command.args);
     } catch (err) {
       await message.react("⚠");
