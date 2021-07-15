@@ -2,7 +2,6 @@ import { Snowflake, TextChannel } from "discord.js";
 import { getChannel, sendBotspamMessage } from "../../core/discord/helpers";
 import { logger } from "../../core/log";
 import { TwitterRule } from "./stream-rules";
-import { getTweetVideoUrl } from "./twitter-video";
 
 interface HandleTweetStreamData {
   buffer: Buffer;
@@ -58,31 +57,23 @@ export const sendTweetToSubbedChannels = async ({
     return;
   }
 
-  const tweetTextWithoutSpaces = json.data.text
-    .replace(/https:\/\/t\.co\/\w+/g, "")
-    .replace(/^[ ]+|[ ]+$/g, "");
-
-  const mp4Url = await getTweetVideoUrl(json.data.id);
-  if (!mp4Url) {
-    return;
-  }
+  // fxtwitter is the only one that works
+  const tweetVideoUrl = `https://fxtwitter.com//status/${json.data.id}`
 
   // TODO clean up this mess
-  const matchedChannels: Array<TextChannel | null> = json
+  const matchedChannels = json
     .matching_rules
     .map(rule => getChannel(rule.tag as Snowflake))
+    .filter((c): c is TextChannel => c !== null)
 
-  const validMatchedChannels: TextChannel[] = matchedChannels
-    .filter(c => c !== null) as TextChannel[] // uuh why do I have to cast this lol
-
-  if (!validMatchedChannels.length) {
+  if (!matchedChannels.length) {
     logger.warn("tweet did not match any channel", { json });
     return;
   }
 
   await Promise.all(
-    validMatchedChannels.map(async (channel) => {
-      await channel.send(`**${tweetTextWithoutSpaces}** ${mp4Url}`);
+    matchedChannels.map(async (channel) => {
+      await channel.send(tweetVideoUrl);
     })
   );
 };
