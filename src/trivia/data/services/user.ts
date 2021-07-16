@@ -1,10 +1,17 @@
-import { userRepository } from "../repositories";
+import { RunResult } from "better-sqlite3";
+import { User } from "../../../core/db";
+import { UserRepository } from "../repositories";
 
-const getAll = () => userRepository.getAll();
+class UserService {
+  private userRepository = new UserRepository();
 
-const upsertUserWin = (userId: string) => userRepository.upsertUserWin(userId);
+  getAll(): User[] {
+    return this.userRepository.getAll();
+  }
 
-export const userService = {
-  getAll,
-  upsertUserWin,
-};
+  upsertUserWin(userId: string): RunResult {
+    return this.userRepository.upsertUserWin(userId);
+  }
+}
+
+export const userService = new UserService();
