@@ -1,6 +1,6 @@
 import { ChutebotCommand } from "../../core/command-parser";
 import { isMessageByOwner } from "../../core/discord";
-import { getPlayerByTransfermarktId } from "../../core/db";
+import { playerService } from "../data";
 
 export default {
   commandName: "remove",
@@ -11,11 +11,15 @@ export default {
       return;
     }
 
-    const player = await getPlayerByTransfermarktId(id);
-    if (player) {
-      const playerName = player?.name || "n/a";
-      await player.destroy();
-      await message.reply(`${playerName} deletado 👍`);
+    const player = playerService.getById(id);
+    if (!player) {
+      await message.reply("Esse jogador não existe.");
+      return;
+    }
+
+    const deleteResult = playerService.delete(id);
+    if (deleteResult.changes > 0) {
+      await message.reply(`${player.name} deletado 👍`);
     }
   },
 } as ChutebotCommand;
