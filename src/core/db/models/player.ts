@@ -1,11 +1,12 @@
 // eslint-disable-next-line max-classes-per-file
 import { STRING, Model, Association, INTEGER, DATE } from "sequelize";
+import { TriviaPlayer } from "../../../trivia/types";
 import { sequelizeInstance } from "../sequelize";
 
 export interface Player {
   transfermarktId: number;
   name: string;
-  lastSpellsUpdate: Date;  
+  lastSpellsUpdate: Date;
 }
 
 /**
@@ -32,6 +33,12 @@ export class PlayerEntity extends Model<PlayerAttributes> {
   public static associations: {
     spells: Association<PlayerEntity, PlayerSpellEntity>;
   };
+
+  public toInterface = (): TriviaPlayer => ({
+    transfermarktId: this.transfermarktId,
+    name: this.name,
+    spells: this.spells ?? [],
+  });
 }
 
 PlayerEntity.init(

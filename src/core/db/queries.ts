@@ -1,11 +1,10 @@
 import { differenceInCalendarDays } from "date-fns";
-import { Op } from "sequelize";
 import { logger } from "../log";
-import { TriviaPlayer, PlayerSpell } from "../../trivia/types";
+import { PlayerSpell, TriviaPlayer } from "../../trivia/types";
 import { sequelizeInstance } from "./sequelize";
 import { PlayerEntity, PlayerSpellEntity } from "./models";
 
-// TODO extract this mess into repositories or something
+// TODO move all this cruft to the new better-sqlite3 architecture
 
 export const getRandomPlayerId = () =>
   PlayerEntity.findOne({
@@ -22,16 +21,6 @@ export const getPlayerByTransfermarktId = (transfermarktId: number) =>
   });
 
 export const getPlayerCount = (): Promise<number> => PlayerEntity.count();
-
-export const searchPlayersByName = (name: string): Promise<PlayerEntity[]> =>
-  PlayerEntity.findAll({
-    where: {
-      name: {
-        [Op.like]: `%${name}%`,
-      },
-    },
-    include: [PlayerEntity.associations.spells],
-  });
 
 export const playerExists = async (
   transfermarktId: number

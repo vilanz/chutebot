@@ -1,6 +1,7 @@
+import { MessageEmbed } from "discord.js";
 import { ChutebotCommand } from "../../core/command-parser";
 import { isMessageByOwner } from "../../core/discord";
-import { searchPlayersByName } from "../../core/db";
+import { playerService } from "../data";
 
 export default {
   commandName: "list",
@@ -11,27 +12,23 @@ export default {
       return;
     }
 
-    const players = await searchPlayersByName(playerName);
+    const players = playerService.searchPlayers(playerName);
     if (!players.length) {
       await message.reply("Ninguém encontrado.");
       return;
     }
 
-    const formattedPlayers = players
-      .map(
-        (p) =>
-          `${p.transfermarktId}: **${p.name}**, ${
-            p.spells?.length ?? "N/A"
-          } clubes`
-      )
-      .join("\n");
+    const embed = new MessageEmbed()
+      .setTitle(`Busca por ${playerName}`)
+      .addFields(
+        players.map((p) => ({
+          name: `${p.name} (#${p.transfermarktId})`,
+          value: `Última atualização: ${p.lastSpellsUpdate}`,
+        }))
+      );
 
     await message.reply({
-      embeds: [
-        {
-          description: formattedPlayers,
-        },
-      ],
+      embeds: [embed],
     });
   },
 } as ChutebotCommand;

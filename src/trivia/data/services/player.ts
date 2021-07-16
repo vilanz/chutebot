@@ -1,3 +1,4 @@
+import { Player } from "../../../core/db";
 import { PlayerRepository } from "../repositories";
 
 class PlayerService {
@@ -5,6 +6,10 @@ class PlayerService {
 
   count(): number {
     return this.playerRepository.count();
+  }
+
+  searchPlayers(name: string): Player[] {
+    return this.playerRepository.searchPlayers(name);
   }
 }
 

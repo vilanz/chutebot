@@ -2,7 +2,7 @@ import {
   getPlayerByTransfermarktId,
   removeOldPlayerSpells,
 } from "../../core/db";
-import { TriviaPlayer, triviaPlayerFromEntity } from "../types";
+import { TriviaPlayer } from "../types";
 import { updatePlayerCareer } from "./update-player-career";
 
 export const getUpdatedPlayer = async (
@@ -16,6 +16,6 @@ export const getUpdatedPlayer = async (
   }
 
   return getPlayerByTransfermarktId(transfermarktId).then((p) =>
-    triviaPlayerFromEntity(p!)
+    p!.toInterface()
   );
 };

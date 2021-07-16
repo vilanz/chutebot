@@ -7,20 +7,22 @@ export default {
   commandName: "feed-status",
   permission: (message) => isMessageByOwner(message),
   handler: async (message) => {
-    const subbedChannels = await goalFeedStream.getSubbedChannelRules()
+    const subbedChannels = await goalFeedStream.getSubbedChannelRules();
 
     const isStreamUp = goalFeedStream.streamUp();
     const statusMessage = `Stream ${isStreamUp ? "ativa" : "inativa"}!`;
 
-    const embed = new MessageEmbed()
-      .setTitle(statusMessage)
-      .addFields(subbedChannels.map(rule => ({
-        name: `#${getChannel(rule.tag as Snowflake)?.name ?? 'outro-canal-hihihi'}`,
-        value: `Pesquisa: \`${rule.value}\`\nID: \`${rule.id}\``
-      })))
+    const embed = new MessageEmbed().setTitle(statusMessage).addFields(
+      subbedChannels.map((rule) => ({
+        name: `#${
+          getChannel(rule.tag as Snowflake)?.name ?? "outro-canal-hihihi"
+        }`,
+        value: `Pesquisa: \`${rule.value}\`\nID: \`${rule.id}\``,
+      }))
+    );
 
     await message.reply({
-      embeds: [embed]
+      embeds: [embed],
     });
   },
 } as ChutebotCommand;

@@ -11,9 +11,9 @@ export default {
     }
     const [channelString, rule] = getSubcommand(args);
 
-    const channelId = parseChannelMention(channelString)
+    const channelId = parseChannelMention(channelString);
     if (!channelId) {
-      throw new Error('sub sem mention')
+      throw new Error("sub sem mention");
     }
 
     await goalFeedStream.subscribeToChannel(channelId, rule);
