@@ -1,7 +1,12 @@
 import path from "path";
 import { getChutebotCommandsMap, parseCommand } from "./core/command-parser";
 import { logger } from "./core/log";
-import { discordClient, dmMeError, sendBotspamMessage } from "./core/discord";
+import {
+  discordClient,
+  dmMeError,
+  GUILD,
+  sendBotspamMessage,
+} from "./core/discord";
 import { botToken } from "./core/env";
 import { syncDatabase } from "./core/db";
 
@@ -33,6 +38,10 @@ void (async () => {
     try {
       const command = parseCommand(message.content);
       if (!command) {
+        return;
+      }
+
+      if (message.guild?.id !== GUILD) {
         return;
       }
 
