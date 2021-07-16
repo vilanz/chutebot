@@ -2,7 +2,9 @@ import { RunResult } from "better-sqlite3";
 import { db, User } from "../../../core/db";
 
 export class UserRepository {
-  private SMT_GET_ALL = db.prepare("SELECT id, wins FROM users");
+  private SMT_GET_ALL = db.prepare(
+    "SELECT id, wins FROM users ORDER BY wins DESC"
+  );
 
   private SMT_UPSERT_USERWIN = db.prepare<string>(
     `INSERT INTO users (id, wins) VALUES (?, 1)
