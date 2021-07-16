@@ -1,6 +1,7 @@
 import cheerio, { Cheerio, CheerioAPI, Node, Element } from "cheerio";
 import UserAgent from "user-agents";
 import fetch from "node-fetch";
+import { URL } from "url";
 import { logger } from "../../core/log";
 
 export const getFullTransfermarktUrl = (partialUrl: string) =>
