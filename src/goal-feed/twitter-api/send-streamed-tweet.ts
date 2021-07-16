@@ -1,5 +1,5 @@
 import { Snowflake, TextChannel } from "discord.js";
-import { getChannel, sendBotspamMessage } from "../../core/discord/helpers";
+import { getChannel } from "../../core/discord";
 import { logger } from "../../core/log";
 import { TwitterRule } from "./stream-rules";
 
@@ -53,18 +53,16 @@ export const sendTweetToSubbedChannels = async ({
 
   if ("errors" in json) {
     logger.error("tweet stream error", { json });
-    await sendBotspamMessage('Deu erro na stream ao ao buscar vídeos de gols 👀')
     return;
   }
 
   // fxtwitter is the only one that works
-  const tweetVideoUrl = `https://fxtwitter.com//status/${json.data.id}`
+  const tweetVideoUrl = `https://fxtwitter.com//status/${json.data.id}`;
 
   // TODO clean up this mess
-  const matchedChannels = json
-    .matching_rules
-    .map(rule => getChannel(rule.tag as Snowflake))
-    .filter((c): c is TextChannel => c !== null)
+  const matchedChannels = json.matching_rules
+    .map((rule) => getChannel(rule.tag as Snowflake))
+    .filter((c): c is TextChannel => c !== null);
 
   if (!matchedChannels.length) {
     logger.warn("tweet did not match any channel", { json });
