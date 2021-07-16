@@ -9,10 +9,10 @@ export default {
     if (!args.trim()) {
       return;
     }
-    
-    const channelId = parseChannelMention(args)    
+
+    const channelId = parseChannelMention(args);
     if (!channelId) {
-      throw new Error('unsub sem channel')
+      throw new Error("unsub sem channel");
     }
 
     await goalFeedStream.unsubscribeToChannel(channelId);

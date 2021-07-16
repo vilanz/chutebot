@@ -7,7 +7,7 @@ export const logger = createLogger({
         format.splat(),
         format.errors(),
         format.prettyPrint({
-          colorize: true
+          colorize: true,
         })
       ),
     }),

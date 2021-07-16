@@ -21,18 +21,16 @@ export const deleteChannelRules = async (
   channelId: Snowflake
 ): Promise<void> => {
   const channelRuleIds = await getAllRules()
-    .then(rules => rules.filter(r => r.tag === channelId))
-    .then(rules => rules.map(x => x.id))
+    .then((rules) => rules.filter((r) => r.tag === channelId))
+    .then((rules) => rules.map((x) => x.id));
   const deleteResult = await twitterNewAPI.post("/tweets/search/stream/rules", {
     delete: {
       ids: channelRuleIds,
     },
   });
-  const deleteErrors = deleteResult.data?.errors
+  const deleteErrors = deleteResult.data?.errors;
   if (deleteErrors) {
-    throw new Error(
-      `failed to delete a rule: ${JSON.stringify(deleteErrors)}`
-    )
+    throw new Error(`failed to delete a rule: ${JSON.stringify(deleteErrors)}`);
   }
 };
 
@@ -49,11 +47,9 @@ export const addChannelRules = async (
     ],
   });
   // TODO standardize handling errors
-  const addErrors = addResult.data?.errors
+  const addErrors = addResult.data?.errors;
   if (addErrors) {
-    throw new Error(
-      `failed to add a rule: ${JSON.stringify(addErrors)}`
-    )
+    throw new Error(`failed to add a rule: ${JSON.stringify(addErrors)}`);
   }
 };
 
@@ -62,5 +58,5 @@ export const resetChannelRules = async (
   rule: string
 ): Promise<void> => {
   await deleteChannelRules(channelId);
-  await addChannelRules(channelId, rule)
+  await addChannelRules(channelId, rule);
 };

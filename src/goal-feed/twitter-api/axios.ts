@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { fromUnixTime } from "date-fns";
-import { IncomingMessage } from 'http'
+import { IncomingMessage } from "http";
 import { env } from "../../core/env";
 import { logger } from "../../core/log";
 
@@ -26,9 +26,7 @@ const logResponseData = (res: AxiosResponse) => {
   logger.info("twitter request", {
     url: res.config.url,
     method: res.config.method,
-    data: res.data instanceof IncomingMessage
-      ? '<message>'
-      : res.data,
+    data: res.data instanceof IncomingMessage ? "<message>" : res.data,
     status: res.status,
     rateLimitLimit: res.headers["x-rate-limit-limit"],
     rateLimitRemaining: res.headers["x-rate-limit-remaining"],

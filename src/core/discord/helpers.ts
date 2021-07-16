@@ -22,7 +22,7 @@ export const getUserById = async (id: string): Promise<GuildMember | null> =>
     .catch(() => null);
 
 export const getChannel = (channelId: Snowflake): TextChannel | null =>
-  getGuild().channels.cache.get(channelId) as TextChannel ?? null;
+  (getGuild().channels.cache.get(channelId) as TextChannel) ?? null;
 
 export const isMessageInCorrectGuild = (message: Message): boolean =>
   message.guild?.id === GUILD;
@@ -41,17 +41,17 @@ export const isMessageByOwner = (message: Message): boolean =>
   message.author.id === OWNER_USER;
 
 export const sendBotspamMessage = async (content: string): Promise<void> => {
-  const botspamChannel = getChannel(BOTSPAM_CHANNEL)
+  const botspamChannel = getChannel(BOTSPAM_CHANNEL);
   if (botspamChannel) {
-    await botspamChannel.send(content)
+    await botspamChannel.send(content);
   }
-}
+};
 
 export const dmMeError = async (err: any): Promise<void> => {
   const me = await discordClient.users.fetch(OWNER_USER);
   const stringifiedError = err
     ? JSON.stringify(err, Object.getOwnPropertyNames(err), 2)
-    : 'eita'
+    : "eita";
   await me.send(stringifiedError);
 };
 
@@ -97,8 +97,8 @@ export const parseChannelMention = (message: string): Snowflake | null => {
   const matches = message.match(/^<#!?(\d+)>$/);
 
   if (!matches) {
-    return null
+    return null;
   }
 
   return matches[1] as Snowflake;
-}
+};
