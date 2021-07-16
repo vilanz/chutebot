@@ -22,29 +22,25 @@ const getUserWinsEmbed = async (users: User[]): Promise<MessageEmbed> => {
   return new MessageEmbed()
     .setTitle("Placar")
     .addField(
-      "\u200b",
-      mapLinebreak(users, (_, i) => `${i + 1}.`),
-      true
-    )
-    .addField(
       "Usuário",
-      mapLinebreak(users, (u) => {
+      mapLinebreak(users, (u, i) => {
         const discordUser = discordUserMap.get(u.id);
-        if (!discordUser) {
-          return "[sumiu]";
-        }
-        return discordUser.displayName.padEnd(MAX_USERNAME_LENGTH, "\u200b");
+        const name = discordUser
+          ? discordUser.displayName.padEnd(MAX_USERNAME_LENGTH, "\u200b")
+          : "[SUMIU]";
+        return `${i + 1}. ${name}`;
       }),
       true
     )
     .addField(
-      "Vitórias",
+      "Acertos",
       mapLinebreak(users, (x) => x.wins.toString()),
       true
     )
     .setTimestamp(Date.now())
     .setColor("GOLD");
 };
+
 export default {
   commandName: "wins",
   permission: (message) => isMessageInBotspam(message),
