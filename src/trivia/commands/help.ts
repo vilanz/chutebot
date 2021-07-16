@@ -18,6 +18,7 @@ export default {
       )
       .addField("c!wins", "High scores do trivia.")
       .addField("c!add <pesquisa>", "Adicionar jogadores ao bot.")
+      .addField("c!count", "Quantidade de jogadores já adicionados.")
       .setColor("GOLD");
     const GENERAL_EMBED = new MessageEmbed()
       .setTitle("Comandos gerais")
