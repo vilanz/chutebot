@@ -1,8 +1,8 @@
 import { Snowflake } from "discord.js";
 import { differenceInCalendarDays } from "date-fns";
 import { Op } from "sequelize";
-import { logger } from "../../core/log";
-import { Player, PlayerSpell } from "../types";
+import { logger } from "../log";
+import { Player, PlayerSpell } from "../../trivia/types";
 import { sequelizeInstance } from "./sequelize";
 import { PlayerEntity, UserEntity, PlayerSpellEntity } from "./models";
 

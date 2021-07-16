@@ -1,9 +1,9 @@
 import path from "path";
-import { syncTriviaDatabase } from "./trivia";
 import { getChutebotCommandsMap, parseCommand } from "./core/command-parser";
 import { logger } from "./core/log";
 import { discordClient, dmMeError, sendBotspamMessage } from "./core/discord";
 import { botToken } from "./core/env";
+import { syncDatabase } from "./core/db";
 
 void (async () => {
   process.on("message", async (msg) => {
@@ -16,7 +16,7 @@ void (async () => {
     process.exit(0);
   });
 
-  await syncTriviaDatabase();
+  await syncDatabase();
 
   logger.info("starting bot");
 
@@ -42,7 +42,11 @@ void (async () => {
         return;
       }
 
-      logger.info('running command %s with command %s', commandHandler.commandName, command)
+      logger.info(
+        "running command %s with command %s",
+        commandHandler.commandName,
+        command
+      );
       await commandHandler.handler(message, command.args);
     } catch (err) {
       await message.react("⚠");

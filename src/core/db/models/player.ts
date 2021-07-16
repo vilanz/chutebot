@@ -1,6 +1,6 @@
 // eslint-disable-next-line max-classes-per-file
 import { STRING, Model, Association, INTEGER, DATE } from "sequelize";
-import { Player } from "../../types";
+import { Player } from "../../../trivia/types";
 import { sequelizeInstance } from "../sequelize";
 
 export interface PlayerAttributes {

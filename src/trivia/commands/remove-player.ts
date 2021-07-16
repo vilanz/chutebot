@@ -1,6 +1,6 @@
 import { ChutebotCommand } from "../../core/command-parser";
 import { isMessageByOwner } from "../../core/discord";
-import { getPlayerByTransfermarktId } from "../db";
+import { getPlayerByTransfermarktId } from "../../core/db";
 
 export default {
   commandName: "remove",

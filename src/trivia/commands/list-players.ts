@@ -1,6 +1,6 @@
 import { ChutebotCommand } from "../../core/command-parser";
 import { isMessageByOwner } from "../../core/discord";
-import { searchPlayersByName } from "../db";
+import { searchPlayersByName } from "../../core/db";
 
 export default {
   commandName: "list",

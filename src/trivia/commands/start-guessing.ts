@@ -4,7 +4,7 @@ import {
   Commands,
   ChutebotCommand,
 } from "../../core/command-parser";
-import { addUserWin, getRandomPlayerId } from "../db";
+import { addUserWin, getRandomPlayerId } from "../../core/db";
 import { guessPlayerName, formatPlayerSpells } from "../format";
 import { getUpdatedPlayer } from "../actions";
 import { isMessageInBotspam, waitForMessage } from "../../core/discord";

@@ -1,7 +1,7 @@
 import {
   getPlayerByTransfermarktId,
-  removeOldPlayerSpells
-} from "../db";
+  removeOldPlayerSpells,
+} from "../../core/db";
 import { Player } from "../types";
 import { updatePlayerCareer } from "./update-player-career";
 
@@ -12,7 +12,7 @@ export const getUpdatedPlayer = async (
   const hasRemovedOldSpells = await removeOldPlayerSpells(transfermarktId);
 
   if (hasRemovedOldSpells) {
-    await updatePlayerCareer(transfermarktId)
+    await updatePlayerCareer(transfermarktId);
   }
 
   return getPlayerByTransfermarktId(transfermarktId).then((p) =>

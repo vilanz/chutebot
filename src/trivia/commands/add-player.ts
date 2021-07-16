@@ -6,7 +6,7 @@ import {
   searchPlayersInTransfermarkt,
 } from "../transfermarkt";
 import { isMessageInBotspam, waitForUserReaction } from "../../core/discord";
-import { createPlayer, getPlayerByTransfermarktId } from "../db";
+import { createPlayer, getPlayerByTransfermarktId } from "../../core/db";
 
 const awaitForPlayerSearchReaction = async (
   playersFound: PlayerSearchResult[],

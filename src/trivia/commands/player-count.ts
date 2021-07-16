@@ -1,6 +1,6 @@
 import { ChutebotCommand } from "../../core/command-parser";
 import { isMessageInBotspam } from "../../core/discord";
-import { getPlayerCount } from "../db";
+import { getPlayerCount } from "../../core/db";
 
 export default {
   commandName: "count",

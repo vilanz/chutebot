@@ -1,6 +1,6 @@
 import { ChutebotCommand } from "../../core/command-parser";
 import { getUserById, isMessageInBotspam } from "../../core/discord";
-import { getUserWins } from "../db";
+import { getUserWins } from "../../core/db";
 import { formatUserWins } from "../format";
 import { UserWin } from "../types";
 
