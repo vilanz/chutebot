@@ -8,6 +8,7 @@ import { addUserWin, getRandomPlayerId } from "../../core/db";
 import { guessPlayerName, formatPlayerSpells } from "../format";
 import { getUpdatedPlayer } from "../actions";
 import { isMessageInBotspam, waitForMessage } from "../../core/discord";
+import { userService } from "../data";
 
 const SECONDS_TO_GUESS = 25;
 
@@ -69,7 +70,7 @@ export default {
 
       const winner = correctMessage.author;
 
-      await addUserWin(correctMessage.author.id);
+      userService.upsertUserWin(correctMessage.author.id);
 
       await correctMessage.reply(
         `${winner} acertou! Era o **${randomPlayer.name}**.`
