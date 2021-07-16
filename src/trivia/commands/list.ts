@@ -22,8 +22,8 @@ export default {
       .setTitle(`Busca por ${playerName}`)
       .addFields(
         players.map((p) => ({
-          name: `${p.name} (#${p.transfermarktId})`,
-          value: `Última atualização: ${p.lastSpellsUpdate}`,
+          name: p.name,
+          value: `#${p.transfermarktId}\nÚltima atualização: ${p.lastSpellsUpdate}`,
         }))
       );
 
