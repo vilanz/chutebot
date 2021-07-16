@@ -1,14 +1,25 @@
 // eslint-disable-next-line max-classes-per-file
 import { STRING, Model, Association, INTEGER, DATE } from "sequelize";
-import { Player } from "../../../trivia/types";
 import { sequelizeInstance } from "../sequelize";
 
+export interface Player {
+  transfermarktId: number;
+  name: string;
+  lastSpellsUpdate: Date;  
+}
+
+/**
+ * @deprecated use better-sqlite3
+ */
 export interface PlayerAttributes {
   transfermarktId: number;
   name: string;
   lastSpellsUpdate: Date;
 }
 
+/**
+ * @deprecated use better-sqlite3
+ */
 export class PlayerEntity extends Model<PlayerAttributes> {
   public readonly transfermarktId!: number;
 
@@ -21,12 +32,6 @@ export class PlayerEntity extends Model<PlayerAttributes> {
   public static associations: {
     spells: Association<PlayerEntity, PlayerSpellEntity>;
   };
-
-  public toInterface = (): Player => ({
-    transfermarktId: this.transfermarktId,
-    name: this.name,
-    spells: this.spells ?? [],
-  });
 }
 
 PlayerEntity.init(

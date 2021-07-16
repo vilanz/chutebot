@@ -1,7 +1,7 @@
 import { differenceInCalendarDays } from "date-fns";
 import { Op } from "sequelize";
 import { logger } from "../log";
-import { Player, PlayerSpell } from "../../trivia/types";
+import { TriviaPlayer, PlayerSpell } from "../../trivia/types";
 import { sequelizeInstance } from "./sequelize";
 import { PlayerEntity, PlayerSpellEntity } from "./models";
 
@@ -101,7 +101,7 @@ export const addPlayerSpells = async (
   }
 };
 
-export const createPlayer = async (player: Player) => {
+export const createPlayer = async (player: TriviaPlayer) => {
   const { transfermarktId, name, spells } = player;
   const entity = await PlayerEntity.create({
     transfermarktId,

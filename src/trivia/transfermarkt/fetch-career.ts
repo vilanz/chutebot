@@ -1,5 +1,5 @@
 import { Cheerio, Node } from "cheerio";
-import { Player, PlayerSpell } from "../types";
+import { TriviaPlayer, PlayerSpell } from "../types";
 import {
   getCheerioFromPageHTML,
   parseNumberFromNode,
@@ -57,7 +57,7 @@ const extractPlayerSpells = (rows: Cheerio<Node>[]): PlayerSpell[] => {
 
 export const fetchPlayerCareer = async (
   transfermarktId: number
-): Promise<Player> => {
+): Promise<TriviaPlayer> => {
   const careerUrl = getTransfermarktPlayerCareerUrl(transfermarktId);
   const ch = await getCheerioFromPageHTML(careerUrl);
 
