@@ -1,12 +1,13 @@
 import { db, User } from "../../../core/db";
 
-const preparedGetAll = db.prepare("SELECT id, wins FROM UserEntities");
+const preparedGetAll = db.prepare("SELECT id, wins FROM users");
 const getAll = (): User[] => preparedGetAll.all();
 
-const preparedUpsert = db.prepare<string>(
-  "INSERT INTO UserEntities (id, wins) VALUES (?, 0)"
+const preparedUpsertUserWin = db.prepare<string>(
+  `INSERT INTO users (id, wins) VALUES (?, 1)
+  ON CONFLICT(id) DO UPDATE SET wins = wins + 1;`
 );
-const upsertUserWin = (userId: string) => preparedUpsert.run(userId);
+const upsertUserWin = (userId: string) => preparedUpsertUserWin.run(userId);
 
 export const userRepository = {
   getAll,

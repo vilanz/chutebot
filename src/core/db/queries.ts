@@ -1,10 +1,9 @@
-import { Snowflake } from "discord.js";
 import { differenceInCalendarDays } from "date-fns";
 import { Op } from "sequelize";
 import { logger } from "../log";
 import { Player, PlayerSpell } from "../../trivia/types";
 import { sequelizeInstance } from "./sequelize";
-import { PlayerEntity, UserEntity, PlayerSpellEntity } from "./models";
+import { PlayerEntity, PlayerSpellEntity } from "./models";
 
 // TODO extract this mess into repositories or something
 
@@ -112,23 +111,3 @@ export const createPlayer = async (player: Player) => {
   await addPlayerSpells(transfermarktId, spells);
   return entity;
 };
-
-export const addUserWin = async (userId: Snowflake) => {
-  const idAsString = userId.toString();
-  const [user] = await UserEntity.findOrCreate({
-    where: {
-      id: idAsString,
-    },
-    defaults: {
-      id: idAsString,
-      wins: 0,
-    },
-  });
-  await user.increment("wins");
-};
-
-// TODO limit users quantity
-export const getUserWins = () =>
-  UserEntity.findAll({
-    order: [["wins", "DESC"]],
-  });

@@ -1,3 +1,3 @@
 export * from "./player";
-export * from "./user";
 export * from "./sync";
+export * from "./user";
