@@ -18,8 +18,10 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@types/better-sqlite3": "^5.4.3",
     "@vilanz/tooling": "vilanz/tooling#main",
     "axios": "^0.21.1",
+    "better-sqlite3": "^7.4.1",
     "cheerio": "^1.0.0-rc.10",
     "common-tags": "^1.8.0",
     "country-emoji": "^1.5.6",
