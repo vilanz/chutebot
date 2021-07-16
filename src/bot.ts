@@ -42,11 +42,7 @@ void (async () => {
         return;
       }
 
-      logger.info(
-        "running command %s with command %s",
-        commandHandler.commandName,
-        command
-      );
+      logger.info("running command %s from message %s", command, message);
       await commandHandler.handler(message, command.args);
     } catch (err) {
       await message.react("⚠");
@@ -57,6 +53,14 @@ void (async () => {
 
   discordClient.on("error", async (err) => {
     logger.error("discord error", { err });
+  });
+
+  discordClient.on("rateLimit", (rateLimitData) => {
+    // reactions are heavily rate-limited anyway
+    if (rateLimitData.route.endsWith("/messages/:id/reactions")) {
+      return;
+    }
+    logger.info("discord rate limit", rateLimitData);
   });
 
   await discordClient.login(botToken);
