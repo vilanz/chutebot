@@ -26,9 +26,9 @@ Displays a leaderboard of quiz winners.
 
 Displays how many players have been added.
 
-### Live goals stream
+### Live goal feed
 
-#### `c!feed start | kill | sub <twitter query> | unsub` _(admin-only)_
+#### `c!feed-start | feed-kill | feed-sub <twitter query> | feed-unsub` _(admin-only)_
 
 Whenever a tweet matching a query specified in `c!feed sub` is posted, if it has a video, the video will be posted on the channel where the command was run earlier.
 
@@ -41,7 +41,6 @@ Returns `Pong!` with the response's latency.
 ## TODO
 
 - Replace Sequelize with a better alternative for TypeScript, like TypeORM
-- Use the official Commando framework instead of handmade command parsing
 - Send logs to AWS CloudWatch instead of a local file
 
 ## Getting started
