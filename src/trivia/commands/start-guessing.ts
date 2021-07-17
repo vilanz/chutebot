@@ -7,10 +7,11 @@ import {
 import { getRandomPlayerId } from "../../core/db";
 import { guessPlayerName, formatPlayerSpells } from "../format";
 import { getUpdatedPlayer } from "../actions";
-import { isMessageInBotspam, waitForMessage } from "../../core/discord";
+import { isMessageInBotspam } from "../../core/discord";
 import { userService } from "../data";
+import { secondsToMs } from "../../core/utils";
 
-const SECONDS_TO_GUESS = 25;
+const SECONDS_TO_GUESS = 20;
 
 const isCorrectPlayer =
   (playerName: string) =>
@@ -55,11 +56,22 @@ export default {
         embeds: [formatPlayerSpells(randomPlayer.spells)],
       });
 
-      const correctMessage = await waitForMessage(
-        message,
-        SECONDS_TO_GUESS,
-        isCorrectPlayer(randomPlayer.name)
-      );
+      let correctMessage: Message | null = null;
+
+      setTimeout(() => {
+        if (!correctMessage) {
+          void playerSpellsMessage.reply("5 segundos faltando...");
+        }
+      }, secondsToMs(SECONDS_TO_GUESS - 5));
+
+      correctMessage = await message.channel
+        .awaitMessages(isCorrectPlayer(randomPlayer.name), {
+          max: 1,
+          time: secondsToMs(SECONDS_TO_GUESS),
+          errors: ["time"],
+        })
+        .then((ms) => ms.first()!)
+        .catch(() => null);
 
       if (correctMessage === null) {
         await playerSpellsMessage.reply(
@@ -75,8 +87,6 @@ export default {
       await correctMessage.reply(
         `${winner} acertou! Era o **${randomPlayer.name}**.`
       );
-
-      channelsWithSessionsRunning.delete(channelId);
     } finally {
       channelsWithSessionsRunning.delete(channelId);
     }

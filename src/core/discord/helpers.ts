@@ -79,20 +79,6 @@ export const waitForUserReaction = async (
     });
 };
 
-export const waitForMessage = async (
-  message: Message,
-  seconds: number,
-  filter: (message: Message) => boolean
-): Promise<Message | null> =>
-  message.channel
-    .awaitMessages(filter, {
-      max: 1,
-      time: secondsToMs(seconds),
-      errors: ["time"],
-    })
-    .then((ms) => ms.first()!)
-    .catch(() => null);
-
 export const parseChannelMention = (message: string): Snowflake | null => {
   const matches = message.match(/^<#!?(\d+)>$/);
 
