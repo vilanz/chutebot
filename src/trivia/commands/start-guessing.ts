@@ -17,6 +17,7 @@ const getPlayerSpellsEmbed = (spells: PlayerSpell[]): MessageEmbed => {
   const sortedSpells = sortBySeason(spells);
   return new MessageEmbed()
     .setTitle("Quem é?")
+    .setDescription(`Chute com **c!g** em até ${SECONDS_TO_GUESS} segundos.`)
     .addField(
       "Temp.",
       mapLinebreak(sortedSpells, (x) => x.season),
@@ -28,7 +29,7 @@ const getPlayerSpellsEmbed = (spells: PlayerSpell[]): MessageEmbed => {
       true
     )
     .addField(
-      "P (G)",
+      "P (g)",
       mapLinebreak(sortedSpells, (x) => `${x.matches} (${x.goals})`),
       true
     )
