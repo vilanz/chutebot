@@ -1,4 +1,5 @@
 import {
+  Collection,
   Guild,
   GuildMember,
   Message,
@@ -15,11 +16,14 @@ import { BOTSPAM_CHANNEL, BR_TEAMS_CHANNEL, GUILD, OWNER_USER } from "./consts";
 
 const getGuild = (): Guild => discordClient.guilds.cache.get(GUILD)!;
 
-export const getUserById = async (id: string): Promise<GuildMember | null> =>
+export const prefetchAllUsers = () => getGuild().members.fetch();
+
+export const getUsersByIds = async (
+  ids: string[]
+): Promise<Collection<Snowflake, GuildMember>> =>
   getGuild()
-    .members.fetch(id as Snowflake)
-    .then((m) => m || null)
-    .catch(() => null);
+    .members.fetch()
+    .then((members) => members.filter((u) => ids.includes(u.id)));
 
 export const getChannel = (channelId: Snowflake): TextChannel | null =>
   (getGuild().channels.cache.get(channelId) as TextChannel) ?? null;
@@ -30,7 +34,6 @@ export const isMessageInCorrectGuild = (message: Message): boolean =>
 export const isMessageIn = (message: Message, channelId: Snowflake): boolean =>
   message.channel.id === channelId;
 
-// TODO remove these two
 export const isMessageInBotspam = (message: Message): boolean =>
   isMessageIn(message, BOTSPAM_CHANNEL);
 

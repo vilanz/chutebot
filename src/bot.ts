@@ -5,6 +5,7 @@ import {
   discordClient,
   dmMeError,
   GUILD,
+  prefetchAllUsers,
   sendBotspamMessage,
 } from "./core/discord";
 import { botToken } from "./core/env";
@@ -30,7 +31,8 @@ void (async () => {
     path.join(__dirname, "./trivia/commands")
   );
 
-  discordClient.on("ready", async () => {
+  discordClient.once("ready", async () => {
+    await prefetchAllUsers();
     await sendBotspamMessage("Bot iniciado.");
   });
 
