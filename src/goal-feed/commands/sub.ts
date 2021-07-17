@@ -1,6 +1,6 @@
 import { ChutebotCommand, getSubcommand } from "../../core/command-parser";
 import { isMessageByOwner, parseChannelMention } from "../../core/discord";
-import { goalFeedStream } from "../goal-feed-stream";
+import { goalFeedStream } from "../twitter-api";
 
 export default {
   commandName: "feed-sub",

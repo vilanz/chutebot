@@ -1,7 +1,7 @@
 import { MessageEmbed, Snowflake } from "discord.js";
 import { ChutebotCommand } from "../../core/command-parser";
 import { getChannel, isMessageByOwner } from "../../core/discord";
-import { goalFeedStream } from "../goal-feed-stream";
+import { goalFeedStream } from "../twitter-api";
 
 export default {
   commandName: "feed-status",

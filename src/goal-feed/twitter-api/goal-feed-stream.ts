@@ -1,17 +1,16 @@
 /* eslint-disable max-classes-per-file */
 import { Snowflake } from "discord.js";
-import { logger } from "../core/log";
+import { logger } from "../../core/log";
+import { waitSeconds } from "../../core/utils";
+import { sendBotspamMessage } from "../../core/discord";
 import {
-  TweetStream,
-  resetChannelRules,
-  getTweetStream,
   deleteChannelRules,
   getAllRules,
-  sendTweetToSubbedChannels,
+  resetChannelRules,
   TwitterRule,
-} from "./twitter-api";
-import { waitSeconds } from "../core/utils";
-import { sendBotspamMessage } from "../core/discord";
+} from "./stream-rules";
+import { getTweetStream, TweetStream } from "./stream-tweets";
+import { sendTweetToSubbedChannels } from "./send-streamed-tweet";
 
 class StreamKilledError extends Error {}
 class StreamRestartedError extends Error {}
