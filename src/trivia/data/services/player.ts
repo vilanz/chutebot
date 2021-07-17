@@ -1,5 +1,6 @@
 import { RunResult } from "better-sqlite3";
-import { Player } from "../../../core/db";
+import { getPlayerByTransfermarktId, Player } from "../../../core/db";
+import { TriviaPlayer } from "../../types";
 import { PlayerRepository } from "../repositories";
 
 class PlayerService {
@@ -15,6 +16,13 @@ class PlayerService {
 
   getById(id: number): Player {
     return this.playerRepository.getById(id);
+  }
+
+  async getRandom(): Promise<TriviaPlayer> {
+    const randomPlayerId = this.playerRepository.getRandomId();
+    // TODO use better-sqlite3
+    const randomPlayer = await getPlayerByTransfermarktId(randomPlayerId);
+    return randomPlayer!.toInterface();
   }
 
   delete(id: number): RunResult {

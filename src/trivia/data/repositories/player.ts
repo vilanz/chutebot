@@ -18,6 +18,10 @@ export class PlayerRepository {
     "DELETE FROM players WHERE transfermarktId = ?"
   );
 
+  private SMT_RANDOM_ID = db.prepare(
+    "SELECT transfermarktId FROM players ORDER BY RANDOM() LIMIT 1"
+  );
+
   count(): number {
     return this.SMT_COUNT.get().count;
   }
@@ -28,6 +32,10 @@ export class PlayerRepository {
 
   getById(id: number): Player {
     return this.SMT_GET_PLAYER.get(id);
+  }
+
+  getRandomId(): number {
+    return this.SMT_RANDOM_ID.get().transfermarktId;
   }
 
   delete(id: number): RunResult {
