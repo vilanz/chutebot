@@ -1,18 +1,20 @@
 # chutebot
 
-Football bot for Discord with a live goal feed and player career trivia.
+Football bot for Discord written in Node.js and TypesSript.
 
 ## Features
 
 ### Player trivia
 
+Guess what's the random player from a custom, incrementable database by their career record.
+
 ##### `c!add <player name>`
 
-Gets the player's career record from Transfermarkt and adds it into the pool of available players.
+Search up to 5 players from Transfermarkt. Pick one with reactions to add it into the player database.
 
 ##### `c!start`
 
-Starts a trivia session, listing a random anonymous player's career.
+Starts a trivia session, picking a random anonymous player and detailing their career.
 
 ##### `c!g [name]`
 
@@ -20,34 +22,63 @@ Guess the player in the current trivia session.
 
 ##### `c!wins`
 
-Displays a leaderboard of quiz winners.
+Displays a leaderboard of trivia winners.
 
 ##### `c!count`
 
-Displays how many players have been added.
+Displays how many players have been added in total.
 
 ### Live goal feed
 
-#### `c!feed-start | feed-kill | feed-sub <twitter query> | feed-unsub` _(admin-only)_
+Configure posting new videos on Twitter accounts to certain channels.
 
-Whenever a tweet matching a query specified in `c!feed sub` is posted, if it has a video, the video will be posted on the channel where the command was run earlier.
+_All these commands are admin only._
 
-### General
+#### `c!feed-start | feed-kill`
+
+Start or stop the Twitter stream.
+
+#### `c!feed-sub <channel> <query> | c!feed-unsub <channel>`
+
+Start or stop posting videos matching `<query>` to `<channel>`.
+
+### General commands
 
 #### `c!ping`
 
 Returns `Pong!` with the response's latency.
 
+## Stack
+
+- Code: Node.js, TypeScript, SQLite, better-sqlite3, ESLint, Prettier, AWS Lightsail, AWS S3
+
 ## TODO
 
-- Replace Sequelize with a better alternative for TypeScript, like TypeORM
-- Send logs to AWS CloudWatch instead of a local file
+- Fully replace `Sequelize` with `better-sqlite3`.
+  - `sequelize` isn't playing well with TypeScript, and although `TypeORM` looks great something simpler like `better-sqlite3` plays better with this project.
+- Make this possible to use on multiple servers separately with a `serverId` column on database tables.
+- Send logs to AWS CloudWatch instead of the local console.
+- Migrate the current database backup every 8 hours from local cronjobs to `node-cron`.
+  - This will make it more explicit.
+  - Also create a cron to, every 8 hours, delete player career records older than a week.
 
 ## Getting started
 
-#### `pm2 start pm2.config.js`
+#### `yarn start<:prod>`
 
-Runs the bot. Use `--env prod` for production.
+Builds and runs the bot. Use `start:prod` to run the production bot instead of the staging one.
+
+#### `yarn stop`
+
+Stops the bot.
+
+#### `yarn rebuild<:prod>`
+
+Same as `yarn:start`, but runs `yarn stop` first.
+
+#### `yarn logs`
+
+Displays logs from PM2.
 
 #### `yarn test`
 
