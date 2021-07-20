@@ -4,7 +4,7 @@ import { getChannel, isMessageByOwner } from "../../core/discord";
 import { goalFeedStream } from "../twitter-api";
 
 export default {
-  commandName: "feed-status",
+  name: "feed-status",
   permission: (message) => isMessageByOwner(message),
   run: async ({ message }) => {
     const subbedChannels = await goalFeedStream.getSubbedChannelRules();

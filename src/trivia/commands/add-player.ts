@@ -57,7 +57,7 @@ const awaitForPlayerSearchReaction = async (
 };
 
 export default {
-  commandName: "add",
+  name: "add",
   permission: (message) => isMessageInBotspam(message),
   run: async ({ message, args }) => {
     const playerNameWithoutSpaces = args?.trim();

@@ -2,7 +2,7 @@ import { ChutebotCommand } from "../../core/command-parser";
 import { isMessageByOwner } from "../../core/discord";
 
 export default {
-  commandName: "remove",
+  name: "remove",
   permission: (message) => isMessageByOwner(message),
   run: async ({ message, args, playerRepo }) => {
     const id = parseInt(args, 10);

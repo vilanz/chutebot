@@ -3,7 +3,7 @@ import { isMessageByOwner, parseChannelMention } from "../../core/discord";
 import { goalFeedStream } from "../twitter-api";
 
 export default {
-  commandName: "feed-unsub",
+  name: "feed-unsub",
   permission: (message) => isMessageByOwner(message),
   run: async ({ message, args }) => {
     if (!args.trim()) {

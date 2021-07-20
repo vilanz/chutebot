@@ -54,7 +54,7 @@ const filterForCorrectGuess =
 const channelsWithSessionsRunning = new Set<string>();
 
 export default {
-  commandName: "start",
+  name: "start",
   permission: (message) => isMessageInBotspam(message),
   run: async ({ message, playerRepo, userRepo }) => {
     const channelId = message.channel.id;

@@ -3,7 +3,7 @@ import { isMessageByOwner } from "../../core/discord";
 import { goalFeedStream } from "../twitter-api";
 
 export default {
-  commandName: "feed-kill",
+  name: "feed-kill",
   permission: (message) => isMessageByOwner(message),
   run: async ({ message }) => {
     goalFeedStream.killTweetStream();

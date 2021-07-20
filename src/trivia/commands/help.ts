@@ -3,7 +3,7 @@ import { ChutebotCommand } from "../../core/command-parser";
 import { isMessageInBotspam } from "../../core/discord";
 
 export default {
-  commandName: "help",
+  name: "help",
   permission: (message) => isMessageInBotspam(message),
   run: async ({ message }) => {
     const TRIVIA_EMBED = new MessageEmbed()

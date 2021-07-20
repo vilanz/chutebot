@@ -3,7 +3,7 @@ import { ChutebotCommand } from "../../core/command-parser";
 import { isMessageByOwner } from "../../core/discord";
 
 export default {
-  commandName: "list",
+  name: "list",
   permission: (message) => isMessageByOwner(message),
   run: async ({ message, args, playerRepo }) => {
     const playerName = args.trim();

@@ -16,7 +16,7 @@ export interface CommandContext {
 }
 
 export type ChutebotCommand = {
-  commandName: string;
+  name: string;
   permission: (message: Message) => boolean;
   run: (ctx: CommandContext) => void | Promise<void>;
 };
@@ -87,7 +87,7 @@ export const getChutebotCommandsMap = async (
   const commandsMap = new Map();
   const allCommands = await getExportedCommandsInDirs(...commandPaths);
   allCommands.forEach((command) => {
-    commandsMap.set(command.commandName, command);
+    commandsMap.set(command.name, command);
   });
   return commandsMap;
 };
