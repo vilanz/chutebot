@@ -1,14 +1,14 @@
-import { parseCommand } from ".";
+import { parseUserInput } from ".";
 
 test("parsing a simple command", () => {
-  expect(parseCommand("c!ping")).toEqual({
+  expect(parseUserInput("c!ping")).toEqual({
     name: "ping",
     args: "",
   });
 });
 
 test("parsing a command with args", () => {
-  expect(parseCommand("c!kick fire extinguisher")).toEqual({
+  expect(parseUserInput("c!kick fire extinguisher")).toEqual({
     name: "kick",
     args: "fire extinguisher",
   });
@@ -17,6 +17,6 @@ test("parsing a command with args", () => {
 test.each(["big invalid command", "  ", "g!", ""])(
   "parsing invalid commands returns null",
   (command) => {
-    expect(parseCommand(command)).toBeNull();
+    expect(parseUserInput(command)).toBeNull();
   }
 );
