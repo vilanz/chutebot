@@ -4,6 +4,8 @@ import { guessPlayerName, sortBySeason, removeClubLabels } from "../format";
 import { isMessageInBotspam } from "../../core/discord";
 import { mapLinebreak, secondsToMs } from "../../core/utils";
 import { PlayerSpell } from "../types";
+import { fetchPlayerCareer } from "../transfermarkt";
+import { addPlayerSpells } from "../../core/db";
 
 const SECONDS_TO_GUESS = 20;
 
@@ -61,6 +63,13 @@ export default {
 
     try {
       const randomPlayer = await playerRepo.getRandom();
+
+      if (!randomPlayer.spells.length) {
+        void message.reply("Buscando a carreira atualizada do jogador...");
+        const career = await fetchPlayerCareer(randomPlayer.transfermarktId);
+        await addPlayerSpells(randomPlayer.transfermarktId, career.spells);
+        randomPlayer.spells = career.spells;
+      }
 
       const playerSpellsMessage = await message.reply({
         embeds: [getPlayerSpellsEmbed(randomPlayer.spells)],
