@@ -1,5 +1,8 @@
 import { RunResult } from "better-sqlite3";
+import format from "date-fns/format";
+import subWeeks from "date-fns/subWeeks";
 import { db, getPlayerByTransfermarktId, Player } from "../../core/db";
+import { logger } from "../../core/log";
 import { TriviaPlayer } from "../types";
 
 export class PlayerRepository {
@@ -45,5 +48,28 @@ export class PlayerRepository {
 
   delete(id: number): RunResult {
     return this.SMT_DELETE_PLAYER.run(id);
+  }
+
+  private SMT_DELETE_OUTDATED_SPELLS = db.prepare<string>(
+    `DELETE FROM player_spells WHERE playerTransfermarktId IN
+      (SELECT transfermarktId FROM players WHERE lastSpellsUpdate <= ?)`
+  );
+
+  private SMT_REFRESH_OUTDATED_PLAYER = db.prepare<string>(
+    `UPDATE players SET lastSpellsUpdate = datetime() WHERE lastSpellsUpdate <= ?`
+  );
+
+  removeOutdatedPlayers(): void {
+    const lastWeek = subWeeks(new Date(), 1);
+    const lastWeekString = format(lastWeek, "yyyy-MM-dd hh:mm:ss");
+    logger.info(
+      "Removing players with last spell update before %s",
+      lastWeekString
+    );
+    const removeSpells = db.transaction((d: string) => {
+      this.SMT_DELETE_OUTDATED_SPELLS.run(d);
+      this.SMT_REFRESH_OUTDATED_PLAYER.run(d);
+    });
+    removeSpells(lastWeekString);
   }
 }

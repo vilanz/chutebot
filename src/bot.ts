@@ -1,4 +1,5 @@
 import path from "path";
+import cron from "node-cron";
 import { getChutebotCommandsMap, parseUserInput } from "./core/command-parser";
 import { logger } from "./core/log";
 import {
@@ -21,6 +22,12 @@ void (async () => {
       await sendBotspamMessage("Bot irá parar.");
     }
     process.exit(0);
+  });
+
+  cron.schedule("0 6,18 * * *", () => {
+    logger.info("removing old players...");
+    // TODO use each server's ID
+    new PlayerRepository().removeOutdatedPlayers();
   });
 
   await syncDatabase();
