@@ -21,19 +21,6 @@ export type ChutebotCommand = {
   run: (ctx: CommandContext) => void | Promise<void>;
 };
 
-export enum Commands {
-  Ping = "ping",
-  Start = "start",
-  Guess = "g",
-  AddPlayer = "add",
-  Wins = "wins",
-  Help = "help",
-  GoalFeed = "feed",
-  Remove = "remove",
-  ListPlayerIds = "list-ids",
-  PlayerCount = "count",
-}
-
 export const BOT_PREFIX = "c!";
 
 export const parseUserInput = (content: string): UserInput | null => {

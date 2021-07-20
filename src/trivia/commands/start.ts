@@ -1,9 +1,5 @@
 import { Message, MessageEmbed } from "discord.js";
-import {
-  parseCommand,
-  Commands,
-  ChutebotCommand,
-} from "../../core/command-parser";
+import { parseUserInput, ChutebotCommand } from "../../core/command-parser";
 import { guessPlayerName, sortBySeason, removeClubLabels } from "../format";
 import { isMessageInBotspam } from "../../core/discord";
 import { mapLinebreak, secondsToMs } from "../../core/utils";
@@ -35,21 +31,19 @@ const getPlayerSpellsEmbed = (spells: PlayerSpell[]): MessageEmbed => {
     .setTimestamp(Date.now());
 };
 
-const filterForCorrectGuess =
-  (playerName: string) =>
-  (message: Message): boolean => {
-    const command = parseCommand(message.content);
-    if (!command || command.name !== Commands.Guess) {
-      return false;
-    }
-    const guess = command.args;
-    const correct = guessPlayerName(playerName, guess);
-    if (!correct) {
-      // eslint-disable-next-line no-void
-      void message.react("❌");
-    }
-    return correct;
-  };
+const filterByPlayerName = (message: Message, playerName: string): boolean => {
+  const userInput = parseUserInput(message.content);
+  if (userInput?.name !== "g") {
+    return false;
+  }
+  const guess = userInput.args;
+  const correct = guessPlayerName(playerName, guess);
+  if (!correct) {
+    // eslint-disable-next-line no-void
+    void message.react("❌");
+  }
+  return correct;
+};
 
 const channelsWithSessionsRunning = new Set<string>();
 
@@ -80,8 +74,11 @@ export default {
         }
       }, secondsToMs(SECONDS_TO_GUESS - 5));
 
+      const correctGuessFn = (m: Message) =>
+        filterByPlayerName(m, randomPlayer.name);
+
       correctMessage = await message.channel
-        .awaitMessages(filterForCorrectGuess(randomPlayer.name), {
+        .awaitMessages(correctGuessFn, {
           max: 1,
           time: secondsToMs(SECONDS_TO_GUESS),
           errors: ["time"],
