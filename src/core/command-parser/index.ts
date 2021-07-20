@@ -1,21 +1,24 @@
 import { Message } from "discord.js";
 import fs from "fs";
 import path from "path";
+import { PlayerRepository, UserRepository } from "../../trivia/data";
 
 export interface BotCommand {
   name: string;
   args: string;
 }
 
-export type CommandHandler = (
-  message: Message,
-  args: string
-) => void | Promise<void>;
+export interface CommandContext {
+  userRepo: UserRepository;
+  playerRepo: PlayerRepository;
+  message: Message;
+  args: string;
+}
 
 export type ChutebotCommand = {
   commandName: string;
   permission: (message: Message) => boolean;
-  handler: CommandHandler;
+  handler: (ctx: CommandContext) => void | Promise<void>;
 };
 
 export enum Commands {

@@ -10,6 +10,7 @@ import {
 } from "./core/discord";
 import { botToken } from "./core/env";
 import { syncDatabase } from "./core/db";
+import { PlayerRepository, UserRepository } from "./trivia/data";
 
 void (async () => {
   process.on("message", async (msg) => {
@@ -47,14 +48,22 @@ void (async () => {
         return;
       }
 
-      const commandHandler = chutebotCommandsMap.get(command.name);
+      const { name, args } = command;
+
+      const commandHandler = chutebotCommandsMap.get(name);
 
       if (!commandHandler || !commandHandler.permission(message)) {
         return;
       }
 
       logger.info("running command %s from message %s", command, message);
-      await commandHandler.handler(message, command.args);
+      await commandHandler.handler({
+        message,
+        args,
+        // TODO inject guildId in here
+        playerRepo: new PlayerRepository(),
+        userRepo: new UserRepository(),
+      });
     } catch (err) {
       await message.react("⚠");
       logger.error("error when running a command", err);

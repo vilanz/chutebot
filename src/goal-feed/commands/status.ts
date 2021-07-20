@@ -6,7 +6,7 @@ import { goalFeedStream } from "../twitter-api";
 export default {
   commandName: "feed-status",
   permission: (message) => isMessageByOwner(message),
-  handler: async (message) => {
+  handler: async ({ message }) => {
     const subbedChannels = await goalFeedStream.getSubbedChannelRules();
 
     const isStreamUp = goalFeedStream.streamUp();

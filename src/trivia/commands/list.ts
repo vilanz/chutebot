@@ -1,18 +1,17 @@
 import { MessageEmbed } from "discord.js";
 import { ChutebotCommand } from "../../core/command-parser";
 import { isMessageByOwner } from "../../core/discord";
-import { playerService } from "../data";
 
 export default {
   commandName: "list",
   permission: (message) => isMessageByOwner(message),
-  handler: async (message, args) => {
+  handler: async ({ message, args, playerRepo }) => {
     const playerName = args.trim();
     if (!playerName) {
       return;
     }
 
-    const players = playerService.searchPlayers(playerName);
+    const players = playerRepo.searchPlayers(playerName);
     if (!players.length) {
       await message.reply("Ninguém encontrado.");
       return;

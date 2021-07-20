@@ -5,7 +5,7 @@ import { goalFeedStream } from "../twitter-api";
 export default {
   commandName: "feed-kill",
   permission: (message) => isMessageByOwner(message),
-  handler: async (message) => {
+  handler: async ({ message }) => {
     goalFeedStream.killTweetStream();
     await message.reply("Stream destruída.");
   },

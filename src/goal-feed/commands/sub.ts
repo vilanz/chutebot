@@ -5,7 +5,7 @@ import { goalFeedStream } from "../twitter-api";
 export default {
   commandName: "feed-sub",
   permission: (message) => isMessageByOwner(message),
-  handler: async (message, args) => {
+  handler: async ({ message, args }) => {
     if (!args.trim()) {
       return;
     }

@@ -6,7 +6,6 @@ import {
 } from "../../core/command-parser";
 import { guessPlayerName, sortBySeason } from "../format";
 import { isMessageInBotspam } from "../../core/discord";
-import { playerService, userService } from "../data";
 import { mapLinebreak, secondsToMs } from "../../core/utils";
 import { PlayerSpell } from "../types";
 import { removeClubLabels } from "../format/clubs";
@@ -58,7 +57,7 @@ const channelsWithSessionsRunning = new Set<string>();
 export default {
   commandName: "start",
   permission: (message) => isMessageInBotspam(message),
-  handler: async (message) => {
+  handler: async ({ message, playerRepo, userRepo }) => {
     const channelId = message.channel.id;
 
     if (channelsWithSessionsRunning.has(channelId)) {
@@ -68,7 +67,7 @@ export default {
     channelsWithSessionsRunning.add(channelId);
 
     try {
-      const randomPlayer = await playerService.getRandom();
+      const randomPlayer = await playerRepo.getRandom();
 
       const playerSpellsMessage = await message.reply({
         embeds: [getPlayerSpellsEmbed(randomPlayer.spells)],
@@ -99,7 +98,7 @@ export default {
       }
 
       const winner = correctMessage.author;
-      userService.upsertUserWin(correctMessage.author.id);
+      userRepo.upsertUserWin(correctMessage.author.id);
       await correctMessage.reply(
         `${winner} acertou! Era o **${randomPlayer.name}**.`
       );
