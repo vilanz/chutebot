@@ -4,11 +4,10 @@ import {
   Commands,
   ChutebotCommand,
 } from "../../core/command-parser";
-import { guessPlayerName, sortBySeason } from "../format";
+import { guessPlayerName, sortBySeason, removeClubLabels } from "../format";
 import { isMessageInBotspam } from "../../core/discord";
 import { mapLinebreak, secondsToMs } from "../../core/utils";
 import { PlayerSpell } from "../types";
-import { removeClubLabels } from "../format/clubs";
 
 const SECONDS_TO_GUESS = 20;
 
