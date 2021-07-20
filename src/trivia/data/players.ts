@@ -60,10 +60,10 @@ export class PlayerRepository {
   );
 
   removeOutdatedPlayers(): void {
-    const lastWeek = subWeeks(new Date(), 1);
+    const lastWeek = subWeeks(new Date(), 2);
     const lastWeekString = format(lastWeek, "yyyy-MM-dd hh:mm:ss");
     logger.info(
-      "Removing players with last spell update before %s",
+      "removing players with last spell update before %s",
       lastWeekString
     );
     const removeSpells = db.transaction((d: string) => {
