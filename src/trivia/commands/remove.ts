@@ -4,7 +4,7 @@ import { isMessageByOwner } from "../../core/discord";
 export default {
   commandName: "remove",
   permission: (message) => isMessageByOwner(message),
-  handler: async ({ message, args, playerRepo }) => {
+  run: async ({ message, args, playerRepo }) => {
     const id = parseInt(args, 10);
     if (Number.isNaN(id)) {
       return;

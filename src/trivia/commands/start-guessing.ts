@@ -56,7 +56,7 @@ const channelsWithSessionsRunning = new Set<string>();
 export default {
   commandName: "start",
   permission: (message) => isMessageInBotspam(message),
-  handler: async ({ message, playerRepo, userRepo }) => {
+  run: async ({ message, playerRepo, userRepo }) => {
     const channelId = message.channel.id;
 
     if (channelsWithSessionsRunning.has(channelId)) {

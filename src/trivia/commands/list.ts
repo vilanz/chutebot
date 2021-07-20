@@ -5,7 +5,7 @@ import { isMessageByOwner } from "../../core/discord";
 export default {
   commandName: "list",
   permission: (message) => isMessageByOwner(message),
-  handler: async ({ message, args, playerRepo }) => {
+  run: async ({ message, args, playerRepo }) => {
     const playerName = args.trim();
     if (!playerName) {
       return;

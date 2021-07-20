@@ -59,7 +59,7 @@ const awaitForPlayerSearchReaction = async (
 export default {
   commandName: "add",
   permission: (message) => isMessageInBotspam(message),
-  handler: async ({ message, args }) => {
+  run: async ({ message, args }) => {
     const playerNameWithoutSpaces = args?.trim();
     if (!playerNameWithoutSpaces || playerNameWithoutSpaces.length > 80) {
       await message.reply("Precisamos de um nome válido.");

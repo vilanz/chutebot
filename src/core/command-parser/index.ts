@@ -18,7 +18,7 @@ export interface CommandContext {
 export type ChutebotCommand = {
   commandName: string;
   permission: (message: Message) => boolean;
-  handler: (ctx: CommandContext) => void | Promise<void>;
+  run: (ctx: CommandContext) => void | Promise<void>;
 };
 
 export enum Commands {

@@ -5,7 +5,7 @@ import { isMessageInBotspam } from "../../core/discord";
 export default {
   commandName: "help",
   permission: (message) => isMessageInBotspam(message),
-  handler: async ({ message }) => {
+  run: async ({ message }) => {
     const TRIVIA_EMBED = new MessageEmbed()
       .setTitle("Comandos de trivia")
       .addField(

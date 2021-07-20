@@ -34,7 +34,7 @@ const getUserWinsEmbed = async (users: User[]): Promise<MessageEmbed> => {
 export default {
   commandName: "wins",
   permission: (message) => isMessageInBotspam(message),
-  handler: async ({ message, userRepo }) => {
+  run: async ({ message, userRepo }) => {
     const allUsers = userRepo.getAll();
     await message.reply({
       embeds: [await getUserWinsEmbed(allUsers)],

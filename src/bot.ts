@@ -57,7 +57,7 @@ void (async () => {
       }
 
       logger.info("running command %s from message %s", command, message);
-      await commandHandler.handler({
+      await commandHandler.run({
         message,
         args,
         // TODO inject guildId in here
