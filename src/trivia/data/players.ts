@@ -59,17 +59,20 @@ export class PlayerRepository {
     `UPDATE players SET lastSpellsUpdate = datetime() WHERE lastSpellsUpdate <= ?`
   );
 
-  removeOutdatedPlayers(): void {
-    const lastWeek = subWeeks(new Date(), 2);
+  removeOutdatedPlayers(): { spells: number; players: number } {
+    const lastWeek = subWeeks(new Date(), 1);
     const lastWeekString = format(lastWeek, "yyyy-MM-dd hh:mm:ss");
     logger.info(
       "removing players with last spell update before %s",
       lastWeekString
     );
-    const removeSpells = db.transaction((d: string) => {
-      this.SMT_DELETE_OUTDATED_SPELLS.run(d);
-      this.SMT_REFRESH_OUTDATED_PLAYER.run(d);
-    });
-    removeSpells(lastWeekString);
+    return db.transaction((d: string) => {
+      const spellsResult = this.SMT_DELETE_OUTDATED_SPELLS.run(d);
+      const playersResult = this.SMT_REFRESH_OUTDATED_PLAYER.run(d);
+      return {
+        spells: spellsResult.changes,
+        players: playersResult.changes,
+      };
+    })(lastWeekString);
   }
 }

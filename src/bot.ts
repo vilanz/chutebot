@@ -24,12 +24,6 @@ void (async () => {
     process.exit(0);
   });
 
-  cron.schedule("0 6,18 * * *", () => {
-    logger.info("removing old players...");
-    // TODO use each server's ID
-    new PlayerRepository().removeOutdatedPlayers();
-  });
-
   await syncDatabase();
 
   logger.info("starting bot");
@@ -42,6 +36,19 @@ void (async () => {
   discordClient.once("ready", async () => {
     await prefetchAllUsers();
     await sendBotspamMessage("Bot iniciado.");
+
+    cron.schedule("0 6,18 * * *", async () => {
+      logger.info("removing old players...");
+      // TODO do it individually for each server
+      await sendBotspamMessage(
+        "> Atualizando jogadores com carreiras desatualizadas..."
+      );
+      const { spells, players } =
+        new PlayerRepository().removeOutdatedPlayers();
+      await sendBotspamMessage(
+        `> ${spells} passagens desatualizadas (de ${players} jogadores) removidas.`
+      );
+    });
   });
 
   discordClient.on("message", async (message) => {
