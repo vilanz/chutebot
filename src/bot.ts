@@ -1,5 +1,5 @@
 import path from "path";
-import { getChutebotCommandsMap, parseCommand } from "./core/command-parser";
+import { getChutebotCommandsMap, parseUserInput } from "./core/command-parser";
 import { logger } from "./core/log";
 import {
   discordClient,
@@ -39,27 +39,26 @@ void (async () => {
 
   discordClient.on("message", async (message) => {
     try {
-      const command = parseCommand(message.content);
-      if (!command) {
+      const isOutsideGuild = message.guild?.id !== GUILD;
+      const isBotUser = message.author.bot;
+      if (isOutsideGuild || isBotUser) {
         return;
       }
 
-      if (message.guild?.id !== GUILD) {
+      const userInput = parseUserInput(message.content);
+      if (!userInput) {
         return;
       }
 
-      const { name, args } = command;
-
-      const commandHandler = chutebotCommandsMap.get(name);
-
-      if (!commandHandler || !commandHandler.permission(message)) {
+      const commandHandler = chutebotCommandsMap.get(userInput.name);
+      if (!commandHandler?.permission(message)) {
         return;
       }
 
-      logger.info("running command %s from message %s", command, message);
+      logger.info("running command %s from message %s", userInput, message);
       await commandHandler.run({
         message,
-        args,
+        args: userInput.args,
         // TODO inject guildId in here
         playerRepo: new PlayerRepository(),
         userRepo: new UserRepository(),

@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { PlayerRepository, UserRepository } from "../../trivia/data";
 
-export interface BotCommand {
+export interface UserInput {
   name: string;
   args: string;
 }
@@ -36,23 +36,20 @@ export enum Commands {
 
 export const BOT_PREFIX = "c!";
 
-export const parseCommand = (content: string): BotCommand | null => {
+export const parseUserInput = (content: string): UserInput | null => {
   if (!content.startsWith(BOT_PREFIX)) {
     return null;
   }
 
-  const [commandName, ...commandArgs] = content
-    .slice(BOT_PREFIX.length)
-    .trim()
-    .split(/ +/);
+  const [name, ...args] = content.slice(BOT_PREFIX.length).trim().split(/ +/);
 
-  if (!commandName) {
+  if (!name) {
     return null;
   }
 
   return {
-    name: commandName.toLowerCase(),
-    args: commandArgs.join(" "),
+    name: name.toLowerCase(),
+    args: args.join(" "),
   };
 };
 
@@ -91,5 +88,3 @@ export const getChutebotCommandsMap = async (
   });
   return commandsMap;
 };
-
-export const noop = () => {};
