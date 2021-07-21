@@ -60,11 +60,11 @@ export class PlayerRepository {
   );
 
   removeOutdatedPlayers(): { spells: number; players: number } {
-    const lastWeek = subWeeks(new Date(), 1);
-    const lastWeekString = format(lastWeek, "yyyy-MM-dd hh:mm:ss");
+    const fourWeeksAgo = subWeeks(new Date(), 4);
+    const fourWeeksAgoStr = format(fourWeeksAgo, "yyyy-MM-dd hh:mm:ss");
     logger.info(
       "removing players with last spell update before %s",
-      lastWeekString
+      fourWeeksAgoStr
     );
     return db.transaction((d: string) => {
       const spellsResult = this.SMT_DELETE_OUTDATED_SPELLS.run(d);
@@ -73,6 +73,6 @@ export class PlayerRepository {
         spells: spellsResult.changes,
         players: playersResult.changes,
       };
-    })(lastWeekString);
+    })(fourWeeksAgoStr);
   }
 }

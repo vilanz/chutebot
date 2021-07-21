@@ -37,11 +37,11 @@ void (async () => {
     await prefetchAllUsers();
     await sendBotspamMessage("Bot iniciado.");
 
-    cron.schedule("0 6,18 * * *", async () => {
-      logger.info("removing old players...");
+    cron.schedule("0 0 * * *", async () => {
+      logger.info("daily removal of old players");
       // TODO do it individually for each server
       await sendBotspamMessage(
-        "> Atualizando jogadores com carreiras desatualizadas..."
+        "> Removendo passagens de jogadores desatualizadas há mais de 4 semanas..."
       );
       const { spells, players } =
         new PlayerRepository().removeOutdatedPlayers();
