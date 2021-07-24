@@ -5,6 +5,11 @@ import { db, getPlayerByTransfermarktId, Player } from "../../core/db";
 import { logger } from "../../core/log";
 import { TriviaPlayer } from "../types";
 
+export type PlayersRemovedResult = [
+  spellsRemoved: number,
+  playersRemoved: number
+];
+
 export class PlayerRepository {
   private SMT_COUNT = db.prepare("SELECT COUNT(*) as count FROM players");
 
@@ -59,7 +64,7 @@ export class PlayerRepository {
     `UPDATE players SET lastSpellsUpdate = datetime() WHERE lastSpellsUpdate <= ?`
   );
 
-  removeOutdatedPlayers(): { spells: number; players: number } {
+  removeOutdatedPlayers(): PlayersRemovedResult {
     const fourWeeksAgo = subWeeks(new Date(), 4);
     const fourWeeksAgoStr = format(fourWeeksAgo, "yyyy-MM-dd hh:mm:ss");
     logger.info(
@@ -69,10 +74,10 @@ export class PlayerRepository {
     return db.transaction((d: string) => {
       const spellsResult = this.SMT_DELETE_OUTDATED_SPELLS.run(d);
       const playersResult = this.SMT_REFRESH_OUTDATED_PLAYER.run(d);
-      return {
-        spells: spellsResult.changes,
-        players: playersResult.changes,
-      };
+      return [
+        spellsResult.changes,
+        playersResult.changes,
+      ] as PlayersRemovedResult;
     })(fourWeeksAgoStr);
   }
 }
