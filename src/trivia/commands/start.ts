@@ -65,7 +65,7 @@ export default {
       const randomPlayer = await playerRepo.getRandom();
 
       if (!randomPlayer.spells.length) {
-        void message.reply("Buscando a carreira atualizada do jogador...");
+        void message.react("🔎");
         const career = await fetchPlayerCareer(randomPlayer.transfermarktId);
         await addPlayerSpells(randomPlayer.transfermarktId, career.spells);
         randomPlayer.spells = career.spells;
@@ -77,11 +77,12 @@ export default {
 
       let correctMessage: Message | null = null;
 
+      const WHEN_FIVE_SECONDS_REMAIN = secondsToMs(SECONDS_TO_GUESS - 5);
       setTimeout(() => {
         if (!correctMessage) {
           void playerSpellsMessage.reply("5 segundos faltando...");
         }
-      }, secondsToMs(SECONDS_TO_GUESS - 5));
+      }, WHEN_FIVE_SECONDS_REMAIN);
 
       const correctGuessFn = (m: Message) =>
         filterByPlayerName(m, randomPlayer.name);
