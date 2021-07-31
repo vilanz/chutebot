@@ -23,7 +23,13 @@ export const getUsersByIds = async (
 ): Promise<Collection<Snowflake, GuildMember>> =>
   getGuild()
     .members.fetch()
-    .then((members) => members.filter((u) => ids.includes(u.id)));
+    .then(
+      (members) =>
+        members.filter((u) => ids.includes(u.id)) as Collection<
+          Snowflake,
+          GuildMember
+        >
+    );
 
 export const getChannel = (channelId: Snowflake): TextChannel | null =>
   (getGuild().channels.cache.get(channelId) as TextChannel) ?? null;
@@ -69,7 +75,8 @@ export const waitForUserReaction = async (
   await Promise.all(reactions.map((R) => message.react(R)));
 
   return message
-    .awaitReactions(isCorrectReactionFromUser, {
+    .awaitReactions({
+      filter: isCorrectReactionFromUser,
       max: 1,
       time: secondsToMs(20),
     })

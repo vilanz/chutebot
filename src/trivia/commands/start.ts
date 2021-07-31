@@ -88,7 +88,8 @@ export default {
         filterByPlayerName(m, randomPlayer.name);
 
       correctMessage = await message.channel
-        .awaitMessages(correctGuessFn, {
+        .awaitMessages({
+          filter: correctGuessFn,
           max: 1,
           time: secondsToMs(SECONDS_TO_GUESS),
           errors: ["time"],
