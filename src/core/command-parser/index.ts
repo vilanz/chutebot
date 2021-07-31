@@ -1,6 +1,7 @@
 import { Message } from "discord.js";
 import fs from "fs";
 import path from "path";
+import { Connection } from "typeorm";
 import { PlayerRepository, UserRepository } from "../../trivia/data";
 
 export interface UserInput {
@@ -13,6 +14,7 @@ export interface CommandContext {
   playerRepo: PlayerRepository;
   message: Message;
   args: string;
+  connection: Connection;
 }
 
 export type ChutebotCommand = {

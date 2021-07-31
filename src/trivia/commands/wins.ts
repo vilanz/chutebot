@@ -1,6 +1,6 @@
 import { MessageEmbed, Snowflake } from "discord.js";
 import { ChutebotCommand } from "../../core/command-parser";
-import { User } from "../../core/db";
+import { User } from "../../core/db/entities";
 import { getUsersByIds, isMessageInBotspam } from "../../core/discord";
 import { mapLinebreak } from "../../core/utils";
 
@@ -34,8 +34,12 @@ const getUserWinsEmbed = async (users: User[]): Promise<MessageEmbed> => {
 export default {
   name: "wins",
   permission: (message) => isMessageInBotspam(message),
-  run: async ({ message, userRepo }) => {
-    const allUsers = userRepo.getAll();
+  run: async ({ message, connection }) => {
+    const allUsers = await connection.manager.find(User, {
+      order: {
+        wins: "DESC",
+      },
+    });
     await message.reply({
       embeds: [await getUserWinsEmbed(allUsers)],
     });

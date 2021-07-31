@@ -10,11 +10,13 @@ import {
   sendBotspamMessage,
 } from "./core/discord";
 import { botToken } from "./core/env";
-import { syncDatabase } from "./core/db";
+import { getTypeORMConnection, syncDatabase } from "./core/db";
 import { PlayerRepository, UserRepository } from "./trivia/data";
 import "reflect-metadata";
 
 void (async () => {
+  const typeORMConnection = await getTypeORMConnection();
+
   process.on("message", async (msg) => {
     if (msg !== "shutdown") {
       return;
@@ -76,6 +78,7 @@ void (async () => {
         // TODO inject guildId in here
         playerRepo: new PlayerRepository(),
         userRepo: new UserRepository(),
+        connection: typeORMConnection,
       });
     } catch (err) {
       await message.react("⚠");
