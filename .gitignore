@@ -8,7 +8,7 @@ lerna-debug.log*
 
 # SQLite DB
 *.sqlite*
-db/
+/db/
 
 # Build
 build
