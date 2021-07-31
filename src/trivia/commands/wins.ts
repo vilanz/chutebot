@@ -34,8 +34,8 @@ const getUserWinsEmbed = async (users: User[]): Promise<MessageEmbed> => {
 export default {
   name: "wins",
   permission: (message) => isMessageInBotspam(message),
-  run: async ({ message, connection }) => {
-    const allUsers = await connection.manager.find(User, {
+  run: async ({ message }) => {
+    const allUsers = await User.find({
       order: {
         wins: "DESC",
       },

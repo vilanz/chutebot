@@ -1,5 +1,6 @@
 import path from "path";
 import cron from "node-cron";
+import { getRepository } from "typeorm";
 import { getChutebotCommandsMap, parseUserInput } from "./core/command-parser";
 import { logger } from "./core/log";
 import {
@@ -10,12 +11,12 @@ import {
   sendBotspamMessage,
 } from "./core/discord";
 import { botToken } from "./core/env";
-import { getTypeORMConnection, syncDatabase } from "./core/db";
+import { createTypeORMConnection, syncDatabase } from "./core/db";
 import { PlayerRepository, UserRepository } from "./trivia/data";
 import "reflect-metadata";
 
 void (async () => {
-  const typeORMConnection = await getTypeORMConnection();
+  await createTypeORMConnection();
 
   process.on("message", async (msg) => {
     if (msg !== "shutdown") {
@@ -78,7 +79,6 @@ void (async () => {
         // TODO inject guildId in here
         playerRepo: new PlayerRepository(),
         userRepo: new UserRepository(),
-        connection: typeORMConnection,
       });
     } catch (err) {
       await message.react("⚠");

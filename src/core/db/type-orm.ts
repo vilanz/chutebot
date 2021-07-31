@@ -1,12 +1,12 @@
 import { createConnection } from "typeorm";
-import { Player, User } from "./entities";
+import { Player, PlayerSpell, User } from "./entities";
 
-export const getTypeORMConnection = () =>
+export const createTypeORMConnection = () =>
   createConnection({
     type: "sqlite",
     database: "db/db.sqlite",
     enableWAL: true,
     synchronize: false,
     logging: true,
-    entities: [Player, User],
+    entities: [PlayerSpell, Player, User],
   });
