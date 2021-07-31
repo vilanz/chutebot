@@ -12,6 +12,7 @@ import {
 import { botToken } from "./core/env";
 import { syncDatabase } from "./core/db";
 import { PlayerRepository, UserRepository } from "./trivia/data";
+import "reflect-metadata";
 
 void (async () => {
   process.on("message", async (msg) => {
