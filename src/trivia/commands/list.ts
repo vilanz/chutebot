@@ -1,8 +1,8 @@
 import { format } from "date-fns";
-import { MessageEmbed } from "discord.js";
 import { ChutebotCommand } from "../../core/command-parser";
 import { PlayerEntity } from "../../core/db/entities";
 import { isMessageByOwner } from "../../core/discord";
+import { linebreak } from "../../core/utils";
 
 export default {
   name: "list",
@@ -15,6 +15,7 @@ export default {
 
     const players = await PlayerEntity.createQueryBuilder("player")
       .leftJoinAndSelect("player.spells", "spells")
+      .orderBy("random()")
       .where("name like :searchQuery", { searchQuery: `%${searchQuery}%` })
       .limit(6)
       .getMany();
@@ -23,21 +24,24 @@ export default {
       return;
     }
 
-    const embed = new MessageEmbed()
-      .setTitle(`Busca por ${searchQuery}`)
-      .addFields(
-        players.map((p) => ({
-          name: p.name,
-          value: `#${p.transfermarktId}\nÚltima atualização: ${format(
-            p.lastSpellsUpdate,
-            "Pp"
-          )}\n${p.spells.length} times`,
-          inline: true,
-        }))
-      );
-
     await message.reply({
-      embeds: [embed],
+      embeds: [
+        {
+          title: `Busca por ${searchQuery}`,
+          fields: players.map((p) => {
+            const formattedLastSpellsUpdate = format(p.lastSpellsUpdate, "Pp");
+            return {
+              name: p.name,
+              value: linebreak(
+                `#${p.transfermarktId}`,
+                `${p.spells.length} passagens`,
+                `Atualizado em ${formattedLastSpellsUpdate}`
+              ),
+              inline: true,
+            };
+          }),
+        },
+      ],
     });
   },
 } as ChutebotCommand;

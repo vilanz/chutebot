@@ -6,7 +6,9 @@ export const getRandomNumberUpTo = (max: number) =>
 export const waitSeconds = (seconds: number) =>
   new Promise((resolve) => setTimeout(resolve, secondsToMs(seconds)));
 
+export const linebreak = (...strings: string[]) => strings.join("\n");
+
 export const mapLinebreak = <T extends unknown>(
   list: T[],
   mapping: (t: T, i: number) => string
-) => list.map((x, i) => mapping(x, i)).join("\n");
+) => linebreak(...list.map((x, i) => mapping(x, i)));

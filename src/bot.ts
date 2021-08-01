@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import path from "path";
 import { getChutebotCommandsMap, parseUserInput } from "./core/command-parser";
 import { logger } from "./core/log";
@@ -10,7 +11,6 @@ import {
 } from "./core/discord";
 import { botToken } from "./core/env";
 import { createTypeORMConnection } from "./core/db";
-import "reflect-metadata";
 import { removeOutdatedPlayersEveryMonth } from "./core/cronjobs";
 
 void (async () => {
