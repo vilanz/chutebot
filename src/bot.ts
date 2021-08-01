@@ -1,21 +1,15 @@
 import "reflect-metadata";
-import path from "path";
-import { TextChannel } from "discord.js";
-import { getChutebotCommandsMap, parseUserInput } from "./commands/parser";
+import { getChutebotCommandsMap, handleMessageCommand } from "./commands";
 import { logger } from "./log";
-import {
-  discordClient,
-  dmMeError,
-  GUILD,
-  prefetchAllUsers,
-  sendBotspamMessage,
-} from "./discord";
+import { discordClient, prefetchAllUsers, sendBotspamMessage } from "./discord";
 import { botToken } from "./env";
 import { createTypeORMConnection } from "./db";
 import { removeOutdatedPlayersEveryMonth } from "./cron";
 
 void (async () => {
   await createTypeORMConnection();
+
+  const chutebotCommandsMap = await getChutebotCommandsMap();
 
   process.on("message", async (msg) => {
     if (msg !== "shutdown") {
@@ -29,46 +23,14 @@ void (async () => {
 
   logger.info("starting bot");
 
-  const chutebotCommandsMap = await getChutebotCommandsMap(
-    path.join(__dirname, "./commands/goal-feed/"),
-    path.join(__dirname, "./commands/trivia")
-  );
-
   discordClient.once("ready", async () => {
     removeOutdatedPlayersEveryMonth();
     await prefetchAllUsers();
     await sendBotspamMessage("Bot iniciado.");
   });
 
-  discordClient.on("message", async (message) => {
-    try {
-      const isOutsideGuild = message.guild?.id !== GUILD;
-      const isBotUser = message.author.bot;
-      if (isOutsideGuild || isBotUser) {
-        return;
-      }
-
-      const userInput = parseUserInput(message.content);
-      if (!userInput) {
-        return;
-      }
-
-      const commandHandler = chutebotCommandsMap.get(userInput.name);
-      if (!commandHandler?.permission(message)) {
-        return;
-      }
-
-      logger.info("running command %s from message %s", userInput, message);
-      await commandHandler.run({
-        message,
-        args: userInput.args,
-        textChannel: message.channel as TextChannel,
-      });
-    } catch (err) {
-      await message.react("⚠");
-      logger.error("error when running a command", err);
-      await dmMeError(err);
-    }
+  discordClient.on("message", async (m) => {
+    await handleMessageCommand(m, chutebotCommandsMap);
   });
 
   discordClient.on("error", async (err) => {

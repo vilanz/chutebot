@@ -1,5 +1,5 @@
 import { MessageEmbed, Snowflake, ThreadChannel } from "discord.js";
-import { ChutebotCommand } from "../parser";
+import { ChutebotCommand } from "..";
 import {
   fetchPlayerCareer,
   PlayerSearchResult,
@@ -60,14 +60,14 @@ const awaitForPlayerSearchReaction = async (
 export default {
   name: "add",
   permission: (message) => isMessageInBotspam(message),
-  run: async ({ message, args, textChannel }) => {
+  run: async ({ message, args }) => {
     const playerNameWithoutSpaces = args?.trim();
     if (!playerNameWithoutSpaces || playerNameWithoutSpaces.length > 80) {
       await message.react("❌");
       return;
     }
 
-    const playersThread = await textChannel.threads.create({
+    const playersThread = await message.startThread({
       name: "add-player",
       autoArchiveDuration: 60,
     });

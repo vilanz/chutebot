@@ -1,38 +1,8 @@
-import {
-  Collection,
-  Guild,
-  GuildMember,
-  Message,
-  MessageReaction,
-  Snowflake,
-  TextChannel,
-  User,
-} from "discord.js";
+import { Message, MessageReaction, Snowflake, User } from "discord.js";
 import { secondsToMs } from "../utils";
+import { getChannel } from "./channels";
 import { discordClient } from "./client";
 import { BOTSPAM_CHANNEL, BR_TEAMS_CHANNEL, GUILD, OWNER_USER } from "./consts";
-
-// TODO split this file
-
-const getGuild = (): Guild => discordClient.guilds.cache.get(GUILD)!;
-
-export const prefetchAllUsers = () => getGuild().members.fetch();
-
-export const getUsersByIds = async (
-  ids: string[]
-): Promise<Collection<Snowflake, GuildMember>> =>
-  getGuild()
-    .members.fetch()
-    .then(
-      (members) =>
-        members.filter((u) => ids.includes(u.id)) as Collection<
-          Snowflake,
-          GuildMember
-        >
-    );
-
-export const getChannel = (channelId: Snowflake): TextChannel | null =>
-  (getGuild().channels.cache.get(channelId) as TextChannel) ?? null;
 
 export const isMessageInCorrectGuild = (message: Message): boolean =>
   message.guild?.id === GUILD;
@@ -54,14 +24,6 @@ export const sendBotspamMessage = async (content: string): Promise<void> => {
   if (botspamChannel) {
     await botspamChannel.send(content);
   }
-};
-
-export const dmMeError = async (err: any): Promise<void> => {
-  const me = await discordClient.users.fetch(OWNER_USER);
-  const stringifiedError = err
-    ? JSON.stringify(err, Object.getOwnPropertyNames(err), 2)
-    : "eita";
-  await me.send(stringifiedError);
 };
 
 export const waitForUserReaction = async (
@@ -87,6 +49,14 @@ export const waitForUserReaction = async (
       }
       return reactions.findIndex((r) => r === emoji);
     });
+};
+
+export const dmMeError = async (err: any): Promise<void> => {
+  const me = discordClient.users.cache.get(OWNER_USER)!;
+  const stringifiedError = err
+    ? JSON.stringify(err, Object.getOwnPropertyNames(err), 2).slice(0, 3999)
+    : "eita";
+  await me.send(stringifiedError);
 };
 
 export const parseChannelMention = (message: string): Snowflake | null => {

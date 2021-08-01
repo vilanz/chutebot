@@ -1,6 +1,6 @@
 import { PlayerEntity } from "../../db";
 import { isMessageByOwner } from "../../discord";
-import { ChutebotCommand } from "../parser";
+import { ChutebotCommand } from "..";
 
 export default {
   name: "remove",

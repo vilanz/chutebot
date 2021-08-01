@@ -2,7 +2,7 @@ import { MessageEmbed, Snowflake } from "discord.js";
 import { UserEntity } from "../../db";
 import { getUsersByIds, isMessageInBotspam } from "../../discord";
 import { EMPTY_CHAR, mapLinebreak } from "../../utils";
-import { ChutebotCommand } from "../parser";
+import { ChutebotCommand } from "..";
 
 const getUserWinsEmbed = async (users: UserEntity[]): Promise<MessageEmbed> => {
   const discordUsers = await getUsersByIds(users.map((u) => u.id));

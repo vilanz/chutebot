@@ -1,5 +1,5 @@
 import { isMessageInBotspam } from "../../discord";
-import { ChutebotCommand } from "../parser";
+import { ChutebotCommand } from "..";
 
 export default {
   name: "ping",

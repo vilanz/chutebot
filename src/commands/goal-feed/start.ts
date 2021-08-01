@@ -1,6 +1,6 @@
 import { isMessageByOwner } from "../../discord";
 import { goalFeedStream } from "../../twitter-api";
-import { ChutebotCommand } from "../parser";
+import { ChutebotCommand } from "..";
 
 export default {
   name: "feed-start",

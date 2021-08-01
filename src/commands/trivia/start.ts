@@ -1,5 +1,5 @@
 import { Message, MessageEmbed, ThreadChannel } from "discord.js";
-import { parseUserInput, ChutebotCommand } from "../parser";
+import { parseUserInput, ChutebotCommand } from "..";
 import {
   arePlayerNamesEqual,
   sortBySeason,
@@ -97,7 +97,7 @@ const waitForCorrectGuess = async (
 export default {
   name: "start",
   permission: (message) => isMessageInBotspam(message),
-  run: async ({ message, textChannel }) => {
+  run: async ({ message }) => {
     const randomPlayer = await PlayerEntity.createQueryBuilder("player")
       .leftJoinAndSelect("player.spells", "spells")
       .orderBy("random()")
@@ -108,7 +108,7 @@ export default {
       await updatePlayerSpells(randomPlayer);
     }
 
-    const triviaThread = await textChannel.threads.create({
+    const triviaThread = await message.startThread({
       name: "chutebot-trivia",
       autoArchiveDuration: 60,
     });

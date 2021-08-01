@@ -2,7 +2,7 @@ import { format } from "date-fns";
 import { PlayerEntity } from "../../db/entities";
 import { isMessageByOwner } from "../../discord";
 import { linebreak } from "../../utils";
-import { ChutebotCommand } from "../parser";
+import { ChutebotCommand } from "..";
 
 export default {
   name: "list",
