@@ -7,25 +7,37 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 // eslint-disable-next-line import/no-cycle
-import { Player } from "./player";
+import { Player, PlayerEntity } from "./player";
+
+export interface PlayerSpell {
+  id: number;
+  club: string;
+  season: string;
+  matches: number;
+  goals: number;
+  player: Player;
+}
 
 @Entity({
   name: "player_spells",
 })
-export class PlayerSpell extends BaseEntity {
-  @PrimaryGeneratedColumn()
+export class PlayerSpellEntity extends BaseEntity implements PlayerSpell {
+  @PrimaryGeneratedColumn({ type: "integer" })
   id!: number;
 
-  @Column()
-  club!: string;
-
-  @Column()
+  @Column({ type: "varchar", length: "255" })
   season!: string;
 
-  @Column()
+  @Column({ type: "varchar", length: "255" })
+  club!: string;
+
+  @Column({ type: "integer" })
+  goals!: number;
+
+  @Column({ type: "integer" })
   matches!: number;
 
-  @ManyToOne(() => Player, (player) => player.spells)
+  @ManyToOne(() => PlayerEntity, (player) => player.spells)
   @JoinColumn({
     name: "playerTransfermarktId",
   })

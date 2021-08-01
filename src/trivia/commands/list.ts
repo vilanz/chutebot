@@ -1,18 +1,20 @@
+import { format } from "date-fns";
 import { MessageEmbed } from "discord.js";
 import { ChutebotCommand } from "../../core/command-parser";
-import { Player } from "../../core/db/entities";
+import { PlayerEntity } from "../../core/db/entities";
 import { isMessageByOwner } from "../../core/discord";
 
 export default {
   name: "list",
   permission: (message) => isMessageByOwner(message),
-  run: async ({ message, args, playerRepo }) => {
+  run: async ({ message, args }) => {
     const searchQuery = args.trim();
     if (!searchQuery) {
       return;
     }
 
-    const players = await Player.createQueryBuilder()
+    const players = await PlayerEntity.createQueryBuilder("player")
+      .leftJoinAndSelect("player.spells", "spells")
       .where("name like :searchQuery", { searchQuery: `%${searchQuery}%` })
       .limit(6)
       .getMany();
@@ -26,7 +28,10 @@ export default {
       .addFields(
         players.map((p) => ({
           name: p.name,
-          value: `#${p.transfermarktId}\nÚltima atualização: ${p.lastSpellsUpdate}`,
+          value: `#${p.transfermarktId}\nÚltima atualização: ${format(
+            p.lastSpellsUpdate,
+            "Pp"
+          )}\n${p.spells.length} times`,
           inline: true,
         }))
       );

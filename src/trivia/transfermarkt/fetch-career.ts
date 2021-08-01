@@ -1,5 +1,5 @@
 import { Cheerio, Node } from "cheerio";
-import { TriviaPlayer, PlayerSpell } from "../types";
+import { Player, PlayerSpell } from "../../core/db/entities";
 import {
   getCheerioFromPageHTML,
   parseNumberFromNode,
@@ -57,7 +57,7 @@ const extractPlayerSpells = (rows: Cheerio<Node>[]): PlayerSpell[] => {
 
 export const fetchPlayerCareer = async (
   transfermarktId: number
-): Promise<TriviaPlayer> => {
+): Promise<Player> => {
   const careerUrl = getTransfermarktPlayerCareerUrl(transfermarktId);
   const ch = await getCheerioFromPageHTML(careerUrl);
 
@@ -67,11 +67,10 @@ export const fetchPlayerCareer = async (
     ch(".grid-view table.items tbody tr")
   );
 
-  const playerCareer = {
+  return {
     transfermarktId,
     name,
+    lastSpellsUpdate: new Date(),
     spells: extractPlayerSpells(allCompetitionsColumns),
   };
-
-  return playerCareer;
 };

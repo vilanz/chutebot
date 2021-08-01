@@ -72,7 +72,7 @@ export const waitForUserReaction = async (
   const isCorrectReactionFromUser = (r: MessageReaction, user: User) =>
     !!r.emoji.name && reactions.includes(r.emoji.name) && user.id === authorId;
 
-  await Promise.all(reactions.map((R) => message.react(R)));
+  reactions.forEach((R) => message.react(R));
 
   return message
     .awaitReactions({

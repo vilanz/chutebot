@@ -1,3 +1,0 @@
-ALTER TABLE UserEntities RENAME TO users;
-ALTER TABLE users DROP COLUMN createdAt;
-ALTER TABLE users DROP COLUMN updatedAt;

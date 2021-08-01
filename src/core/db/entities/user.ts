@@ -4,9 +4,9 @@ import { BaseEntity, Column, Entity, PrimaryColumn } from "typeorm";
   name: "users",
 })
 export class User extends BaseEntity {
-  @PrimaryColumn()
+  @PrimaryColumn({ type: "varchar", length: "255" })
   id!: string;
 
-  @Column()
+  @Column({ type: "integer" })
   wins!: number;
 }
