@@ -1,12 +1,12 @@
 import { MessageEmbed, Snowflake } from "discord.js";
 import { ChutebotCommand } from "../../core/command-parser";
-import { User } from "../../core/db";
+import { UserEntity } from "../../core/db/entities";
 import { getUsersByIds, isMessageInBotspam } from "../../core/discord";
 import { mapLinebreak } from "../../core/utils";
 
 const MAX_USERNAME_LENGTH = 30;
 
-const getUserWinsEmbed = async (users: User[]): Promise<MessageEmbed> => {
+const getUserWinsEmbed = async (users: UserEntity[]): Promise<MessageEmbed> => {
   const discordUsers = await getUsersByIds(users.map((u) => u.id));
 
   return new MessageEmbed()
@@ -34,8 +34,12 @@ const getUserWinsEmbed = async (users: User[]): Promise<MessageEmbed> => {
 export default {
   name: "wins",
   permission: (message) => isMessageInBotspam(message),
-  run: async ({ message, userRepo }) => {
-    const allUsers = userRepo.getAll();
+  run: async ({ message }) => {
+    const allUsers = await UserEntity.find({
+      order: {
+        wins: "DESC",
+      },
+    });
     await message.reply({
       embeds: [await getUserWinsEmbed(allUsers)],
     });

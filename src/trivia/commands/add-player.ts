@@ -6,7 +6,7 @@ import {
   searchPlayersInTransfermarkt,
 } from "../transfermarkt";
 import { isMessageInBotspam, waitForUserReaction } from "../../core/discord";
-import { createPlayer, getPlayerByTransfermarktId } from "../../core/db";
+import { PlayerEntity, PlayerSpellEntity } from "../../core/db/entities";
 
 const awaitForPlayerSearchReaction = async (
   playersFound: PlayerSearchResult[],
@@ -86,26 +86,43 @@ export default {
 
     const { transfermarktId } = wantedPlayer;
 
-    if (await getPlayerByTransfermarktId(transfermarktId)) {
+    // TODO use a faster query like EXISTS() (TypeORM has no builtin support for it)
+    const existingPlayer = await PlayerEntity.findOne({
+      where: {
+        transfermarktId,
+      },
+      select: ["transfermarktId"],
+    });
+
+    if (existingPlayer) {
       await message.reply(
         `O **${wantedPlayer.name}** já foi adicionado antes.`
       );
       return;
     }
 
-    const career = await fetchPlayerCareer(transfermarktId);
+    const newPlayer = await fetchPlayerCareer(transfermarktId);
 
-    if (!career.spells.length) {
+    if (!newPlayer.spells.length) {
       await message.reply("Esse jogador não tem clubes na carreira. :analise:");
       return;
     }
 
-    const newPlayerEntity = await createPlayer({
-      name: career.name,
-      transfermarktId,
-      spells: career.spells,
-    });
+    await PlayerEntity.createQueryBuilder()
+      .insert()
+      .values(newPlayer)
+      .execute();
 
-    await message.reply(`**${newPlayerEntity.name}** adicionado com sucesso.`);
+    await PlayerSpellEntity.createQueryBuilder()
+      .insert()
+      .values(
+        newPlayer.spells.map((sp) => ({
+          ...sp,
+          player: newPlayer,
+        }))
+      )
+      .execute();
+
+    await message.reply(`**${newPlayer.name}** adicionado com sucesso.`);
   },
 } as ChutebotCommand;

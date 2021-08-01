@@ -1,5 +1,5 @@
+import "reflect-metadata";
 import path from "path";
-import cron from "node-cron";
 import { getChutebotCommandsMap, parseUserInput } from "./core/command-parser";
 import { logger } from "./core/log";
 import {
@@ -10,10 +10,12 @@ import {
   sendBotspamMessage,
 } from "./core/discord";
 import { botToken } from "./core/env";
-import { syncDatabase } from "./core/db";
-import { PlayerRepository, UserRepository } from "./trivia/data";
+import { createTypeORMConnection } from "./core/db";
+import { removeOutdatedPlayersEveryMonth } from "./core/cronjobs";
 
 void (async () => {
+  await createTypeORMConnection();
+
   process.on("message", async (msg) => {
     if (msg !== "shutdown") {
       return;
@@ -24,8 +26,6 @@ void (async () => {
     process.exit(0);
   });
 
-  await syncDatabase();
-
   logger.info("starting bot");
 
   const chutebotCommandsMap = await getChutebotCommandsMap(
@@ -34,20 +34,9 @@ void (async () => {
   );
 
   discordClient.once("ready", async () => {
+    removeOutdatedPlayersEveryMonth();
     await prefetchAllUsers();
     await sendBotspamMessage("Bot iniciado.");
-
-    cron.schedule("0 0 * * 0", async () => {
-      logger.info("removing old players");
-      await sendBotspamMessage(
-        "> Removendo passagens de jogadores desatualizadas há mais de 4 semanas..."
-      );
-      const [spellsRemoved, playersRemoved] =
-        new PlayerRepository().removeOutdatedPlayers();
-      await sendBotspamMessage(
-        `> ${spellsRemoved} passagens desatualizadas (de ${playersRemoved} jogadores) removidas.`
-      );
-    });
   });
 
   discordClient.on("message", async (message) => {
@@ -72,9 +61,6 @@ void (async () => {
       await commandHandler.run({
         message,
         args: userInput.args,
-        // TODO inject guildId in here
-        playerRepo: new PlayerRepository(),
-        userRepo: new UserRepository(),
       });
     } catch (err) {
       await message.react("⚠");

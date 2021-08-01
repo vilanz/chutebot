@@ -50,12 +50,11 @@ Returns `Pong!` with the response's latency.
 
 ## Stack
 
-- Code: Node.js, TypeScript, SQLite, better-sqlite3, ESLint, Prettier, AWS Lightsail, AWS S3
+- Code: Node.js, TypeScript, SQLite, Sequelize, TypeORM, ESLint, Prettier, AWS Lightsail, AWS S3
 
 ## TODO
 
-- Fully replace `Sequelize` with `better-sqlite3`.
-  - `sequelize` isn't playing well with TypeScript, and although `TypeORM` looks great something simpler like `better-sqlite3` plays better with this project.
+- Fully replace `Sequelize` with `TypeORM`.
 - Make this possible to use on multiple servers separately with a `serverId` column on database tables.
 - Send logs to AWS CloudWatch instead of the local console.
 - Migrate the current database backup every 8 hours from local cronjobs to `node-cron`.

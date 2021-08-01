@@ -3,9 +3,14 @@ import { parseUserInput, ChutebotCommand } from "../../core/command-parser";
 import { guessPlayerName, sortBySeason, removeClubLabels } from "../format";
 import { isMessageInBotspam } from "../../core/discord";
 import { mapLinebreak, secondsToMs } from "../../core/utils";
-import { PlayerSpell } from "../types";
 import { fetchPlayerCareer } from "../transfermarkt";
-import { addPlayerSpells } from "../../core/db";
+import {
+  PlayerEntity,
+  PlayerSpell,
+  PlayerSpellEntity,
+  UserEntity,
+} from "../../core/db";
+import { logger } from "../../core/log";
 
 const SECONDS_TO_GUESS = 20;
 
@@ -52,7 +57,7 @@ const channelsWithSessionsRunning = new Set<string>();
 export default {
   name: "start",
   permission: (message) => isMessageInBotspam(message),
-  run: async ({ message, playerRepo, userRepo }) => {
+  run: async ({ message }) => {
     const channelId = message.channel.id;
 
     if (channelsWithSessionsRunning.has(channelId)) {
@@ -62,13 +67,25 @@ export default {
     channelsWithSessionsRunning.add(channelId);
 
     try {
-      const randomPlayer = await playerRepo.getRandom();
+      const randomPlayer = await PlayerEntity.createQueryBuilder("player")
+        .leftJoinAndSelect("player.spells", "spells")
+        .orderBy("random()")
+        .getOneOrFail();
+
+      logger.info(randomPlayer);
 
       if (!randomPlayer.spells.length) {
         void message.react("🔎");
         const career = await fetchPlayerCareer(randomPlayer.transfermarktId);
-        await addPlayerSpells(randomPlayer.transfermarktId, career.spells);
-        randomPlayer.spells = career.spells;
+        career.spells.forEach((sp) => {
+          const spell = new PlayerSpellEntity();
+          spell.club = sp.club;
+          spell.goals = sp.goals;
+          spell.matches = sp.matches;
+          spell.season = sp.season;
+          randomPlayer.spells.push(spell);
+        });
+        await randomPlayer.save();
       }
 
       const playerSpellsMessage = await message.reply({
@@ -88,7 +105,8 @@ export default {
         filterByPlayerName(m, randomPlayer.name);
 
       correctMessage = await message.channel
-        .awaitMessages(correctGuessFn, {
+        .awaitMessages({
+          filter: correctGuessFn,
           max: 1,
           time: secondsToMs(SECONDS_TO_GUESS),
           errors: ["time"],
@@ -104,7 +122,12 @@ export default {
       }
 
       const winner = correctMessage.author;
-      userRepo.upsertUserWin(correctMessage.author.id);
+      await UserEntity.createQueryBuilder()
+        .insert()
+        .values({ id: winner.id, wins: 1 })
+        .onConflict("(id) DO UPDATE SET wins = wins + 1")
+        .execute();
+
       await correctMessage.reply(
         `${winner} acertou! Era o **${randomPlayer.name}**.`
       );

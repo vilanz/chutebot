@@ -1,4 +1,4 @@
-import { PlayerSpell } from "../types";
+import { PlayerSpell } from "../../core/db";
 
 const currentYear = new Date().getFullYear();
 

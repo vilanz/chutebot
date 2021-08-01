@@ -1,7 +1,7 @@
-import { IncomingMessage } from "http";
+import { Http2Stream } from "http2";
 import { mapAxiosData, twitterNewAPI } from "./axios";
 
-export type TweetStream = IncomingMessage;
+export type TweetStream = Http2Stream;
 
 export enum StreamStoppage {
   COMMAND = "stopped via command",

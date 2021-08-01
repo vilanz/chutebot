@@ -1,7 +1,6 @@
 import { Message } from "discord.js";
 import fs from "fs";
 import path from "path";
-import { PlayerRepository, UserRepository } from "../../trivia/data";
 
 export interface UserInput {
   name: string;
@@ -9,8 +8,6 @@ export interface UserInput {
 }
 
 export interface CommandContext {
-  userRepo: UserRepository;
-  playerRepo: PlayerRepository;
   message: Message;
   args: string;
 }
