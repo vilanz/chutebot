@@ -8,7 +8,7 @@ import {
   PlayerEntity,
   PlayerSpell,
   PlayerSpellEntity,
-  User,
+  UserEntity,
 } from "../../core/db";
 import { logger } from "../../core/log";
 
@@ -122,7 +122,7 @@ export default {
       }
 
       const winner = correctMessage.author;
-      await User.createQueryBuilder()
+      await UserEntity.createQueryBuilder()
         .insert()
         .values({ id: winner.id, wins: 1 })
         .onConflict("(id) DO UPDATE SET wins = wins + 1")
