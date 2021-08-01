@@ -1,4 +1,4 @@
-import { Message, MessageEmbed } from "discord.js";
+import { Message, MessageEmbed, ThreadChannel } from "discord.js";
 import { parseUserInput, ChutebotCommand } from "../parser";
 import {
   arePlayerNamesEqual,
@@ -10,13 +10,28 @@ import {
 import { isMessageInBotspam } from "../../discord";
 import { fetchPlayerCareer } from "../../transfermarkt";
 import {
+  Player,
   PlayerEntity,
   PlayerSpell,
   PlayerSpellEntity,
   UserEntity,
 } from "../../db";
 
-const SECONDS_TO_GUESS = 20;
+// TODO move this to a more specific file
+const updatePlayerSpells = async (player: PlayerEntity) => {
+  const career = await fetchPlayerCareer(player.transfermarktId);
+  career.spells.forEach((sp) => {
+    const spell = new PlayerSpellEntity();
+    spell.club = sp.club;
+    spell.goals = sp.goals;
+    spell.matches = sp.matches;
+    spell.season = sp.season;
+    player.spells.push(spell);
+  });
+  await player.save();
+};
+
+const SECONDS_TO_GUESS = 25;
 
 const getPlayerSpellsEmbed = (spells: PlayerSpell[]): MessageEmbed => {
   const sortedSpells = sortBySeason(spells);
@@ -56,74 +71,67 @@ const filterByPlayerName = (message: Message, playerName: string): boolean => {
   return correct;
 };
 
-const channelsWithSessionsRunning = new Set<string>();
+const waitForCorrectGuess = async (
+  triviaThread: ThreadChannel,
+  player: Player
+): Promise<Message | null> => {
+  const WHEN_FIVE_SECONDS_REMAIN = secondsToMs(SECONDS_TO_GUESS - 5);
+  const countTimeout = setTimeout(() => {
+    void triviaThread.send("Faltam 5 segundos!");
+  }, WHEN_FIVE_SECONDS_REMAIN);
+
+  return triviaThread
+    .awaitMessages({
+      filter: (m: Message) => filterByPlayerName(m, player.name),
+      max: 1,
+      time: secondsToMs(SECONDS_TO_GUESS),
+      errors: ["time"],
+    })
+    .then((ms) => ms.first()!)
+    .catch(() => null)
+    .finally(() => {
+      clearTimeout(countTimeout);
+    });
+};
 
 export default {
   name: "start",
   permission: (message) => isMessageInBotspam(message),
-  run: async ({ message }) => {
-    const channelId = message.channel.id;
+  run: async ({ message, textChannel }) => {
+    const randomPlayer = await PlayerEntity.createQueryBuilder("player")
+      .leftJoinAndSelect("player.spells", "spells")
+      .orderBy("random()")
+      .getOneOrFail();
 
-    if (channelsWithSessionsRunning.has(channelId)) {
-      await message.reply("Já tem uma sessão rodando.");
-      return;
+    if (!randomPlayer.spells.length) {
+      void message.react("🔎");
+      await updatePlayerSpells(randomPlayer);
     }
-    channelsWithSessionsRunning.add(channelId);
+
+    const triviaThread = await textChannel.threads.create({
+      name: "chutebot-trivia",
+      autoArchiveDuration: 60,
+    });
 
     try {
-      const randomPlayer = await PlayerEntity.createQueryBuilder("player")
-        .leftJoinAndSelect("player.spells", "spells")
-        .orderBy("random()")
-        .getOneOrFail();
-
-      if (!randomPlayer.spells.length) {
-        void message.react("🔎");
-        const career = await fetchPlayerCareer(randomPlayer.transfermarktId);
-        career.spells.forEach((sp) => {
-          const spell = new PlayerSpellEntity();
-          spell.club = sp.club;
-          spell.goals = sp.goals;
-          spell.matches = sp.matches;
-          spell.season = sp.season;
-          randomPlayer.spells.push(spell);
-        });
-        await randomPlayer.save();
-      }
-
-      const playerSpellsMessage = await message.reply({
+      await triviaThread.send({
         embeds: [getPlayerSpellsEmbed(randomPlayer.spells)],
       });
 
-      let correctMessage: Message | null = null;
-
-      const WHEN_FIVE_SECONDS_REMAIN = secondsToMs(SECONDS_TO_GUESS - 5);
-      setTimeout(() => {
-        if (!correctMessage) {
-          void playerSpellsMessage.reply("5 segundos faltando...");
-        }
-      }, WHEN_FIVE_SECONDS_REMAIN);
-
-      const correctGuessFn = (m: Message) =>
-        filterByPlayerName(m, randomPlayer.name);
-
-      correctMessage = await message.channel
-        .awaitMessages({
-          filter: correctGuessFn,
-          max: 1,
-          time: secondsToMs(SECONDS_TO_GUESS),
-          errors: ["time"],
-        })
-        .then((ms) => ms.first()!)
-        .catch(() => null);
+      const correctMessage = await waitForCorrectGuess(
+        triviaThread,
+        randomPlayer
+      );
 
       if (correctMessage === null) {
-        await playerSpellsMessage.reply(
+        await triviaThread.send(
           `Ninguém acertou depois de ${SECONDS_TO_GUESS} segundos. Era o **${randomPlayer.name}**.`
         );
         return;
       }
 
       const winner = correctMessage.author;
+
       await UserEntity.createQueryBuilder()
         .insert()
         .values({ id: winner.id, wins: 1 })
@@ -134,7 +142,7 @@ export default {
         `${winner} acertou! Era o **${randomPlayer.name}**.`
       );
     } finally {
-      channelsWithSessionsRunning.delete(channelId);
+      await triviaThread.setArchived(true);
     }
   },
 } as ChutebotCommand;

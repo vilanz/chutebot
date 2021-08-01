@@ -6,7 +6,8 @@ export const createTypeORMConnection = async () => {
     type: "better-sqlite3",
     database: "db/db.sqlite",
     synchronize: false,
-    logging: true,
+    maxQueryExecutionTime: 1000,
+    logging: ["schema", "error", "warn"],
     entities: [PlayerSpellEntity, PlayerEntity, UserEntity],
   });
   await conn.query("PRAGMA journal_mode = WAL");

@@ -1,4 +1,4 @@
-import { Message, MessageEmbed } from "discord.js";
+import { MessageEmbed, Snowflake, ThreadChannel } from "discord.js";
 import { ChutebotCommand } from "../parser";
 import {
   fetchPlayerCareer,
@@ -10,7 +10,8 @@ import { PlayerEntity, PlayerSpellEntity } from "../../db/entities";
 
 const awaitForPlayerSearchReaction = async (
   playersFound: PlayerSearchResult[],
-  message: Message
+  playersThread: ThreadChannel,
+  authorId: Snowflake
 ): Promise<PlayerSearchResult | null> => {
   const MAX_SHOWN_PLAYERS = 5;
   const PLAYER_REACTIONS = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"].slice(
@@ -18,7 +19,7 @@ const awaitForPlayerSearchReaction = async (
     playersFound.length
   );
 
-  const playersFoundMessage = await message.reply({
+  const playersFoundMessage = await playersThread.send({
     embeds: playersFound
       .slice(0, MAX_SHOWN_PLAYERS)
       .map((p, i) =>
@@ -34,7 +35,7 @@ const awaitForPlayerSearchReaction = async (
   });
 
   const wantedPlayerIndex = await waitForUserReaction(
-    message.author.id,
+    authorId,
     playersFoundMessage,
     PLAYER_REACTIONS
   );
@@ -59,70 +60,79 @@ const awaitForPlayerSearchReaction = async (
 export default {
   name: "add",
   permission: (message) => isMessageInBotspam(message),
-  run: async ({ message, args }) => {
+  run: async ({ message, args, textChannel }) => {
     const playerNameWithoutSpaces = args?.trim();
     if (!playerNameWithoutSpaces || playerNameWithoutSpaces.length > 80) {
-      await message.reply("Precisamos de um nome válido.");
+      await message.react("❌");
       return;
     }
 
-    const playersFound = await searchPlayersInTransfermarkt(
-      playerNameWithoutSpaces
-    );
-
-    if (!playersFound.length) {
-      await message.reply("Nenhum jogador encontrado.");
-      return;
-    }
-
-    const wantedPlayer = await awaitForPlayerSearchReaction(
-      playersFound,
-      message
-    );
-
-    if (!wantedPlayer) {
-      return;
-    }
-
-    const { transfermarktId } = wantedPlayer;
-
-    // TODO use a faster query like EXISTS() (TypeORM has no builtin support for it)
-    const existingPlayer = await PlayerEntity.findOne({
-      where: {
-        transfermarktId,
-      },
-      select: ["transfermarktId"],
+    const playersThread = await textChannel.threads.create({
+      name: "add-player",
+      autoArchiveDuration: 60,
     });
 
-    if (existingPlayer) {
-      await message.reply(
-        `O **${wantedPlayer.name}** já foi adicionado antes.`
+    try {
+      const playersFound = await searchPlayersInTransfermarkt(
+        playerNameWithoutSpaces
       );
-      return;
+
+      if (!playersFound.length) {
+        await playersThread.send("Nenhum jogador encontrado.");
+        return;
+      }
+
+      const wantedPlayer = await awaitForPlayerSearchReaction(
+        playersFound,
+        playersThread,
+        message.author.id
+      );
+      if (!wantedPlayer) {
+        return;
+      }
+
+      // TODO use a faster query like EXISTS() (TypeORM has no builtin support for it)
+      const existingPlayer = await PlayerEntity.findOne({
+        where: {
+          transfermarktId: wantedPlayer.transfermarktId,
+        },
+        select: ["transfermarktId"],
+      });
+
+      if (existingPlayer) {
+        await playersThread.send(
+          `O **${wantedPlayer.name}** já foi adicionado antes.`
+        );
+        return;
+      }
+
+      const newPlayer = await fetchPlayerCareer(wantedPlayer.transfermarktId);
+
+      if (!newPlayer.spells.length) {
+        await playersThread.send(
+          "Esse jogador não tem clubes na carreira. :analise:"
+        );
+        return;
+      }
+
+      await PlayerEntity.createQueryBuilder()
+        .insert()
+        .values(newPlayer)
+        .execute();
+
+      await PlayerSpellEntity.createQueryBuilder()
+        .insert()
+        .values(
+          newPlayer.spells.map((sp) => ({
+            ...sp,
+            player: newPlayer,
+          }))
+        )
+        .execute();
+
+      await playersThread.send(`**${newPlayer.name}** adicionado com sucesso.`);
+    } finally {
+      await playersThread.setArchived(true);
     }
-
-    const newPlayer = await fetchPlayerCareer(transfermarktId);
-
-    if (!newPlayer.spells.length) {
-      await message.reply("Esse jogador não tem clubes na carreira. :analise:");
-      return;
-    }
-
-    await PlayerEntity.createQueryBuilder()
-      .insert()
-      .values(newPlayer)
-      .execute();
-
-    await PlayerSpellEntity.createQueryBuilder()
-      .insert()
-      .values(
-        newPlayer.spells.map((sp) => ({
-          ...sp,
-          player: newPlayer,
-        }))
-      )
-      .execute();
-
-    await message.reply(`**${newPlayer.name}** adicionado com sucesso.`);
   },
 } as ChutebotCommand;

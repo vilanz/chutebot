@@ -1,4 +1,4 @@
-import { Message } from "discord.js";
+import { Message, TextChannel } from "discord.js";
 import fs from "fs";
 import path from "path";
 
@@ -10,6 +10,7 @@ export interface UserInput {
 export interface CommandContext {
   message: Message;
   args: string;
+  textChannel: TextChannel;
 }
 
 export type ChutebotCommand = {

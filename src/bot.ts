@@ -1,5 +1,6 @@
 import "reflect-metadata";
 import path from "path";
+import { TextChannel } from "discord.js";
 import { getChutebotCommandsMap, parseUserInput } from "./commands/parser";
 import { logger } from "./log";
 import {
@@ -61,6 +62,7 @@ void (async () => {
       await commandHandler.run({
         message,
         args: userInput.args,
+        textChannel: message.channel as TextChannel,
       });
     } catch (err) {
       await message.react("⚠");
