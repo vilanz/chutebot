@@ -1,4 +1,4 @@
-import { format, subWeeks } from "date-fns";
+import { subWeeks } from "date-fns";
 import cron from "node-cron";
 import { LessThanOrEqual } from "typeorm";
 import { PlayerEntity, PlayerSpellEntity } from "../db/entities";
@@ -12,11 +12,11 @@ export const removeOutdatedPlayersEveryMonth = () => {
       "> Removendo passagens de jogadores desatualizadas há mais de 4 semanas..."
     );
 
-    const fourWeeksAgo = format(subWeeks(new Date(), 4), "yyyy-MM-dd hh:mm:ss");
+    const fourWeeksAgo = subWeeks(new Date(), 4);
     const outdatedPlayers = await PlayerEntity.find({
       select: ["transfermarktId", "lastSpellsUpdate"],
       where: {
-        lastSpellsUpdate: LessThanOrEqual(fourWeeksAgo),
+        lastSpellsUpdate: LessThanOrEqual(fourWeeksAgo.toISOString()),
       },
     });
 
