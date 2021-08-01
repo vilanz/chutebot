@@ -2,7 +2,8 @@
   "type": "better-sqlite3",
   "database": "db/db.sqlite",
   "synchronize": false,
-  "logging": true,
+  "logging": ["schema", "error", "warn"],
+  "maxQueryExecutionTime": 1000,
   "entities": ["build/core/db/entities/*.js"],
   "migrations": ["build/core/db/migrations/*.js"],
   "cli": { "migrationsDir": "src/core/db/migrations" }

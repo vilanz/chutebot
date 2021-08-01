@@ -75,6 +75,10 @@ Stops the bot.
 
 Same as `yarn:start`, but runs `yarn stop` first.
 
+### `yarn typeorm <command>`
+
+Runs TypeORM's CLI commands, such as `yarn typeorm migrations:run`.
+
 #### `yarn logs`
 
 Displays logs from PM2.

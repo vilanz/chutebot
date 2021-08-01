@@ -1,17 +1,17 @@
 import "reflect-metadata";
 import path from "path";
-import { getChutebotCommandsMap, parseUserInput } from "./core/command-parser";
-import { logger } from "./core/log";
+import { getChutebotCommandsMap, parseUserInput } from "./commands/parser";
+import { logger } from "./log";
 import {
   discordClient,
   dmMeError,
   GUILD,
   prefetchAllUsers,
   sendBotspamMessage,
-} from "./core/discord";
-import { botToken } from "./core/env";
-import { createTypeORMConnection } from "./core/db";
-import { removeOutdatedPlayersEveryMonth } from "./core/cronjobs";
+} from "./discord";
+import { botToken } from "./env";
+import { createTypeORMConnection } from "./db";
+import { removeOutdatedPlayersEveryMonth } from "./cron";
 
 void (async () => {
   await createTypeORMConnection();
@@ -29,8 +29,8 @@ void (async () => {
   logger.info("starting bot");
 
   const chutebotCommandsMap = await getChutebotCommandsMap(
-    path.join(__dirname, "./goal-feed/commands"),
-    path.join(__dirname, "./trivia/commands")
+    path.join(__dirname, "./commands/goal-feed/"),
+    path.join(__dirname, "./commands/trivia")
   );
 
   discordClient.once("ready", async () => {

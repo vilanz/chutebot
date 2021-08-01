@@ -1,6 +1,11 @@
 {
-  "extends": "./node_modules/@vilanz/tooling/eslint",
-  "ignorePatterns": "build",
+  "extends": ["airbnb-typescript", "airbnb/hooks", "prettier"],
+  "ignorePatterns": [
+    ".eslintrc.js",
+    ".prettierc.js",
+    "jest.config.js",
+    "build"
+  ],
   "parserOptions": {
     "project": "./tsconfig.json"
   },
@@ -9,6 +14,7 @@
     "@typescript-eslint/no-floating-promises": "warn",
     "no-void": "off",
     "class-methods-use-this": "off",
+    "import/prefer-default-export": "off",
     "import/no-default-export": "off"
   }
 }

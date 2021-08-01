@@ -1,0 +1,12 @@
+import { ChutebotCommand } from "../parser";
+import { isMessageByOwner } from "../../discord";
+import { goalFeedStream } from "../../twitter-api";
+
+export default {
+  name: "feed-kill",
+  permission: (message) => isMessageByOwner(message),
+  run: async ({ message }) => {
+    goalFeedStream.killTweetStream();
+    await message.reply("Stream destruída.");
+  },
+} as ChutebotCommand;
