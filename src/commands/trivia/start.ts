@@ -58,6 +58,10 @@ const getPlayerSpellsEmbed = (spells: PlayerSpell[]): MessageEmbed => {
 };
 
 const filterByPlayerName = (message: Message, playerName: string): boolean => {
+  if (message.author.bot) {
+    return false
+  }
+  
   const guessedName = message.content.replace('c!g', '').trim();
   if (!guessedName){
     return false
