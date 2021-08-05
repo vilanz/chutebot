@@ -1,5 +1,5 @@
 import { Message, MessageEmbed, ThreadChannel } from "discord.js";
-import { parseUserInput, ChutebotCommand } from "..";
+import { ChutebotCommand } from "..";
 import {
   arePlayerNamesEqual,
   sortBySeason,
@@ -58,17 +58,22 @@ const getPlayerSpellsEmbed = (spells: PlayerSpell[]): MessageEmbed => {
 };
 
 const filterByPlayerName = (message: Message, playerName: string): boolean => {
-  const userInput = parseUserInput(message.content);
-  if (userInput?.name !== "g") {
-    return false;
+  if (message.author.bot) {
+    return false
   }
-  const guess = userInput.args;
-  const correct = arePlayerNamesEqual(playerName, guess);
-  if (!correct) {
+  
+  const guessedName = message.content.replace('c!g', '').trim();
+  if (!guessedName){
+    return false
+  }
+
+  const isCorrectGuess = arePlayerNamesEqual(playerName, guessedName);
+  if (!isCorrectGuess) {
     // eslint-disable-next-line no-void
     void message.react("❌");
   }
-  return correct;
+
+  return isCorrectGuess;
 };
 
 const waitForCorrectGuess = async (
