@@ -50,16 +50,7 @@ Returns `Pong!` with the response's latency.
 
 ## Stack
 
-- Code: Node.js, TypeScript, SQLite, Sequelize, TypeORM, ESLint, Prettier, AWS Lightsail, AWS S3
-
-## TODO
-
-- Fully replace `Sequelize` with `TypeORM`.
-- Make this possible to use on multiple servers separately with a `serverId` column on database tables.
-- Send logs to AWS CloudWatch instead of the local console.
-- Migrate the current database backup every 8 hours from local cronjobs to `node-cron`.
-  - This will make it more explicit.
-  - Also create a cron to, every 8 hours, delete player career records older than a week.
+- Node.js, TypeScript, SQLite, TypeORM, AWS Lightsail, AWS S3
 
 ## Getting started
 
