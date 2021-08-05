@@ -5,13 +5,17 @@ import { ChutebotCommand } from "..";
 export default {
   name: "remove",
   permission: (message) => isMessageByOwner(message),
-  run: async ({ message, args }) => {
+  run: async ({ message, args, serverId }) => {
     const id = parseInt(args, 10);
     if (Number.isNaN(id)) {
       return;
     }
 
-    const player = await PlayerEntity.findOne(id);
+    const player = await PlayerEntity.findOne(id, {
+      where: {
+        serverId,
+      },
+    });
     if (!player) {
       await message.reply("Esse jogador não existe.");
       return;

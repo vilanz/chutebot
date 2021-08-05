@@ -6,6 +6,7 @@ export interface CommandContext {
   message: Message;
   args: string;
   textChannel: TextChannel;
+  serverId: string;
 }
 
 export type ChutebotCommand = {

@@ -10,7 +10,7 @@ const getUserWinsEmbed = async (users: UserEntity[]): Promise<MessageEmbed> => {
   return new MessageEmbed()
     .setTitle("Placar")
     .addField(
-      "P",
+      "Pts.",
       mapLinebreak(users, (x) => x.wins.toString()),
       true
     )
@@ -18,7 +18,7 @@ const getUserWinsEmbed = async (users: UserEntity[]): Promise<MessageEmbed> => {
       "Usuário",
       mapLinebreak(users, (u, i) => {
         const discordUser = discordUsers.get(u.id as Snowflake);
-        const name = discordUser || "[SUMIU]";
+        const name = discordUser || "-- sumiu --";
         return `**${i + 1}.** ${name}`;
       }),
       true
@@ -31,14 +31,19 @@ const getUserWinsEmbed = async (users: UserEntity[]): Promise<MessageEmbed> => {
 export default {
   name: "wins",
   permission: (message) => isMessageInBotspam(message),
-  run: async ({ message }) => {
+  run: async ({ message, serverId }) => {
     const allUsers = await UserEntity.find({
+      where: {
+        serverId,
+      },
       order: {
         wins: "DESC",
       },
     });
+
     await message.channel.send({
       embeds: [await getUserWinsEmbed(allUsers)],
+      // prevent mentions
       allowedMentions: {
         parse: [],
       },

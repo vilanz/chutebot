@@ -4,8 +4,10 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "start": "yarn build && pm2 start pm2.config.js",
+    "start": "yarn build && yarn up",
     "start:prod": "yarn start --env prod",
+    "up": "pm2 start pm2.config.js",
+    "up:prod": "yarn run --env prod",
     "rebuild": "yarn stop && yarn start",
     "rebuild:prod": "yarn restart --env prod",
     "stop": "pm2 stop bot || echo Already stopped",

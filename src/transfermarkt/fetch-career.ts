@@ -57,7 +57,7 @@ const extractPlayerSpells = (rows: Cheerio<Node>[]): PlayerSpell[] => {
 
 export const fetchPlayerCareer = async (
   transfermarktId: number
-): Promise<Player> => {
+): Promise<Omit<Player, "serverId">> => {
   const careerUrl = getTransfermarktPlayerCareerUrl(transfermarktId);
   const ch = await getCheerioFromPageHTML(careerUrl);
 

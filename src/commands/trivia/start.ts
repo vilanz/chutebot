@@ -22,6 +22,7 @@ const updatePlayerSpells = async (player: PlayerEntity) => {
   const career = await fetchPlayerCareer(player.transfermarktId);
   career.spells.forEach((sp) => {
     const spell = new PlayerSpellEntity();
+    spell.serverId = player.serverId;
     spell.club = sp.club;
     spell.goals = sp.goals;
     spell.matches = sp.matches;
@@ -59,12 +60,12 @@ const getPlayerSpellsEmbed = (spells: PlayerSpell[]): MessageEmbed => {
 
 const filterByPlayerName = (message: Message, playerName: string): boolean => {
   if (message.author.bot) {
-    return false
+    return false;
   }
-  
-  const guessedName = message.content.replace('c!g', '').trim();
-  if (!guessedName){
-    return false
+
+  const guessedName = message.content.replace("c!g", "").trim();
+  if (!guessedName) {
+    return false;
   }
 
   const isCorrectGuess = arePlayerNamesEqual(playerName, guessedName);
@@ -102,9 +103,11 @@ const waitForCorrectGuess = async (
 export default {
   name: "start",
   permission: (message) => isMessageInBotspam(message),
-  run: async ({ message }) => {
+  run: async ({ message, serverId }) => {
     const randomPlayer = await PlayerEntity.createQueryBuilder("player")
       .leftJoinAndSelect("player.spells", "spells")
+      .addSelect("player.serverId")
+      .where("player.serverId like :serverId", { serverId })
       .orderBy("random()")
       .getOneOrFail();
 
@@ -139,7 +142,11 @@ export default {
 
       await UserEntity.createQueryBuilder()
         .insert()
-        .values({ id: winner.id, wins: 1 })
+        .values({
+          id: winner.id,
+          wins: 1,
+          serverId,
+        })
         .onConflict("(id) DO UPDATE SET wins = wins + 1")
         .execute();
 

@@ -7,7 +7,7 @@ import { ChutebotCommand } from "..";
 export default {
   name: "list",
   permission: (message) => isMessageByOwner(message),
-  run: async ({ message, args }) => {
+  run: async ({ message, args, serverId }) => {
     const searchQuery = args.trim();
     if (!searchQuery) {
       return;
@@ -15,8 +15,9 @@ export default {
 
     const players = await PlayerEntity.createQueryBuilder("player")
       .leftJoinAndSelect("player.spells", "spells")
-      .orderBy("random()")
+      .where("player.serverId = :serverId", { serverId })
       .where("name like :searchQuery", { searchQuery: `%${searchQuery}%` })
+      .orderBy("random()")
       .limit(6)
       .getMany();
     if (!players.length) {

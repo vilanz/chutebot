@@ -11,6 +11,7 @@ import { Player, PlayerEntity } from "./player";
 
 export interface PlayerSpell {
   id: number;
+  serverId: string;
   club: string;
   season: string;
   matches: number;
@@ -25,10 +26,13 @@ export class PlayerSpellEntity extends BaseEntity implements PlayerSpell {
   @PrimaryGeneratedColumn({ type: "integer" })
   id!: number;
 
-  @Column({ type: "varchar", length: "255" })
+  @Column({ type: "varchar" })
+  serverId!: string;
+
+  @Column({ type: "varchar" })
   season!: string;
 
-  @Column({ type: "varchar", length: "255" })
+  @Column({ type: "varchar" })
   club!: string;
 
   @Column({ type: "integer" })

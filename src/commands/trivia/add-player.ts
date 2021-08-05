@@ -6,7 +6,7 @@ import {
   searchPlayersInTransfermarkt,
 } from "../../transfermarkt";
 import { isMessageInBotspam, waitForUserReaction } from "../../discord";
-import { PlayerEntity, PlayerSpellEntity } from "../../db/entities";
+import { Player, PlayerEntity, PlayerSpellEntity } from "../../db/entities";
 
 const awaitForPlayerSearchReaction = async (
   playersFound: PlayerSearchResult[],
@@ -60,7 +60,7 @@ const awaitForPlayerSearchReaction = async (
 export default {
   name: "add",
   permission: (message) => isMessageInBotspam(message),
-  run: async ({ message, args }) => {
+  run: async ({ message, args, serverId }) => {
     const playerNameWithoutSpaces = args?.trim();
     if (!playerNameWithoutSpaces || playerNameWithoutSpaces.length > 80) {
       await message.react("❌");
@@ -95,6 +95,7 @@ export default {
       const existingPlayer = await PlayerEntity.findOne({
         where: {
           transfermarktId: wantedPlayer.transfermarktId,
+          serverId,
         },
         select: ["transfermarktId"],
       });
@@ -106,14 +107,21 @@ export default {
         return;
       }
 
-      const newPlayer = await fetchPlayerCareer(wantedPlayer.transfermarktId);
+      const fetchedPlayer = await fetchPlayerCareer(
+        wantedPlayer.transfermarktId
+      );
 
-      if (!newPlayer.spells.length) {
+      if (!fetchedPlayer.spells.length) {
         await playersThread.send(
           "Esse jogador não tem clubes na carreira. :analise:"
         );
         return;
       }
+
+      const newPlayer: Player = {
+        ...fetchedPlayer,
+        serverId,
+      };
 
       await PlayerEntity.createQueryBuilder()
         .insert()
@@ -125,6 +133,7 @@ export default {
         .values(
           newPlayer.spells.map((sp) => ({
             ...sp,
+            serverId,
             player: newPlayer,
           }))
         )

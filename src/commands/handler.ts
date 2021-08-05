@@ -24,11 +24,19 @@ export const handleMessageCommand = async (
       return;
     }
 
-    logger.info("running command %s from message %s", userInput, message);
+    const serverId = message.guildId!;
+
+    logger.info(
+      "running command %s from message %s in server %s",
+      userInput,
+      message,
+      serverId
+    );
     await commandHandler.run({
       message,
       args: userInput.args,
       textChannel: message.channel as TextChannel,
+      serverId,
     });
   } catch (err) {
     await message.react("⚠");
