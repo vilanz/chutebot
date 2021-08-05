@@ -7,7 +7,7 @@
     "start": "yarn build && yarn up",
     "start:prod": "yarn start --env prod",
     "up": "pm2 start pm2.config.js",
-    "up:prod": "yarn run --env prod",
+    "up:prod": "yarn up --env prod",
     "rebuild": "yarn stop && yarn start",
     "rebuild:prod": "yarn restart --env prod",
     "stop": "pm2 stop bot || echo Already stopped",
