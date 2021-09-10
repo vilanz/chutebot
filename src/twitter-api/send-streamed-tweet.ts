@@ -46,13 +46,13 @@ export const sendTweetToSubbedChannels = async ({
   const json: TweetStreamBufferJSON = JSON.parse(buffer.toString());
 
   if ("connection_issue" in json) {
-    logger.error("connection issue with a tweet stream", { json });
+    logger.error("[tweet stream] stream connection issue", { json });
     await reconnect();
     return;
   }
 
   if ("errors" in json) {
-    logger.error("an error was streamed by twitter", { json });
+    logger.error("[tweet stream] stream emitted an json with errors", { json });
     await reconnect();
     return;
   }
@@ -65,13 +65,11 @@ export const sendTweetToSubbedChannels = async ({
     .filter((c): c is TextChannel => c !== null);
 
   if (!matchedChannels.length) {
-    logger.warn("tweet did not match any channel", { json });
+    logger.warn("[tweet stream] tweet did not match any channel", { json });
     return;
   }
 
-  await Promise.all(
-    matchedChannels.map(async (channel) => {
-      await channel.send(tweetVideoUrl);
-    })
-  );
+  matchedChannels.forEach((channel) => {
+    void channel.send(tweetVideoUrl);
+  });
 };

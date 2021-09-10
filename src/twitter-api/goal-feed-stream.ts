@@ -12,9 +12,6 @@ import {
 import { getTweetStream, TweetStream } from "./stream-tweets";
 import { sendTweetToSubbedChannels } from "./send-streamed-tweet";
 
-class StreamKilledError extends Error {}
-class StreamRestartedError extends Error {}
-
 class GoalFeedStream {
   private tweetStream: TweetStream | null = null;
 
@@ -38,11 +35,11 @@ class GoalFeedStream {
 
   async streamTweets(): Promise<void> {
     if (this.streamUp()) {
-      logger.warn("already had a tweet stream up");
+      logger.warn("[tweet stream] tried to start stream but it was already up");
       return;
     }
 
-    logger.info("starting to stream tweets");
+    logger.info("[tweet stream] starting");
 
     this.tweetStream = await getTweetStream();
 
@@ -52,28 +49,18 @@ class GoalFeedStream {
         `Deu pau na stream de gols, reconexão em ${sleepDuration} segundos 👀`
       );
 
-      logger.warn(
-        "tweet stream scheduled to restart in %d seconds",
-        sleepDuration
-      );
+      logger.warn("[tweet stream] restarting in %d seconds", sleepDuration);
 
       await waitSeconds(sleepDuration);
 
       this.reconnectTimeout += 1;
-      this.destroyTweetStream(new StreamRestartedError());
+
+      this.destroyTweetStream();
+      await this.streamTweets();
     };
 
     this.tweetStream?.on("error", async (err) => {
-      if (err instanceof StreamKilledError) {
-        logger.info("successfully killed tweet stream");
-        return;
-      }
-      if (err instanceof StreamRestartedError) {
-        logger.info("tweet stream will restart");
-        await this.streamTweets();
-        return;
-      }
-      logger.error("tweet stream error", err);
+      logger.error("[tweet stream] stream error", err);
       await reconnectToTweetStream();
     });
 
@@ -83,14 +70,18 @@ class GoalFeedStream {
         reconnect: reconnectToTweetStream,
       });
     });
+
+    this.tweetStream?.on("close", async () => {
+      logger.info("[tweet stream] closed");
+    });
   }
 
   killTweetStream() {
-    this.destroyTweetStream(new StreamKilledError());
+    this.destroyTweetStream();
   }
 
-  private destroyTweetStream(error: Error): void {
-    this.tweetStream?.destroy(error);
+  private destroyTweetStream(): void {
+    this.tweetStream?.destroy();
   }
 }
 
