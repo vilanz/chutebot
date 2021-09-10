@@ -5,6 +5,7 @@ import { discordClient, prefetchAllUsers, sendBotspamMessage } from "./discord";
 import { botToken } from "./env";
 import { createTypeORMConnection } from "./db";
 import { removeOutdatedPlayersEveryMonth } from "./cron";
+import { goalFeedStream } from "./twitter-api";
 
 void (async () => {
   await createTypeORMConnection();
@@ -27,6 +28,7 @@ void (async () => {
     removeOutdatedPlayersEveryMonth();
     await prefetchAllUsers();
     await sendBotspamMessage("Bot iniciado.");
+    await goalFeedStream.streamTweets();
   });
 
   discordClient.on("message", async (m) => {
