@@ -1,5 +1,5 @@
 import { Snowflake, TextChannel } from "discord.js";
-import { getChannel, sendBotspamMessage } from "../discord";
+import { getChannel } from "../discord";
 import { logger } from "../log";
 import { TwitterRule } from "./stream-rules";
 
@@ -52,8 +52,8 @@ export const sendTweetToSubbedChannels = async ({
   }
 
   if ("errors" in json) {
-    logger.error("tweet streamed error", { json });
-    await sendBotspamMessage("Twitter streamou um erro 👀");
+    logger.error("an error was streamed by twitter", { json });
+    await reconnect();
     return;
   }
 
