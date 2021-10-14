@@ -15,8 +15,6 @@ import { sendTweetToSubbedChannels } from "./send-streamed-tweet";
 class GoalFeedStream {
   private tweetStream: TweetStream | null = null;
 
-  private reconnectTimeout: number = 0;
-
   streamUp(): boolean {
     return !!this.tweetStream && !this.tweetStream.destroyed;
   }
@@ -44,16 +42,11 @@ class GoalFeedStream {
     this.tweetStream = await getTweetStream();
 
     const reconnectToTweetStream = async () => {
-      const sleepDuration = 2 ** this.reconnectTimeout;
-      await sendBotspamMessage(
-        `Deu pau na stream de gols, reconexão em ${sleepDuration} segundos 👀`
-      );
+      const sleepDuration = 30;
 
       logger.warn("[tweet stream] restarting in %d seconds", sleepDuration);
 
       await waitSeconds(sleepDuration);
-
-      this.reconnectTimeout += 1;
 
       this.destroyTweetStream();
       await this.streamTweets();
