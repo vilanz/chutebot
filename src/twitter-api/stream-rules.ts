@@ -41,7 +41,7 @@ export const addChannelRules = async (
   const addResult = await twitterNewAPI.post("/tweets/search/stream/rules", {
     add: [
       {
-        value: `${rule} has:videos`,
+        value: rule,
         tag: channelId,
       },
     ],
