@@ -58,7 +58,7 @@ export const sendTweetToSubbedChannels = async ({
   }
 
   // fxtwitter is the only one that works
-  const tweetVideoUrl = `https://fxtwitter.com/geosmina/status/${json.data.id}`;
+  const tweetVideoUrl = `https://twitter.com/geosmina/status/${json.data.id}`;
 
   const matchedChannels = json.matching_rules
     .map((rule) => getChannel(rule.tag as Snowflake))
