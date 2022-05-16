@@ -57,8 +57,8 @@ export const sendTweetToSubbedChannels = async ({
     return;
   }
 
-  // fxtwitter is the only one that works
-  const tweetVideoUrl = `https://fxtwitter.com/cuzil/status/${json.data.id}`;
+  // vxtwitter is the only one that works
+  const tweetVideoUrl = `https://vxtwitter.com/cuzil/status/${json.data.id}`;
 
   const matchedChannels = json.matching_rules
     .map((rule) => getChannel(rule.tag as Snowflake))
