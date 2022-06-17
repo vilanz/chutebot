@@ -1,10 +1,30 @@
 # chutebot
 
-Football bot for Discord written in Node.js and TypesSript.
+A Twitter/football bot for Discord written in Node.js and TypesSript.
 
-## Features
+## Commands
 
-### Player trivia
+### Live Twitter feed
+
+Stream tweets that match a specific query to a Discord channel in real time. _admin only_
+
+#### `c!feed-start`
+
+Starts the Twitter stream.
+
+#### `c!feed-kill`
+
+Kills the Twitter stream.
+
+#### `c!feed-sub <channel> <Twitter search query>`
+
+Subscribes a channel to a Twitter search feed, e.g. `c!feed-sub #general funny cat has:videos`
+
+#### `c!feed-unsub <channel>`
+
+Unsubscribes a channel from all Twitter search feeds.
+
+### Football player trivia
 
 Guess what's the random player from a custom, incrementable database by their career record.
 
@@ -27,20 +47,6 @@ Displays a leaderboard of trivia winners.
 ##### `c!count`
 
 Displays how many players have been added in total.
-
-### Live goal feed
-
-Configure posting new videos on Twitter accounts to certain channels.
-
-_All these commands are admin only._
-
-#### `c!feed-start | feed-kill`
-
-Start or stop the Twitter stream.
-
-#### `c!feed-sub <channel> <query> | c!feed-unsub <channel>`
-
-Start or stop posting videos matching `<query>` to `<channel>`.
 
 ### General commands
 
