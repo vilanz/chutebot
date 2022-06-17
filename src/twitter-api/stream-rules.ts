@@ -23,6 +23,9 @@ export const deleteChannelRules = async (
   const channelRuleIds = await getAllRules()
     .then((rules) => rules.filter((r) => r.tag === channelId))
     .then((rules) => rules.map((x) => x.id));
+  if (channelRuleIds.length === 0) {
+    return;
+  }
   const deleteResult = await twitterNewAPI.post("/tweets/search/stream/rules", {
     delete: {
       ids: channelRuleIds,
