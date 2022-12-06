@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	t "github.com/vilanz/go-twitter/v2"
 )
@@ -52,18 +53,23 @@ func (cbot *Chutebot) SubscribeToTwitter() {
 				log.Println("Closing Twitter stream...")
 				tweetStream.Close()
 
-			case tm := <-tweetStream.Tweets():
-				tmb, err := json.Marshal(tm)
-				LogOnErr("Error decoding tweet message: %v (message: %v)", err, string(tmb))
-				log.Printf("Tweet: %v, cu: %v", string(tmb), tm.Raw)
+			case tweetMessage := <-tweetStream.Tweets():
+				tweet := tweetMessage.Raw.Tweets[0]
+				log.Printf("Tweet: %v", tweet)
+				for _, rule := range tweetMessage.Raw.MatchingRules {
+					ruleTag := strings.Split(rule.Tag, "-")
+					tweetChannel := ruleTag[0]
+					linkToVxTwitter := fmt.Sprintf(
+						"https://vxtwitter.com/cuzil/status/%v", tweet.ID,
+					)
+					cbot.discord.SendMessageToChannel(tweetChannel, linkToVxTwitter)
+				}
 
-			case sm := <-tweetStream.SystemMessages():
-				smb, err := json.Marshal(sm)
-				LogOnErr("Error decoding system message: %v (message: %v)", err, string(smb))
-				log.Printf("Received system message: %v", string(smb))
+			case systemMessage := <-tweetStream.SystemMessages():
+				log.Printf("Received system message: %v", systemMessage)
 
-			case strErr := <-tweetStream.Err():
-				LogOnErr("Tweet stream error: %v", strErr)
+			case err := <-tweetStream.Err():
+				LogOnErr("Tweet stream error: %v", err)
 
 			default:
 			}
@@ -108,14 +114,19 @@ func (twitter *ChutebotTwitter) DeleteRulesByValue(ruleValues []string) error {
 	res, err := twitter.client.TweetSearchStreamDeleteRuleByValue(
 		context.Background(), ruleValues, false,
 	)
-	twitterErr := getTwitterError(res.Errors)
-	if twitterErr != nil {
-		return twitterErr
+	if res != nil {
+		twitterErr := getTwitterError(res.Errors)
+		if twitterErr != nil {
+			return twitterErr
+		}
 	}
 	return err
 }
 
 func getTwitterError(errObj []*t.ErrorObj) error {
+	if errObj == nil {
+		return nil
+	}
 	if len(errObj) > 0 {
 		errorsJSON, err := json.Marshal(errObj)
 		if err != nil {
