@@ -28,7 +28,7 @@ func StartLiveTwitterFeed(
 				log.Printf("Received tweet: %v\n", tweet)
 				for _, rule := range tweetMessage.Raw.MatchingRules {
 					cbotDiscord.SendMessageToChannel(
-						getDiscordChannelFromRule(rule), getTweetLink(tweet),
+						getDiscordChannelFromRule(rule), getStreamMessage(tweet),
 					)
 				}
 
@@ -51,8 +51,8 @@ func StartLiveTwitterFeed(
 	return tweetStream, nil
 }
 
-func getTweetLink(tweet *t.TweetObj) string {
-	return fmt.Sprintf("https://vxtwitter.com/cuzil/status/%v", tweet.ID)
+func getStreamMessage(tweet *t.TweetObj) string {
+	return fmt.Sprintf("**Novo tweet!** https://vxtwitter.com/cuzil/status/%v", tweet.ID)
 }
 
 func getDiscordChannelFromRule(rule *t.MatchingRule) string {
