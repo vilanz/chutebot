@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/bwmarrin/discordgo v0.26.1
 	github.com/joho/godotenv v1.4.0
-	github.com/vilanz/go-twitter/v2 v2.0.0-20221205032948-4f05f7cac805
+	github.com/vilanz/go-twitter/v2 v2.0.0-20221206014938-a90af21959af
 )
 
 require (
