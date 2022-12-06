@@ -103,31 +103,19 @@ func (cbot *Chutebot) SetupCommands() {
 
 			switch option.Name {
 			case "start":
-				s.InteractionRespond(i.Interaction, &d.InteractionResponse{
-					Type: d.InteractionResponseChannelMessageWithSource,
-					Data: &d.InteractionResponseData{
-						Content: "Starting...",
-					},
-				})
+				cbot.discord.RespondInteractionWithMessage(i, "Iniciando stream de tweets...")
+
 			case "stop":
-				s.InteractionRespond(i.Interaction, &d.InteractionResponse{
-					Type: d.InteractionResponseChannelMessageWithSource,
-					Data: &d.InteractionResponseData{
-						Content: "Stopping...",
-					},
-				})
+				cbot.discord.RespondInteractionWithMessage(i, "Parando stream de tweets...")
+
 			case "sub":
 				channel := option.Options[0].Value.(string)
 				query := option.Options[1].Value.(string)
 				log.Printf("Channel: %v", channel)
 				err := cbot.twitter.AddTwitterRule(query, channel)
 				LogOnErr("Could not add rule: %v", err)
-				s.InteractionRespond(i.Interaction, &d.InteractionResponse{
-					Type: d.InteractionResponseChannelMessageWithSource,
-					Data: &d.InteractionResponseData{
-						Content: "Regra adicionada.",
-					},
-				})
+				cbot.discord.RespondInteractionWithMessage(i, "Regra adicionada.")
+
 			case "unsub":
 				channel := option.Options[0].Value.(string)
 				rules, _ := cbot.twitter.ListRules()
@@ -139,21 +127,12 @@ func (cbot *Chutebot) SetupCommands() {
 				}
 				err := cbot.twitter.DeleteRulesByValue(rulesToDelete)
 				LogOnErr("Could not delete rules: %v", err)
-				s.InteractionRespond(i.Interaction, &d.InteractionResponse{
-					Type: d.InteractionResponseChannelMessageWithSource,
-					Data: &d.InteractionResponseData{
-						Content: "Regras removidas.",
-					},
-				})
+				cbot.discord.RespondInteractionWithMessage(i, "Regras removidas.")
+
 			case "list":
 				rules, _ := cbot.twitter.ListRules()
 				str, _ := json.Marshal(rules)
-				s.InteractionRespond(i.Interaction, &d.InteractionResponse{
-					Type: d.InteractionResponseChannelMessageWithSource,
-					Data: &d.InteractionResponseData{
-						Content: string(str),
-					},
-				})
+				cbot.discord.RespondInteractionWithMessage(i, string(str))
 			}
 		},
 	}
@@ -173,4 +152,15 @@ func (cbot *Chutebot) SetupCommands() {
 		)
 		PanicOnErr("Cannot create command: %v (command name: %v)", err, commandName)
 	}
+}
+
+func (cbotDiscord *ChutebotDiscord) RespondInteractionWithMessage(
+	i *d.InteractionCreate, content string,
+) {
+	cbotDiscord.session.InteractionRespond(i.Interaction, &d.InteractionResponse{
+		Type: d.InteractionResponseChannelMessageWithSource,
+		Data: &d.InteractionResponseData{
+			Content: content,
+		},
+	})
 }
