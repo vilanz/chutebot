@@ -6,17 +6,16 @@ import (
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
-	d "github.com/bwmarrin/discordgo"
 )
 
 type ChutebotDiscord struct {
-	session *d.Session
+	session *discordgo.Session
 	guildID string
 }
 
-type CommandHandler func(s *d.Session, i *d.InteractionCreate)
+type CommandHandler func(s *discordgo.Session, i *discordgo.InteractionCreate)
 
-var commandMap = map[string]*d.ApplicationCommand{
+var commandMap = map[string]*discordgo.ApplicationCommand{
 	"ping": {
 		Name:        "ping",
 		Description: "Ping!",
@@ -24,29 +23,29 @@ var commandMap = map[string]*d.ApplicationCommand{
 	"feed": {
 		Name:        "feed",
 		Description: "Twitter feed interaction",
-		Options: []*d.ApplicationCommandOption{
+		Options: []*discordgo.ApplicationCommandOption{
 			{
 				Name:        "start",
 				Description: "Start the Twitter feed",
-				Type:        d.ApplicationCommandOptionSubCommand,
+				Type:        discordgo.ApplicationCommandOptionSubCommand,
 			},
 			{
 				Name:        "stop",
 				Description: "Stop the Twitter feed",
-				Type:        d.ApplicationCommandOptionSubCommand,
+				Type:        discordgo.ApplicationCommandOptionSubCommand,
 			},
 			{
 				Name:        "sub",
 				Description: "Sub to a channel",
-				Type:        d.ApplicationCommandOptionSubCommand,
-				Options: []*d.ApplicationCommandOption{
+				Type:        discordgo.ApplicationCommandOptionSubCommand,
+				Options: []*discordgo.ApplicationCommandOption{
 					{
-						Type:        d.ApplicationCommandOptionChannel,
+						Type:        discordgo.ApplicationCommandOptionChannel,
 						Name:        "channel",
 						Description: "Channel",
 						Required:    true,
 					}, {
-						Type:        d.ApplicationCommandOptionString,
+						Type:        discordgo.ApplicationCommandOptionString,
 						Name:        "query",
 						Description: "Twitter query",
 						Required:    true,
@@ -56,10 +55,10 @@ var commandMap = map[string]*d.ApplicationCommand{
 			{
 				Name:        "unsub",
 				Description: "Unsub from a channel",
-				Type:        d.ApplicationCommandOptionSubCommand,
-				Options: []*d.ApplicationCommandOption{
+				Type:        discordgo.ApplicationCommandOptionSubCommand,
+				Options: []*discordgo.ApplicationCommandOption{
 					{
-						Type:        d.ApplicationCommandOptionChannel,
+						Type:        discordgo.ApplicationCommandOptionChannel,
 						Name:        "channel",
 						Description: "Channel",
 						Required:    true,
@@ -69,7 +68,7 @@ var commandMap = map[string]*d.ApplicationCommand{
 			{
 				Name:        "list",
 				Description: "List of subscriptions",
-				Type:        d.ApplicationCommandOptionSubCommand,
+				Type:        discordgo.ApplicationCommandOptionSubCommand,
 			},
 		},
 	},
@@ -90,15 +89,10 @@ func CreateDiscordSession(discordBotToken string, guildID string) *ChutebotDisco
 
 func (cbot *Chutebot) SetupCommands() {
 	var commandHandlers = map[string]CommandHandler{
-		"ping": func(s *d.Session, i *d.InteractionCreate) {
-			s.InteractionRespond(i.Interaction, &d.InteractionResponse{
-				Type: d.InteractionResponseChannelMessageWithSource,
-				Data: &d.InteractionResponseData{
-					Content: "Pong!",
-				},
-			})
+		"ping": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+			cbot.discord.RespondInteractionWithMessage(i, "Pong!")
 		},
-		"feed": func(s *d.Session, i *d.InteractionCreate) {
+		"feed": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			option := i.ApplicationCommandData().Options[0]
 
 			switch option.Name {
@@ -138,7 +132,7 @@ func (cbot *Chutebot) SetupCommands() {
 	}
 
 	session := cbot.discord.session
-	session.AddHandler(func(s *d.Session, i *d.InteractionCreate) {
+	session.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		commandName := i.ApplicationCommandData().Name
 		log.Printf("Received command: %v", commandName)
 		handler, ok := commandHandlers[commandName]
@@ -155,12 +149,18 @@ func (cbot *Chutebot) SetupCommands() {
 }
 
 func (cbotDiscord *ChutebotDiscord) RespondInteractionWithMessage(
-	i *d.InteractionCreate, content string,
+	i *discordgo.InteractionCreate, content string,
 ) {
-	cbotDiscord.session.InteractionRespond(i.Interaction, &d.InteractionResponse{
-		Type: d.InteractionResponseChannelMessageWithSource,
-		Data: &d.InteractionResponseData{
+	cbotDiscord.session.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
 			Content: content,
 		},
 	})
+}
+
+func (cbotDiscord *ChutebotDiscord) SendMessageToChannel(
+	channelID string, content string,
+) {
+	cbotDiscord.session.ChannelMessageSend(channelID, content)
 }
