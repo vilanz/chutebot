@@ -5,15 +5,13 @@ import (
 	"log"
 	"strings"
 
-	"github.com/vilanz/chutebot/discord"
-	"github.com/vilanz/chutebot/twitter"
 	t "github.com/vilanz/go-twitter/v2"
 )
 
 func StartLiveTwitterFeed(
-	cbotTwitter *twitter.ChutebotTwitter,
-	cbotDiscord *discord.ChutebotDiscord,
-) (*twitter.ChutebotTwitterStream, error) {
+	cbotTwitter *ChutebotTwitter,
+	cbotDiscord *ChutebotDiscord,
+) (*ChutebotTwitterStream, error) {
 	log.Println("Starting Twitter feed...")
 
 	tweetStream, err := cbotTwitter.CreateTweetStream()

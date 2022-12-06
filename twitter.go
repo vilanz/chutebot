@@ -1,4 +1,4 @@
-package twitter
+package main
 
 import (
 	"context"

@@ -6,8 +6,6 @@ import (
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/vilanz/chutebot/discord"
-	"github.com/vilanz/chutebot/twitter"
 )
 
 var commandMap = map[string]*discordgo.ApplicationCommand{
@@ -60,15 +58,15 @@ var commandMap = map[string]*discordgo.ApplicationCommand{
 }
 
 func SetupDiscordCommands(
-	cbotTwitter *twitter.ChutebotTwitter,
-	cbotDiscord *discord.ChutebotDiscord,
+	cbotTwitter *ChutebotTwitter,
+	cbotDiscord *ChutebotDiscord,
 ) error {
 	log.Println("Setting up Discord commands...")
-	var commandHandlers = map[string]discord.ChutebotCommandHandler{
-		"ping": func(cbotInteraction *discord.ChutebotInteraction) {
+	var commandHandlers = map[string]ChutebotCommandHandler{
+		"ping": func(cbotInteraction *ChutebotInteraction) {
 			cbotInteraction.ReplyWithMessage("Pong!")
 		},
-		"feed": func(cbotInteraction *discord.ChutebotInteraction) {
+		"feed": func(cbotInteraction *ChutebotInteraction) {
 			option := cbotInteraction.ApplicationCommandData().Options[0]
 
 			switch option.Name {
@@ -113,7 +111,7 @@ func SetupDiscordCommands(
 		log.Printf("Received command: %v", commandName)
 		handler, ok := commandHandlers[commandName]
 		if ok {
-			cbotInteraction := &discord.ChutebotInteraction{
+			cbotInteraction := &ChutebotInteraction{
 				Session:           cbotDiscord.Session,
 				InteractionCreate: i,
 			}
