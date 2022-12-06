@@ -15,7 +15,7 @@ func PanicOnErr(message string, err error, v ...any) {
 
 func LogOnErr(message string, err error, v ...any) {
 	if err != nil {
-		log.Panicf(message, err, v)
+		log.Printf(message, err, v)
 	}
 }
 
