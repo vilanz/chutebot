@@ -1,4 +1,4 @@
-module chutebot
+module github.com/vilanz/chutebot
 
 go 1.19
 
