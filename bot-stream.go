@@ -21,7 +21,6 @@ func StartLiveTwitterFeed(
 
 	go func() {
 		for {
-			defer tweetStream.Close()
 			select {
 			case tweetMessage := <-tweetStream.Tweets():
 				tweet := tweetMessage.Raw.Tweets[0]
@@ -37,12 +36,6 @@ func StartLiveTwitterFeed(
 
 			case err := <-tweetStream.Err():
 				log.Printf("Tweet stream error: %v\n", err)
-
-			default:
-			}
-			if !tweetStream.Connection() {
-				log.Println("Connection to Twitter lost")
-				return
 			}
 		}
 	}()
