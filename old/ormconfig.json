@@ -1,8 +1,0 @@
-{
-  "type": "better-sqlite3",
-  "database": "db/db.sqlite",
-  "synchronize": false,
-  "entities": ["build/db/entities/*.js"],
-  "migrations": ["build/db/migrations/*.js"],
-  "cli": { "migrationsDir": "src/db/migrations" }
-}
