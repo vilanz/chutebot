@@ -4,7 +4,17 @@ A Twitter bot for Discord written in Go.
 
 > This has been rewritten from a previous TypeScript and the legacy Transfermarkt features will be brought over in the future.
 
-# Commands
+## Development
+
+Add an .env file with the following:
+
+```dotenv
+DISCORD_BOT_TOKEN=xxx
+DISCORD_GUILD_ID=xxx
+TWITTER_TOKEN=xxx
+```
+
+## Commands
 
 ### /feed sub [#channel] [query]
 
