@@ -37,6 +37,46 @@ func CreateChutebotDiscord(discordBotToken string, guildID string) (*ChutebotDis
 	}, nil
 }
 
+func (cbotDiscord *ChutebotDiscord) GetApplicationID() string {
+	return cbotDiscord.Session.State.User.ID
+}
+
+func (cbotDiscord *ChutebotDiscord) RemoveOldCommands() (err error) {
+	oldCommands, err := cbotDiscord.Session.ApplicationCommands(
+		cbotDiscord.GetApplicationID(),
+		cbotDiscord.GuildID,
+	)
+	if err != nil {
+		return err
+	}
+	for _, oldCommand := range oldCommands {
+		err := cbotDiscord.Session.ApplicationCommandDelete(
+			cbotDiscord.GetApplicationID(),
+			cbotDiscord.GuildID,
+			oldCommand.ID,
+		)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (cbotDiscord *ChutebotDiscord) AddCommands(commands []*discordgo.ApplicationCommand) (err error) {
+	for _, command := range commands {
+		_, err := cbotDiscord.Session.ApplicationCommandCreate(
+			cbotDiscord.GetApplicationID(),
+			cbotDiscord.GuildID,
+			command,
+		)
+		if err != nil {
+			return err
+		}
+		log.Printf("Added command '%s'\n", command.Name)
+	}
+	return nil
+}
+
 func (cbotDiscord *ChutebotDiscord) SendMessageToChannel(
 	channelID string, content string,
 ) {
@@ -53,4 +93,8 @@ func (cbotInteraction *ChutebotInteraction) ReplyWithMessage(content string) {
 			},
 		},
 	)
+}
+
+func (cbotInteraction *ChutebotInteraction) GetOptionAt(index int) *discordgo.ApplicationCommandInteractionDataOption {
+	return cbotInteraction.ApplicationCommandData().Options[index]
 }

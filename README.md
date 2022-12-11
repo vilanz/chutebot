@@ -16,15 +16,15 @@ TWITTER_TOKEN=xxx
 
 ## Commands
 
-### /feed sub [#channel] [query]
+### /twittersub [#channel] [query]
 
 Subscribes a channel to a Twitter query, posting a stream of tweets matching it in real time.
 
-### /feed unsub [#channel]
+### /twitterunsub [#channel]
 
 Unsubcribes a channel from all Twitter streams.
 
-### /feed list
+### /twitterlist
 
 Lists all Twitter streams associated to channels.
 
