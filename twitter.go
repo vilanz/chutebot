@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	t "github.com/vilanz/go-twitter/v2"
 )
@@ -108,4 +109,9 @@ func getTwitterError(errObj []*t.ErrorObj) error {
 		return errors.New(string(errorsJSON))
 	}
 	return nil
+}
+
+func ParseChannelInsideRule(rule *t.TweetSearchStreamRule) string {
+	channel := strings.Split(rule.Tag, "-")[0]
+	return channel
 }

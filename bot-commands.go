@@ -62,6 +62,7 @@ func SetupDiscordCommands(
 			channel := cbotInteraction.GetOptionAt(0).Value.(string)
 			query := cbotInteraction.GetOptionAt(1).Value.(string)
 			log.Printf("Subscribing to channel %v with query: %v\n", channel, query)
+
 			err := cbotTwitter.AddTwitterRule(query, channel)
 			if err != nil {
 				log.Printf("Could not add rule: %v\n", err)
@@ -72,6 +73,7 @@ func SetupDiscordCommands(
 		"twitterunsub": func(cbotInteraction *ChutebotInteraction) {
 			channel := cbotInteraction.GetOptionAt(0).Value.(string)
 			log.Printf("Unsubscribing from channel: %v\n", channel)
+
 			rules, _ := cbotTwitter.ListRules()
 			rulesToDelete := make([]string, 0)
 			for _, r := range rules.Rules {
@@ -79,6 +81,7 @@ func SetupDiscordCommands(
 					rulesToDelete = append(rulesToDelete, r.Value)
 				}
 			}
+
 			err := cbotTwitter.DeleteRulesByValue(rulesToDelete)
 			if err != nil {
 				log.Printf("Could not delete rules %v: %v\n", rulesToDelete, err)
@@ -88,12 +91,14 @@ func SetupDiscordCommands(
 		},
 		"twitterlist": func(cbotInteraction *ChutebotInteraction) {
 			res, _ := cbotTwitter.ListRules()
+
 			var b bytes.Buffer
 			b.WriteString("Regras:")
 			for _, rule := range res.Rules {
-				var channel = strings.Split(rule.Tag, "-")[0]
+				channel := ParseChannelInsideRule(&rule.TweetSearchStreamRule)
 				b.WriteString("\n<#" + channel + "> - " + rule.Value)
 			}
+
 			cbotInteraction.ReplyWithMessage(b.String())
 		},
 	}
@@ -102,7 +107,9 @@ func SetupDiscordCommands(
 		func(_ *discordgo.Session, i *discordgo.InteractionCreate) {
 			commandName := i.ApplicationCommandData().Name
 			log.Printf("Received command: %v", commandName)
+
 			handler, ok := commandHandlers[commandName]
+
 			if ok {
 				cbotInteraction := &ChutebotInteraction{
 					Session:           cbotDiscord.Session,
